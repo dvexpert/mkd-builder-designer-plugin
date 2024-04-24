@@ -1,31 +1,38 @@
-import { defineConfig } from 'vite';
-import path from 'path'
+import { defineConfig } from "vite";
+import path from "path";
 
 export default defineConfig({
-  build: {
-    // Define the output directory
-    outDir: './dist',
-    // Set to true to create smaller bundles optimized for production
-    minify: 'terser',
-    // Configure the library mode
-    lib: {
-      entry: 'main.js', // Main entry file
-      name: 'MyJsPlugin',
-      formats: ['es', 'umd'], // Output formats: ES module and UMD
-      fileName: (format) => `my-js-plugin.${format}.js`
+    build: {
+        outDir: "./dist",
+        assetsDir: "assets",
+        minify: "terser",
+        lib: {
+            entry: "main.js", // Main entry file
+            name: "MyJsPlugin",
+            formats: ["es", "umd"], // Output formats: ES module and UMD
+            fileName: (format) => `mkd-plugin.${format}.js`,
+        },
+        rollupOptions: {
+            // External dependencies to exclude from the bundle
+            external: [],
+            output: {
+                assetFileNames: (assetInfo) => {
+                    // ? Extend this functionality to accommodate other file types/ like image,fonts etc.
+                    if (assetInfo.name.endsWith(".css")) {
+                        return "assets/css/[name][extname]";
+                    } else {
+                        return "[name][extname]";
+                    }
+                },
+                // Global variables to use in UMD format for external imports
+                globals: {},
+            },
+        },
+        cssCodeSplit: false,
     },
-    rollupOptions: {
-      // External dependencies to exclude from the bundle
-      external: [],
-      output: {
-        // Global variables to use in UMD format for external imports
-        globals: {},
-      },
+    resolve: {
+        alias: {
+            "@": path.resolve(__dirname, "/src"),
+        },
     },
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, '/src')
-    }
-  }
 });

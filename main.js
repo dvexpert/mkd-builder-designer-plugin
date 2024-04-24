@@ -1,11 +1,14 @@
-import './assets/css/style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from './assets/vite.svg'
-// import { setupCounter } from './src/counter.js'
-import { setupCounter } from '@/counter.js'
+import "@/assets/css/style.css";
+import javascriptLogo from "./javascript.svg";
+import viteLogo from "@/assets/vite.svg";
+import { setupCounter } from "@/counter.js";
+import "@/assets/css/index.css";
 
-document.querySelector('#app').innerHTML = `
+document.querySelector("#app").innerHTML = `
   <div>
+  <h1 class="text-3xl font-bold underline">
+    Hello world!
+  </h1>
     <a href="https://vitejs.dev" target="_blank">
       <img src="${viteLogo}" class="logo" alt="Vite logo" />
     </a>
@@ -20,6 +23,6 @@ document.querySelector('#app').innerHTML = `
       Click on the Vite logo to learn more
     </p>
   </div>
-`
+`;
 
-setupCounter(document.querySelector('#counter'))
+setupCounter(document.querySelector("#counter"));
