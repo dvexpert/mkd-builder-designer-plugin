@@ -1,16 +1,63 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vite App</title>
 
-    <link rel="stylesheet" href="./dist/assets/css/style.css">
-  </head>
-  <body>
-    <div id="app"></div>
-    <!-- <script type="module" src="/main.js"></script> -->
-    <script type="module" src="./dist/mkd-plugin.umd.js"></script>
-  </body>
+        <link rel="stylesheet" href="./dist/assets/css/style.css" />
+    </head>
+    <body>
+        <div class="border border-black p-4 flex w-max gap-4">
+            <button id="zoom-in" style="all: revert">Zoom In</button>
+            <button id="zoom-out" style="all: revert">Zoom Out</button>
+            <button id="zoom-reset" style="all: revert">Rest Zoom</button>
+            <div>
+                <input type="checkbox" id="enable-drag" />
+                <label for="enable-drag">Enable Drag?</label><br />
+            </div>
+            <button id="position-reset" style="all: revert">
+                Position Reset
+            </button>
+        </div>
+
+        <div id="app"></div>
+
+        <script
+            src="https://code.jquery.com/jquery-3.7.1.js"
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+            crossorigin="anonymous"
+        ></script>
+        <script>
+            $(document).ready(function () {
+                $("#zoom-in").on("click", function () {
+                    const newEvent = new CustomEvent("mkd-plugin:zoom-in");
+                    document.dispatchEvent(newEvent);
+                });
+                $("#zoom-out").on("click", function () {
+                    const newEvent = new CustomEvent("mkd-plugin:zoom-out");
+                    document.dispatchEvent(newEvent);
+                });
+                $("#zoom-reset").on("click", function () {
+                    const newEvent = new CustomEvent("mkd-plugin:zoom-reset");
+                    document.dispatchEvent(newEvent);
+                });
+                $("#enable-drag").on("change", function () {
+                    const newEvent = new CustomEvent("mkd-plugin:drag", {
+                        detail: { enable: this.checked },
+                    });
+                    document.dispatchEvent(newEvent);
+                });
+                $("#position-reset").on("click", function () {
+                    const newEvent = new CustomEvent(
+                        "mkd-plugin:position-reset"
+                    );
+                    document.dispatchEvent(newEvent);
+                });
+            });
+        </script>
+        <!-- <script type="module" src="/main.js"></script> -->
+        <script type="module" src="./dist/mkd-plugin.umd.js"></script>
+    </body>
 </html>

@@ -17,7 +17,6 @@ export default defineConfig({
             external: [],
             output: {
                 assetFileNames: (assetInfo) => {
-                    // ? Extend this functionality to accommodate other file types/ like image,fonts etc.
                     if (assetInfo.name.endsWith(".css")) {
                         return "assets/css/[name][extname]";
                     } else {

@@ -16,6 +16,7 @@
     "vite": "^5.2.0"
   },
   "dependencies": {
+    "konva": "^9.3.6",
     "terser": "^5.30.4"
   }
 }

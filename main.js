@@ -1,28 +1,26 @@
 import "@/assets/css/style.css";
-import javascriptLogo from "./javascript.svg";
-import viteLogo from "@/assets/vite.svg";
-import { setupCounter } from "@/counter.js";
 import "@/assets/css/index.css";
+import { KonvaManager } from "@/KonvaManager";
 
-document.querySelector("#app").innerHTML = `
-  <div>
-  <h1 class="text-3xl font-bold underline">
-    Hello world!
-  </h1>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`;
+document.querySelector("#app").innerHTML = `<div id="canvas-container"></div>`;
 
-setupCounter(document.querySelector("#counter"));
+const container = document.querySelector("#app #canvas-container");
+container.classList.add("border", "w-max");
+
+const konvaManager = new KonvaManager(container);
+
+document.addEventListener("mkd-plugin:zoom-in", () => {
+    konvaManager.zoomIn();
+});
+document.addEventListener("mkd-plugin:zoom-out", () => {
+    konvaManager.zoomOut();
+});
+document.addEventListener("mkd-plugin:zoom-reset", () => {
+    konvaManager.zoomReset();
+});
+document.addEventListener("mkd-plugin:drag", (e) => {
+    konvaManager.setDraggable(Boolean(e.detail?.enable));
+});
+document.addEventListener("mkd-plugin:position-reset", (e) => {
+    konvaManager.positionReset();
+});
