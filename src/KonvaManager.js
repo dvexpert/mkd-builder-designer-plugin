@@ -1,14 +1,8 @@
 import Konva from "konva";
-import EventManager from "./EventManager";
+import EventManager from "./EventManager.js";
 
-export class KonvaManager extends EventManager {
+export class KonvaManager {
     constructor(container) {
-        /**
-         * Must call super constructor in derived class before
-         * accessing 'this' or returning from derived constructor
-         */
-        super();
-
         /**
          * @type {Konva.Stage}
          */
@@ -21,11 +15,14 @@ export class KonvaManager extends EventManager {
         this.layer = new Konva.Layer();
         this.stage.add(this.layer);
 
+        // EventManager instance to handle
+        // generic events like zoom in/out/
+        // enable/disable drag etc
+        this.eventManager = new EventManager(this.stage);
+
         this.initShapes();
         this.setupBackground();
         this.layer.draw();
-
-        this.scaleBy = 0.05;
     }
 
     initShapes() {

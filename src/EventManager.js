@@ -1,12 +1,31 @@
 import Konva from "konva";
 
 export default class EventManager {
-    constructor() {
-        /**
-         * @type {Konva.Stage}
-         */
-        this.stage = null;
+    /**
+     * @param {Konva.Stage} stage
+     */
+    constructor(stage) {
+        this.stage = stage;
         this.scaleBy = 0.05;
+
+        document.addEventListener("mkd-plugin:zoom-in", () => {
+            this.zoomIn();
+        });
+        document.addEventListener("mkd-plugin:zoom-out", () => {
+            this.zoomOut();
+        });
+        document.addEventListener("mkd-plugin:zoom-reset", () => {
+            this.zoomReset();
+        });
+        document.addEventListener("mkd-plugin:drag", (e) => {
+            this.setDraggable(Boolean(e.detail?.enable));
+        });
+        document.addEventListener("mkd-plugin:position-reset", (e) => {
+            this.positionReset();
+        });
+        document.addEventListener("mkd-plugin:draw:square", (e) => {
+            this.positionReset();
+        });
     }
     zoomIn() {
         const oldScale = this.stage.scaleX();
