@@ -1,6 +1,6 @@
 import Konva from "konva";
 
-export default class EventHandler {
+export default class EventManager {
     constructor() {
         /**
          * @type {Konva.Stage}
