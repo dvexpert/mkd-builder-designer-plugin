@@ -1,9 +1,13 @@
 import Konva from "konva";
-import EventHandler from "./EventHandler";
+import EventManager from "./EventManager";
 
-export class KonvaManager extends EventHandler {
+export class KonvaManager extends EventManager {
     constructor(container) {
-        super(); // Must call super constructor in derived class before accessing 'this' or returning from derived constructor
+        /**
+         * Must call super constructor in derived class before
+         * accessing 'this' or returning from derived constructor
+         */
+        super();
 
         /**
          * @type {Konva.Stage}
