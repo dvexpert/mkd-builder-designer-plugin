@@ -1,5 +1,6 @@
 import Konva from "konva";
 import EventManager from "./EventManager.js";
+import ShapeManager from "./ShapeManager.js";
 
 export class KonvaManager {
     constructor(container) {
@@ -8,8 +9,8 @@ export class KonvaManager {
          */
         this.stage = new Konva.Stage({
             container: container,
-            width: 500,
-            height: 500,
+            width: 600,
+            height: 600,
         });
 
         this.layer = new Konva.Layer();
@@ -18,7 +19,11 @@ export class KonvaManager {
         // EventManager instance to handle
         // generic events like zoom in/out/
         // enable/disable drag etc
-        this.eventManager = new EventManager(this.stage);
+        this.eventManager = new EventManager(this.stage, this);
+
+        // ShapeManager instance to handle
+        // creating shapes and tbd ...
+        this.shapeManager = new ShapeManager(this.stage);
 
         this.initShapes();
         this.setupBackground();

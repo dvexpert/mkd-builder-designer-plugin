@@ -1,11 +1,14 @@
 import Konva from "konva";
+import { KonvaManager } from "./KonvaManager";
 
 export default class EventManager {
     /**
      * @param {Konva.Stage} stage
+     * @param {KonvaManager} manager
      */
-    constructor(stage) {
+    constructor(stage, manager) {
         this.stage = stage;
+        this.manager = manager;
         this.scaleBy = 0.05;
 
         document.addEventListener("mkd-plugin:zoom-in", () => {
@@ -24,7 +27,17 @@ export default class EventManager {
             this.positionReset();
         });
         document.addEventListener("mkd-plugin:draw:square", (e) => {
-            this.positionReset();
+            const request = e?.detail;
+            try {
+                this.manager.shapeManager.drawSquare(request?.image);
+                if (typeof request?.error === "function") {
+                    request.success({ message: "Square shape created" });
+                }
+            } catch (e) {
+                if (typeof request?.success === "function") {
+                    request.error({ message: e.message });
+                }
+            }
         });
     }
     zoomIn() {
