@@ -9,7 +9,7 @@ export class KonvaManager {
          */
         this.stage = new Konva.Stage({
             container: container,
-            width: 600,
+            width: 1200,
             height: 600,
         });
 
@@ -23,13 +23,14 @@ export class KonvaManager {
 
         // ShapeManager instance to handle
         // creating shapes and tbd ...
-        this.shapeManager = new ShapeManager(this.stage);
+        this.shapeManager = new ShapeManager(this.stage, this.layer);
 
-        this.initShapes();
+        // this.initShapes();
         this.setupBackground();
         this.layer.draw();
     }
 
+    /** @deprecated - for initial implementation only */
     initShapes() {
         const circle = new Konva.Circle({
             x: this.stage.width() / 2,
