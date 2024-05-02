@@ -49,10 +49,8 @@ export default class EventManager {
     }
     zoomOut() {
         const oldScale = this.stage.scaleX();
-        if (oldScale > 1) {
-            const newScale = oldScale - this.scaleBy;
-            this.stage.scale({ x: newScale, y: newScale });
-        }
+        const newScale = oldScale - this.scaleBy;
+        this.stage.scale({ x: newScale, y: newScale });
     }
     zoomReset() {
         this.stage.scale({ x: 1, y: 1 });
