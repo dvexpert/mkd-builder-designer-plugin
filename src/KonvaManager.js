@@ -9,8 +9,8 @@ export class KonvaManager {
          */
         this.stage = new Konva.Stage({
             container: container,
-            width: 1200,
-            height: 600,
+            width: 1500,
+            height: 800,
         });
 
         this.layer = new Konva.Layer();

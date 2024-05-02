@@ -7,23 +7,52 @@
         <title>Vite App</title>
 
         <link rel="stylesheet" href="./dist/assets/css/style.css" />
+
+        <style>
+            .disabled {
+                cursor: not-allowed;
+            }
+            .disabled::after {
+                content: "Coming Soon...";
+                position: absolute;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.3);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 4px;
+            }
+        </style>
     </head>
     <body>
-        <div class="border-b border-black p-2 flex gap-4">
-            <div class="border border-black p-4 flex gap-4">
-                <button id="zoom-in" style="all: revert">Zoom In</button>
-                <button id="zoom-out" style="all: revert">Zoom Out</button>
-                <button id="zoom-reset" style="all: revert">Rest Zoom</button>
+        <div class="flex">
+            <div
+                class="border-black p-2 flex gap-8 flex-col min-w-[150px] border-r h-screen pr-3"
+            >
+                <button class="p-2 border rounded hover:shadow" id="zoom-in">
+                    Zoom In
+                </button>
+                <button class="p-2 border rounded hover:shadow" id="zoom-out">
+                    Zoom Out
+                </button>
+                <button class="p-2 border rounded hover:shadow" id="zoom-reset">
+                    Rest Zoom
+                </button>
                 <div>
                     <input type="checkbox" id="enable-drag" />
                     <label for="enable-drag">Enable Drag?</label><br />
                 </div>
-                <button id="position-reset" style="all: revert">
+                <button
+                    class="p-2 border rounded hover:shadow"
+                    id="position-reset"
+                >
                     Position Reset
                 </button>
-            </div>
-            <div class="border border-black p-4 flex gap-4">
-                <button id="draw-square">
+
+                <h4 class="font-medium">Add Shapes</h4>
+
+                <button id="draw-square" class="mx-auto">
                     <svg
                         width="50"
                         height="50"
@@ -33,10 +62,65 @@
                         Sorry, your browser does not support inline SVG.
                     </svg>
                 </button>
+                <div class="relative text-center flex">
+                    <button id="draw-l" class="mx-auto disabled">
+                        <svg
+                            width="50"
+                            height="50"
+                            viewBox="0 0 37 36"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M15.7138 0.272705H0.11377V35.7272H15.7138V35.727L36.9864 35.727V20.127L15.7138 20.127V0.272705Z"
+                                fill="#797979"
+                            />
+                        </svg>
+                    </button>
+                </div>
+                <div class="relative text-center flex">
+                    <button id="draw-l" class="mx-auto disabled">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="50"
+                            height="50"
+                            viewBox="0 0 42 36"
+                            fill="none"
+                        >
+                            <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M0.632568 0.272705H16.2326V20.1273H26.1597V0.272705H41.7597V35.7272H37.5052V35.7273H2.0507V35.7272H0.632568V0.272705Z"
+                                fill="#797979"
+                            />
+                        </svg>
+                    </button>
+                </div>
+                <div class="relative text-center flex">
+                    <button id="draw-l" class="mx-auto disabled">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="50"
+                            height="50"
+                            viewBox="0 0 35 36"
+                            fill="none"
+                        >
+                            <ellipse
+                                cx="17.5"
+                                cy="18"
+                                rx="17.5"
+                                ry="18"
+                                fill="#797979"
+                            />
+                        </svg>
+                    </button>
+                </div>
             </div>
-        </div>
 
-        <div id="app" class="flex justify-center"></div>
+            <div id="app" class="w-[calc(100%-150px)]"></div>
+        </div>
 
         <script
             src="https://code.jquery.com/jquery-3.7.1.js"
@@ -75,7 +159,7 @@
                             "mkd-plugin:draw:square",
                             {
                                 detail: {
-                                    image: '/material-1.png',
+                                    image: "/material-1.png",
                                     success: (resp) => console.log(resp),
                                     error: (resp) => console.error(resp),
                                 },

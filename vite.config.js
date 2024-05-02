@@ -3,6 +3,7 @@ import path from "path";
 
 export default defineConfig({
     build: {
+        // emptyOutDir: false,
         outDir: "./dist",
         assetsDir: "assets",
         minify: "terser",
