@@ -1,4 +1,5 @@
 import Konva from "konva";
+import { rotateGroup } from "./Helper.js";
 import RotateIcon from "@/assets/image/rotate.svg?raw";
 import { ShapeActions, SquareShapeIds } from "./enum/ShapeManagerEnum.js";
 
@@ -28,6 +29,7 @@ export default class ShapeManager {
         this.createContextMenu();
         this.createActionOverlay();
     }
+
     createContextMenu() {
         /** @type {CSSStyleDec} */
         const contextMenuStyles = {
@@ -87,6 +89,7 @@ export default class ShapeManager {
                 this.stage.getPointerPosition().x + 4 + "px";
         });
     }
+
     createActionOverlay() {
         /** @type {CSSStyleDec} */
         const actionOverlayStyle = {
@@ -154,8 +157,14 @@ export default class ShapeManager {
 
             const action = targetElm.getAttribute("data-action");
             if (action === ShapeActions.Rotate) {
-                this.currentHoverNode.rotate(90);
-
+                const $shape =
+                    this.currentHoverNode.findOne(
+                        `#${SquareShapeIds.ShapePlaceholderObject}`
+                    ) ??
+                    this.currentHoverNode.findOne(
+                        `#${SquareShapeIds.ShapeObject}`
+                    );
+                rotateGroup(this.currentHoverNode, $shape, 90);
                 this.updateHoverActionOverlayPosition();
             } else if (action === ShapeActions.Place) {
                 let materialImage = this.currentHoverNode
@@ -166,6 +175,7 @@ export default class ShapeManager {
             }
         });
     }
+
     updateHoverActionOverlayPosition() {
         const shapeNode =
             this.currentHoverNode.findOne(
@@ -187,6 +197,7 @@ export default class ShapeManager {
         this.actionOverlayNode.style.left = `${overlayNewPosition.left}px`;
         this.actionOverlayNode.style.top = `${overlayNewPosition.top}px`;
     }
+
     drawSquare(materialImage = "", onlyPlaceholder = true) {
         if (!materialImage) {
             throw new Error("Material Image is required.");
