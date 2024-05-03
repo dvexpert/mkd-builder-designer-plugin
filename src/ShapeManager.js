@@ -157,13 +157,7 @@ export default class ShapeManager {
 
             const action = targetElm.getAttribute("data-action");
             if (action === ShapeActions.Rotate) {
-                const $shape =
-                    this.currentHoverNode.findOne(
-                        `#${SquareShapeIds.ShapePlaceholderObject}`
-                    ) ??
-                    this.currentHoverNode.findOne(
-                        `#${SquareShapeIds.ShapeObject}`
-                    );
+                const $shape = this.getShapeObject(this.currentHoverNode);
                 rotateGroup(this.currentHoverNode, $shape, 90);
                 this.updateHoverActionOverlayPosition();
             } else if (action === ShapeActions.Place) {
@@ -177,11 +171,7 @@ export default class ShapeManager {
     }
 
     updateHoverActionOverlayPosition() {
-        const shapeNode =
-            this.currentHoverNode.findOne(
-                `#${SquareShapeIds.ShapePlaceholderObject}`
-            ) ??
-            this.currentHoverNode.findOne(`#${SquareShapeIds.ShapeObject}`);
+        const shapeNode = this.getShapeObject(this.currentHoverNode);
         const boxRect = shapeNode.getClientRect();
         const shapePosition = {
             x: boxRect.x + boxRect.width / 2,
@@ -257,10 +247,8 @@ export default class ShapeManager {
                 ) {
                     return;
                 }
-                const currentPlaceHolder =
-                    shapeGroup.findOne(
-                        `#${SquareShapeIds.ShapePlaceholderObject}`
-                    ) ?? shapeGroup.findOne(`#${SquareShapeIds.ShapeObject}`);
+
+                const currentPlaceHolder = this.getShapeObject(shapeGroup)
                 this.currentHoverNode = shapeGroup;
                 if (!shapeGroup.draggable()) {
                     this.stage.container().style.cursor = "initial";
@@ -404,11 +392,7 @@ export default class ShapeManager {
             inputBox.addEventListener("keydown", (e) => {
                 // hide on enter
                 if (e.key === "Enter") {
-                    const squarePlaceHolderObject =
-                        shapeGroup.findOne(
-                            `#${SquareShapeIds.ShapePlaceholderObject}`
-                        ) ??
-                        shapeGroup.findOne(`#${SquareShapeIds.ShapeObject}`);
+                    const squarePlaceHolderObject = this.getShapeObject(shapeGroup)
                     heightInput.text(inputBox.value);
                     document.body.removeChild(inputBox);
                     this.setDragging(shapeGroup, true);
@@ -479,11 +463,7 @@ export default class ShapeManager {
             inputBox.addEventListener("keydown", (e) => {
                 // hide on enter
                 if (e.key === "Enter") {
-                    const squarePlaceHolderObject =
-                        shapeGroup.findOne(
-                            `#${SquareShapeIds.ShapePlaceholderObject}`
-                        ) ??
-                        shapeGroup.findOne(`#${SquareShapeIds.ShapeObject}`);
+                    const squarePlaceHolderObject = this.getShapeObject(shapeGroup)
                     widthInput.text(inputBox.value);
                     document.body.removeChild(inputBox);
                     this.setDragging(shapeGroup, true);
@@ -502,10 +482,7 @@ export default class ShapeManager {
      * @param {Konva.Group} shapeGroup
      */
     updateInputsPosition(shapeGroup, heightOnly = true, widthOnly = true) {
-        // TODO: Create getter for this. (to get place holder or placed node)
-        const squareObject =
-            shapeGroup.findOne(`#${SquareShapeIds.ShapePlaceholderObject}`) ??
-            shapeGroup.findOne(`#${SquareShapeIds.ShapeObject}`);
+        const squareObject = this.getShapeObject(shapeGroup);
 
         if (heightOnly) {
             const heightInput = shapeGroup.findOne(
@@ -526,5 +503,17 @@ export default class ShapeManager {
                 y: squareObject.y() - 30,
             });
         }
+    }
+
+    /**
+     * To get Placeholder or placed shape object
+     *
+     * @param {Konva.Group} shapeGroup
+     */
+    getShapeObject(shapeGroup) {
+        return (
+            shapeGroup.findOne(`#${SquareShapeIds.ShapePlaceholderObject}`) ??
+            shapeGroup.findOne(`#${SquareShapeIds.ShapeObject}`)
+        );
     }
 }
