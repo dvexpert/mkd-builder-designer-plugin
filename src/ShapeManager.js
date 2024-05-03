@@ -170,8 +170,14 @@ export default class ShapeManager {
         });
     }
 
-    updateHoverActionOverlayPosition() {
-        const shapeNode = this.getShapeObject(this.currentHoverNode);
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     */
+    updateHoverActionOverlayPosition(shapeGroup = null) {
+        const shapeNode = this.getShapeObject(
+            shapeGroup ?? this.currentHoverNode
+        );
         const boxRect = shapeNode.getClientRect();
         const shapePosition = {
             x: boxRect.x + boxRect.width / 2,
@@ -229,7 +235,9 @@ export default class ShapeManager {
                 materialImage: materialImage,
             });
             shapeGroup.on("click dragend", (e) => {
-                this.actionOverlayNode.style.display = "flex";
+                if (shapeGroup.getAttr("show_action_overlay") !== false) {
+                    this.actionOverlayNode.style.display = "flex";
+                }
             });
             shapeGroup.on("mousedown dragstart", (e) => {
                 this.stage.container().style.cursor = "grabbing";
@@ -239,16 +247,23 @@ export default class ShapeManager {
             });
             shapeGroup.on("mouseenter dragmove", (e) => {
                 const hoverNode = e.target;
+                /**
+                 * After placement action overlay is not required
+                 * rotate will be performed from outside the canvas via events
+                 */
                 if (
                     [
                         SquareShapeIds.ShapeHeightTextLayer,
                         SquareShapeIds.ShapeWidthTextLayer,
-                    ].includes(hoverNode.id())
+                    ].includes(hoverNode.id()) ||
+                    !shapeGroup.findOne(
+                        `#${SquareShapeIds.ShapePlaceholderObject}`
+                    )
                 ) {
+                    shapeGroup.setAttr("show_action_overlay", false);
                     return;
                 }
 
-                const currentPlaceHolder = this.getShapeObject(shapeGroup)
                 this.currentHoverNode = shapeGroup;
                 if (!shapeGroup.draggable()) {
                     this.stage.container().style.cursor = "initial";
@@ -256,15 +271,16 @@ export default class ShapeManager {
                     this.stage.container().style.cursor = "grab";
                 }
 
-                const placeBtn = this.actionOverlayNode.querySelector(
-                    'button[data-action="place"]'
-                );
-                if (currentPlaceHolder.id() === "shapeObject") {
-                    // Means shape is placed so need to hide the place button
-                    placeBtn.style.display = "none";
-                } else {
-                    placeBtn.style.display = "initial";
-                }
+                // const currentPlaceHolder = this.getShapeObject(shapeGroup);
+                // const placeBtn = this.actionOverlayNode.querySelector(
+                //     'button[data-action="place"]'
+                // );
+                // if (currentPlaceHolder.id() === "shapeObject") {
+                //     // Means shape is placed so need to hide the place button
+                //     placeBtn.style.display = "none";
+                // } else {
+                //     placeBtn.style.display = "initial";
+                // }
 
                 this.actionOverlayNode.style.display = "flex";
                 this.updateHoverActionOverlayPosition();
@@ -388,23 +404,50 @@ export default class ShapeManager {
             inputBox.value = heightInput.text();
             Object.assign(inputBox.style, inputBoxStyle);
             inputBox.focus();
-
+            let inputRemoved = false;
             inputBox.addEventListener("keydown", (e) => {
-                // hide on enter
                 if (e.key === "Enter") {
-                    const squarePlaceHolderObject = this.getShapeObject(shapeGroup)
-                    heightInput.text(inputBox.value);
-                    document.body.removeChild(inputBox);
-                    this.setDragging(shapeGroup, true);
-                    squarePlaceHolderObject.height(
-                        Number(inputBox.value) * SizeDiff
+                    inputRemoved = true;
+                    this.handleInputValueChange(
+                        "height",
+                        shapeGroup,
+                        heightInput,
+                        inputBox
                     );
-                    this.updateInputsPosition(shapeGroup);
-                    this.updateHoverActionOverlayPosition();
                 }
+            });
+            inputBox.addEventListener("blur", (e) => {
+                if (inputRemoved) return;
+                this.handleInputValueChange(
+                    "height",
+                    shapeGroup,
+                    heightInput,
+                    inputBox
+                );
             });
         });
     }
+
+    /**
+     *
+     * @param {string} attr - "height" or "width"
+     * @param {Konva.Group} shapeGroup
+     * @param {Konva.Text} labelNode
+     * @param {HTMLInputElement} inputBox
+     */
+    handleInputValueChange = (attr, shapeGroup, labelNode, inputBox) => {
+        const squarePlaceHolderObject = this.getShapeObject(shapeGroup);
+        labelNode.text(inputBox.value);
+        document.body.removeChild(inputBox);
+        this.setDragging(shapeGroup, true);
+        // squarePlaceHolderObject.height(Number(inputBox.value) * SizeDiff);
+        squarePlaceHolderObject.setAttr(
+            attr,
+            Number(inputBox.value) * SizeDiff
+        );
+        this.updateInputsPosition(shapeGroup);
+        this.updateHoverActionOverlayPosition(shapeGroup);
+    };
 
     /**
      * Create Text and Input box for the Width adjustments
@@ -461,19 +504,23 @@ export default class ShapeManager {
             inputBox.focus();
 
             inputBox.addEventListener("keydown", (e) => {
-                // hide on enter
                 if (e.key === "Enter") {
-                    const squarePlaceHolderObject = this.getShapeObject(shapeGroup)
-                    widthInput.text(inputBox.value);
-                    document.body.removeChild(inputBox);
-                    this.setDragging(shapeGroup, true);
-                    squarePlaceHolderObject.width(
-                        Number(inputBox.value) * SizeDiff
+                    this.handleInputValueChange(
+                        "width",
+                        shapeGroup,
+                        widthInput,
+                        inputBox
                     );
-                    this.updateInputsPosition(shapeGroup);
-                    this.updateHoverActionOverlayPosition();
                 }
             });
+            inputBox.addEventListener("blur", () =>
+                this.handleInputValueChange(
+                    "width",
+                    shapeGroup,
+                    widthInput,
+                    inputBox
+                )
+            );
         });
     }
 
