@@ -9,7 +9,7 @@ export default class EventManager {
     constructor(stage, manager) {
         this.stage = stage;
         this.manager = manager;
-        this.scaleBy = 0.05;
+        this.scaleBy = 1.1;
 
         document.addEventListener("mkd-plugin:zoom-in", () => {
             this.zoomIn();
@@ -43,14 +43,52 @@ export default class EventManager {
     zoomIn() {
         const oldScale = this.stage.scaleX();
         if (oldScale <= 2) {
-            const newScale = oldScale + this.scaleBy;
-            this.stage.scale({ x: newScale, y: newScale });
+            const newScale = oldScale * this.scaleBy;
+            const newPos = this.getStageCenterNewPos(oldScale, newScale);
+
+            this.stage.scale({
+                x: newScale,
+                y: newScale,
+            });
+
+            this.stage.position(newPos);
+            this.stage.batchDraw();
         }
     }
     zoomOut() {
         const oldScale = this.stage.scaleX();
-        const newScale = oldScale - this.scaleBy;
-        this.stage.scale({ x: newScale, y: newScale });
+        const newScale = oldScale / this.scaleBy;
+        const newPos = this.getStageCenterNewPos(oldScale, newScale);
+
+        this.stage.scale({
+            x: newScale,
+            y: newScale,
+        });
+
+        this.stage.position(newPos);
+        this.stage.batchDraw();
+    }
+
+    /**
+     *
+     * @param {number} oldScale
+     * @param {number} newScale
+     */
+    getStageCenterNewPos(oldScale, newScale) {
+        const center = {
+            x: this.stage.width() / 2,
+            y: this.stage.height() / 2,
+        };
+
+        const relatedTo = {
+            x: (center.x - this.stage.x()) / oldScale,
+            y: (center.y - this.stage.y()) / oldScale,
+        };
+
+        return {
+            x: center.x - relatedTo.x * newScale,
+            y: center.y - relatedTo.y * newScale,
+        };
     }
     zoomReset() {
         this.stage.scale({ x: 1, y: 1 });
