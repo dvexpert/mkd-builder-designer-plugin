@@ -2,6 +2,8 @@ import Konva from "konva";
 import { rotateGroup } from "./Helper.js";
 import RotateIcon from "@/assets/image/rotate.svg?raw";
 import { ShapeActions, SquareShapeIds } from "./enum/ShapeManagerEnum.js";
+import AttributeOverlayTemplate from "@/templates/AttributesOverlay/index.html?raw";
+import AttributeShapeCutOutTemplate from "@/templates/AttributesOverlay/ShapeCutOut.html?raw";
 
 const SizeDiff = 3;
 
@@ -247,6 +249,9 @@ export default class ShapeManager {
             });
             shapeGroup.on("mouseenter dragmove", (e) => {
                 const hoverNode = e.target;
+                if (e.type === "dragmove") {
+                    this.updateAttributesOverlayPosition(shapeGroup);
+                }
                 /**
                  * After placement action overlay is not required
                  * rotate will be performed from outside the canvas via events
@@ -340,6 +345,7 @@ export default class ShapeManager {
             shapeGroup.add(squareObject);
             placeHolderElm.destroy();
             this.actionOverlayNode.style.display = "none";
+            this.createAttributesOverlay(shapeGroup);
         }
     }
 
@@ -562,5 +568,88 @@ export default class ShapeManager {
             shapeGroup.findOne(`#${SquareShapeIds.ShapePlaceholderObject}`) ??
             shapeGroup.findOne(`#${SquareShapeIds.ShapeObject}`)
         );
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     */
+    createAttributesOverlay(shapeGroup) {
+        let overlayGroup = document.getElementById("attributes-overlay-group");
+        if (!overlayGroup) {
+            overlayGroup = document.createElement("div");
+            overlayGroup.id = "attributes-overlay-group";
+            this.stage.container().append(overlayGroup);
+        }
+
+        /** @type {HTMLElement} */
+        const attributeOverlay = new DOMParser().parseFromString(
+            AttributeOverlayTemplate,
+            "text/html"
+        ).body.firstChild;
+        attributeOverlay.id = `${attributeOverlay.id}-${shapeGroup._id}`;
+        overlayGroup.appendChild(attributeOverlay);
+
+        this.updateAttributesOverlayPosition(shapeGroup);
+
+        // TODO: For demo purpose only
+        Array.from(Array(4)).forEach(() =>
+            this.appendShapeCutOut(
+                shapeGroup,
+                undefined,
+                undefined,
+                attributeOverlay
+            )
+        );
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     * @param {string} url
+     * @param {string} title
+     * @param {HTMLElement} attributeOverlay - when appending shapeCutout right after placing the attribute overlay element in dom.
+     * in this case getting attribute overlay element from dom might be blank.
+     */
+    appendShapeCutOut(
+        shapeGroup,
+        url = "/dynamicAssets/sinkdropin-1.png",
+        title = "Drop-in Sink",
+        attributeOverlay = null
+    ) {
+        const overlay =
+            attributeOverlay ??
+            document.querySelector(`#attribute-overlay-${shapeGroup._id}`);
+        const container = overlay.querySelector("#shape-cutout-group");
+        /** @type {HTMLElement} */
+        const domObject = new DOMParser().parseFromString(
+            AttributeShapeCutOutTemplate,
+            "text/html"
+        ).body.firstChild;
+        const image = domObject.querySelector("img");
+        const titleElm = domObject.querySelector("span");
+        image.src = url;
+        image.alt = url.split("/").reverse()[0];
+
+        titleElm.innerHTML = title;
+
+        container.appendChild(domObject);
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     */
+    updateAttributesOverlayPosition(shapeGroup) {
+        const ShapeObject = this.getShapeObject(shapeGroup);
+        if (ShapeObject.id() !== SquareShapeIds.ShapeObject) return;
+        const boxRect = ShapeObject.getClientRect();
+
+        const attributeOverlay = this.stage
+            .container()
+            .querySelector(`#attributes-overlay-${shapeGroup._id}`);
+
+        attributeOverlay.style.left = `${boxRect.x + 10}px`;
+        attributeOverlay.style.top = `${boxRect.y + 10}px`;
     }
 }

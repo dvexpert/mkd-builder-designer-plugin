@@ -1,0 +1,18 @@
+<div
+    class="absolute top-0 z-40 w-64 rounded bg-black/65 text-white px-3 pt-3"
+    id="attributes-overlay"
+>
+    <label class="text-lg font-bold flex gap-4 items-center peer group pb-2">
+        <input type="checkbox" class="hidden" name="" />
+        <span class="truncate" id="shape-name">Shape 1</span>
+        <svg class="group-has-[:checked]:rotate-180 cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="14" height="9" viewBox="0 0 14 9" fill="none">
+            <path d="M1 1L7 7L13 1" stroke="white" stroke-width="2"/>
+        </svg>
+    </label>
+    <div class="h-0 overflow-hidden peer-has-[:checked]:h-auto peer-has-[:checked]:overflow-visible transition-all duration-100">
+        <p class="text-base truncate">Quartz, Alabaster White</p>
+        <div class="grid gap-2 pt-2 grid-cols-4" id="shape-cutout-group">
+            <!-- ShapeCutOut.html dynamically appended here -->
+        </div>
+    </div>
+</div>
