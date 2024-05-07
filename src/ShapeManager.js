@@ -69,8 +69,9 @@ export default class ShapeManager {
         contextMenuItem_DeleteAction.innerText = "Delete";
         contextMenuItem_DeleteAction.addEventListener("click", () => {
             if (this.currentShape) {
-                const shapeGroup = this.currentShape.findAncestor('#shapeGroup')
-                this.getShapeGroupAttributeOverlay(shapeGroup)?.remove()
+                const shapeGroup =
+                    this.currentShape.findAncestor("#shapeGroup");
+                this.getShapeGroupAttributeOverlay(shapeGroup)?.remove();
                 shapeGroup.destroy();
             }
         });
@@ -261,6 +262,21 @@ export default class ShapeManager {
                 const hoverNode = e.target;
                 if (e.type === "dragmove") {
                     this.updateAttributesOverlayPosition(shapeGroup);
+                    const targetShape = this.getShapeObject(hoverNode);
+                    const targetRect = targetShape.getClientRect();
+                    this.layer.children.forEach((group) => {
+                        // do not check intersection with itself
+                        if (group === hoverNode) {
+                            group.opacity(1);
+                            return;
+                        }
+                        const shape = this.getShapeObject(group);
+                        const haveIntersection = this.haveIntersection(
+                            shape.getClientRect(),
+                            targetRect
+                        );
+                        group.opacity(haveIntersection ? 0.5 : 1);
+                    });
                 }
 
                 const attributeOverlay =
@@ -715,5 +731,25 @@ export default class ShapeManager {
         return this.stage
             .container()
             .querySelector(`#attributes-overlay-${shapeGroup._id}`);
+    }
+
+    /**
+     * @typedef {Object} ClientRect
+     * @property {number} x - The x-coordinate.
+     * @property {number} y - The y-coordinate.
+     * @property {number} width - The width-coordinate.
+     * @property {number} height - The height-coordinate.
+     *
+     * @param {ClientRect} r1
+     * @param {ClientRect} r2
+     * @returns
+     */
+    haveIntersection(r1, r2) {
+        return !(
+            r2.x > r1.x + r1.width ||
+            r2.x + r2.width < r1.x ||
+            r2.y > r1.y + r1.height ||
+            r2.y + r2.height < r1.y
+        );
     }
 }
