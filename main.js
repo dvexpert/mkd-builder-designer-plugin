@@ -1,4 +1,3 @@
-import "@/assets/css/style.css";
 import "@/assets/css/index.css";
 import { KonvaManager } from "@/KonvaManager";
 

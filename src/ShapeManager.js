@@ -30,6 +30,13 @@ export default class ShapeManager {
         this.currentShape = null;
         this.createContextMenu();
         this.createActionOverlay();
+
+        this.stage.on("dragmove", (ev) => {
+            const groups = ev.target.getStage().find("#shapeGroup");
+            groups.forEach((group) =>
+                this.updateAttributesOverlayPosition(group)
+            );
+        });
     }
 
     createContextMenu() {
@@ -60,10 +67,13 @@ export default class ShapeManager {
         );
         contextMenuItem_DeleteAction.id = "image-context-item";
         contextMenuItem_DeleteAction.innerText = "Delete";
-        contextMenuItem_DeleteAction.addEventListener(
-            "click",
-            () => this.currentShape && this.currentShape.destroy()
-        );
+        contextMenuItem_DeleteAction.addEventListener("click", () => {
+            if (this.currentShape) {
+                const shapeGroup = this.currentShape.findAncestor('#shapeGroup')
+                this.getShapeGroupAttributeOverlay(shapeGroup)?.remove()
+                shapeGroup.destroy();
+            }
+        });
         // Append menu items to menu
         this.contextMenuNode.append(contextMenuItem_DeleteAction);
 
@@ -252,6 +262,23 @@ export default class ShapeManager {
                 if (e.type === "dragmove") {
                     this.updateAttributesOverlayPosition(shapeGroup);
                 }
+
+                const attributeOverlay =
+                    this.getShapeGroupAttributeOverlay(shapeGroup);
+                if (e.type === "mouseenter" && attributeOverlay) {
+                    /**
+                     * on shape group hover active the current group attribute overlay
+                     * and in-active other groups attribute overlay
+                     */
+                    const overlayGroup = document.getElementById(
+                        "attributes-overlay-group"
+                    )?.childNodes;
+                    overlayGroup.forEach((child) =>
+                        child.classList.remove("active-attributes-overlay")
+                    );
+
+                    attributeOverlay.classList.add("active-attributes-overlay");
+                }
                 /**
                  * After placement action overlay is not required
                  * rotate will be performed from outside the canvas via events
@@ -295,7 +322,25 @@ export default class ShapeManager {
                  * e.target is used in case of ripple effect created by action overlay mouseleave
                  * so in this case e.evt doesn't exist
                  */
+                const elm = e.evt?.relatedTarget;
                 const elmId = e.evt?.relatedTarget?.id ?? e.target.id();
+
+                if (
+                    !Boolean(
+                        e.evt?.relatedTarget &&
+                            elm?.closest("#attributes-overlay-group")
+                    )
+                ) {
+                    /**
+                     * on Mouse leave remove active state of the attributes overlay
+                     */
+                    const overlayGroup = document.getElementById(
+                        "attributes-overlay-group"
+                    )?.childNodes;
+                    overlayGroup?.forEach((child) =>
+                        child.classList.remove("active-attributes-overlay")
+                    );
+                }
                 if (
                     elmId === null ||
                     ![
@@ -508,9 +553,10 @@ export default class ShapeManager {
             inputBox.value = widthInput.text();
             Object.assign(inputBox.style, inputBoxStyle);
             inputBox.focus();
-
+            let inputRemoved = false;
             inputBox.addEventListener("keydown", (e) => {
                 if (e.key === "Enter") {
+                    inputRemoved = true;
                     this.handleInputValueChange(
                         "width",
                         shapeGroup,
@@ -519,14 +565,15 @@ export default class ShapeManager {
                     );
                 }
             });
-            inputBox.addEventListener("blur", () =>
+            inputBox.addEventListener("blur", () => {
+                if (inputRemoved) return;
                 this.handleInputValueChange(
                     "width",
                     shapeGroup,
                     widthInput,
                     inputBox
-                )
-            );
+                );
+            });
         });
     }
 
@@ -588,6 +635,14 @@ export default class ShapeManager {
             "text/html"
         ).body.firstChild;
         attributeOverlay.id = `${attributeOverlay.id}-${shapeGroup._id}`;
+        attributeOverlay.addEventListener("mouseenter", (e) => {
+            const elm = e.target;
+            elm && elm.classList?.add("active-attributes-overlay");
+        });
+        attributeOverlay.addEventListener("mouseleave", (e) => {
+            const elm = e.target;
+            elm && elm.classList?.remove("active-attributes-overlay");
+        });
         overlayGroup.appendChild(attributeOverlay);
 
         this.updateAttributesOverlayPosition(shapeGroup);
@@ -645,11 +700,20 @@ export default class ShapeManager {
         if (ShapeObject.id() !== SquareShapeIds.ShapeObject) return;
         const boxRect = ShapeObject.getClientRect();
 
-        const attributeOverlay = this.stage
-            .container()
-            .querySelector(`#attributes-overlay-${shapeGroup._id}`);
+        const attributeOverlay = this.getShapeGroupAttributeOverlay(shapeGroup);
 
         attributeOverlay.style.left = `${boxRect.x + 10}px`;
         attributeOverlay.style.top = `${boxRect.y + 10}px`;
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     * @returns {HTMLDivElement}
+     */
+    getShapeGroupAttributeOverlay(shapeGroup) {
+        return this.stage
+            .container()
+            .querySelector(`#attributes-overlay-${shapeGroup._id}`);
     }
 }
