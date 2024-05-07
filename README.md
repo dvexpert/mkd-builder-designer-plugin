@@ -1,5 +1,6 @@
 ### MKD Builder Designer Plugin
 
+## Code splitting TBD (To be decided.)
 
 #### Setup
 
@@ -17,3 +18,8 @@ yarn build
 
 3. Entry file for demo is [index.html](index.html)
 4. 
+
+
+
+ToDO:
+- [ ] on zoom in and out/ also scale action overlay and attributes overlay
