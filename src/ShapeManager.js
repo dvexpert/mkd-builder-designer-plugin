@@ -425,72 +425,78 @@ export default class ShapeManager {
      * @param {Konva.Group} shapeGroup
      */
     createHeightInput(shapeGroup) {
-        const heightInput = new Konva.Text({
-            id: SquareShapeIds.ShapeHeightTextLayer,
-            text: "50",
-            fontSize: 20,
-            fill: "black",
-            width: 40,
+        const heightInputs = [];
+        ["150", "150"].forEach((text) => {
+            const heightInput = new Konva.Text({
+                id: SquareShapeIds.ShapeHeightTextLayer,
+                text: "50",
+                fontSize: 20,
+                fill: "black",
+                width: 40,
+            });
+            heightInputs.push(heightInput);
+            shapeGroup.add(heightInput);
         });
-        shapeGroup.add(heightInput);
 
         this.updateInputsPosition(shapeGroup, true, false);
 
-        // create event listener to show text box to change width
-        heightInput.on("click", (e) => {
-            let wInput = e.target;
-            this.setDragging(shapeGroup, false);
-            // at first lets find position of text node relative to the stage:
-            const textPosition = wInput.getClientRect();
+        heightInputs.forEach((heightInput) => {
+            // create event listener to show text box to change width
+            heightInput.on("click", (e) => {
+                let wInput = e.target;
+                this.setDragging(shapeGroup, false);
+                // at first lets find position of text node relative to the stage:
+                const textPosition = wInput.getClientRect();
 
-            // then lets find position of stage container on the page:
-            const stageBox = this.stage.container().getBoundingClientRect();
+                // then lets find position of stage container on the page:
+                const stageBox = this.stage.container().getBoundingClientRect();
 
-            // so position of textarea will be the sum of positions above:
-            const areaPosition = {
-                x: stageBox.left + textPosition.x,
-                y: stageBox.top + textPosition.y,
-            };
+                // so position of textarea will be the sum of positions above:
+                const areaPosition = {
+                    x: stageBox.left + textPosition.x,
+                    y: stageBox.top + textPosition.y,
+                };
 
-            // create textarea and style it
-            const inputBox = document.createElement("input");
-            inputBox.type = "number";
-            document.body.appendChild(inputBox);
-            /** @type {CSSStyleDec} */
-            const inputBoxStyle = {
-                position: "absolute",
-                top: areaPosition.y + "px",
-                left: areaPosition.x + "px",
-                width: "60px",
-                border: "1px solid",
-                outline: "0",
-                padding: "1px 8px",
-                borderRadius: "4px",
-            };
+                // create textarea and style it
+                const inputBox = document.createElement("input");
+                inputBox.type = "number";
+                document.body.appendChild(inputBox);
+                /** @type {CSSStyleDec} */
+                const inputBoxStyle = {
+                    position: "absolute",
+                    top: areaPosition.y + "px",
+                    left: areaPosition.x + "px",
+                    width: "60px",
+                    border: "1px solid",
+                    outline: "0",
+                    padding: "1px 8px",
+                    borderRadius: "4px",
+                };
 
-            inputBox.value = heightInput.text();
-            Object.assign(inputBox.style, inputBoxStyle);
-            inputBox.focus();
-            let inputRemoved = false;
-            inputBox.addEventListener("keydown", (e) => {
-                if (e.key === "Enter") {
-                    inputRemoved = true;
+                inputBox.value = heightInput.text();
+                Object.assign(inputBox.style, inputBoxStyle);
+                inputBox.focus();
+                let inputRemoved = false;
+                inputBox.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        inputRemoved = true;
+                        this.handleInputValueChange(
+                            "height",
+                            shapeGroup,
+                            heightInput,
+                            inputBox
+                        );
+                    }
+                });
+                inputBox.addEventListener("blur", (e) => {
+                    if (inputRemoved) return;
                     this.handleInputValueChange(
                         "height",
                         shapeGroup,
                         heightInput,
                         inputBox
                     );
-                }
-            });
-            inputBox.addEventListener("blur", (e) => {
-                if (inputRemoved) return;
-                this.handleInputValueChange(
-                    "height",
-                    shapeGroup,
-                    heightInput,
-                    inputBox
-                );
+                });
             });
         });
     }
@@ -504,10 +510,15 @@ export default class ShapeManager {
      */
     handleInputValueChange = (attr, shapeGroup, labelNode, inputBox) => {
         const squarePlaceHolderObject = this.getShapeObject(shapeGroup);
-        labelNode.text(inputBox.value);
+        /** @type {Konva.Text[]} */
+        const labelNodes = shapeGroup.find(`#${labelNode.id()}`);
+
+        // Update both width input positions
+        labelNodes.forEach((labelNode) => {
+            labelNode.text(inputBox.value);
+        });
         document.body.removeChild(inputBox);
         this.setDragging(shapeGroup, true);
-        // squarePlaceHolderObject.height(Number(inputBox.value) * SizeDiff);
         squarePlaceHolderObject.setAttr(
             attr,
             Number(inputBox.value) * SizeDiff
@@ -521,74 +532,77 @@ export default class ShapeManager {
      * @param {Konva.Group} shapeGroup
      */
     createWidthInput(shapeGroup) {
-        // const squarePlaceHolderObject = shapeGroup.findOne(
-        //     `#${SquareShapeIds.ShapePlaceholderObject}`
-        // );
-        const widthInput = new Konva.Text({
-            id: SquareShapeIds.ShapeWidthTextLayer,
-            text: "150",
-            fontSize: 20,
-            fill: "black",
-            width: 40,
+        const widthInputs = [];
+        ["150", "150"].forEach((text) => {
+            const widthText = new Konva.Text({
+                id: SquareShapeIds.ShapeWidthTextLayer,
+                text: text,
+                fontSize: 20,
+                fill: "black",
+                width: 40,
+            });
+            widthInputs.push(widthText);
+            shapeGroup.add(widthText);
         });
-        shapeGroup.add(widthInput);
+
         this.updateInputsPosition(shapeGroup, false, true);
+        widthInputs.forEach((widthInput) => {
+            // create event listener to show text box to change width
+            widthInput.on("click", (e) => {
+                let wInput = e.target;
+                this.setDragging(shapeGroup, false);
+                // at first lets find position of text node relative to the stage:
+                const textPosition = wInput.getClientRect();
 
-        // create event listener to show text box to change width
-        widthInput.on("click", (e) => {
-            let wInput = e.target;
-            this.setDragging(shapeGroup, false);
-            // at first lets find position of text node relative to the stage:
-            const textPosition = wInput.getClientRect();
+                // then lets find position of stage container on the page:
+                const stageBox = this.stage.container().getBoundingClientRect();
 
-            // then lets find position of stage container on the page:
-            const stageBox = this.stage.container().getBoundingClientRect();
+                // so position of textarea will be the sum of positions above:
+                const areaPosition = {
+                    x: stageBox.left + textPosition.x,
+                    y: stageBox.top + textPosition.y,
+                };
 
-            // so position of textarea will be the sum of positions above:
-            const areaPosition = {
-                x: stageBox.left + textPosition.x,
-                y: stageBox.top + textPosition.y,
-            };
+                // create textarea and style it
+                const inputBox = document.createElement("input");
+                inputBox.type = "number";
+                document.body.appendChild(inputBox);
+                /** @type {CSSStyleDec} */
+                const inputBoxStyle = {
+                    position: "absolute",
+                    top: areaPosition.y + "px",
+                    left: areaPosition.x + "px",
+                    width: "60px",
+                    border: "1px solid",
+                    outline: "0",
+                    padding: "1px 8px",
+                    borderRadius: "4px",
+                };
 
-            // create textarea and style it
-            const inputBox = document.createElement("input");
-            inputBox.type = "number";
-            document.body.appendChild(inputBox);
-            /** @type {CSSStyleDec} */
-            const inputBoxStyle = {
-                position: "absolute",
-                top: areaPosition.y + "px",
-                left: areaPosition.x + "px",
-                width: "60px",
-                border: "1px solid",
-                outline: "0",
-                padding: "1px 8px",
-                borderRadius: "4px",
-            };
-
-            inputBox.value = widthInput.text();
-            Object.assign(inputBox.style, inputBoxStyle);
-            inputBox.focus();
-            let inputRemoved = false;
-            inputBox.addEventListener("keydown", (e) => {
-                if (e.key === "Enter") {
-                    inputRemoved = true;
+                inputBox.value = widthInput.text();
+                Object.assign(inputBox.style, inputBoxStyle);
+                inputBox.focus();
+                let inputRemoved = false;
+                inputBox.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        inputRemoved = true;
+                        this.handleInputValueChange(
+                            "width",
+                            shapeGroup,
+                            widthInput,
+                            inputBox
+                        );
+                    }
+                });
+                inputBox.addEventListener("blur", () => {
+                    if (inputRemoved) return;
                     this.handleInputValueChange(
                         "width",
                         shapeGroup,
                         widthInput,
                         inputBox
                     );
-                }
-            });
-            inputBox.addEventListener("blur", () => {
-                if (inputRemoved) return;
-                this.handleInputValueChange(
-                    "width",
-                    shapeGroup,
-                    widthInput,
-                    inputBox
-                );
+                });
             });
         });
     }
@@ -601,22 +615,35 @@ export default class ShapeManager {
         const squareObject = this.getShapeObject(shapeGroup);
 
         if (heightOnly) {
-            const heightInput = shapeGroup.findOne(
+            const heightInputs = shapeGroup.find(
                 `#${SquareShapeIds.ShapeHeightTextLayer}`
             );
-            heightInput.position({
-                x: squareObject.x() + squareObject.width() + 10,
-                y: squareObject.y() + squareObject.height() / 2 - 10,
+            heightInputs.forEach((heightInput, index) => {
+                let x = squareObject.x() - 35;
+                const y = squareObject.y() + squareObject.height() / 2 - 10;
+
+                if (index % 2) {
+                    x += squareObject.width() + 40;
+                }
+
+                heightInput.position({ x, y });
             });
         }
 
         if (widthOnly) {
-            const widthInput = shapeGroup.findOne(
+            const widthInputs = shapeGroup.find(
                 `#${SquareShapeIds.ShapeWidthTextLayer}`
             );
-            widthInput.position({
-                x: squareObject.x() + squareObject.width() / 2,
-                y: squareObject.y() - 30,
+            // Update both width input positions
+            widthInputs.forEach((widthInput, index) => {
+                const x = squareObject.x() + squareObject.width() / 2;
+                let y = squareObject.y() - 30;
+
+                if (index % 2) {
+                    y += squareObject.height() + 40;
+                }
+
+                widthInput.position({ x, y });
             });
         }
     }
