@@ -39,6 +39,9 @@ export default class EventManager {
                 }
             }
         });
+        document.addEventListener("mkd-plugin:export", (e) => {
+            this.export();
+        });
     }
     zoomIn() {
         const oldScale = this.stage.scaleX();
@@ -113,5 +116,50 @@ export default class EventManager {
 
     positionReset() {
         this.stage.position({ x: 0, y: 0 });
+    }
+    export() {
+        // check has children
+        if (!this.stage.findOne("Layer").hasChildren()) {
+            alert("Stage has no children to export");
+            return;
+        }
+
+        const opt = this.stage.toDataURL();
+        this.downloadURI(opt, "stage.png");
+        this.downloadObjectAsJson(
+            this.stage.toObject(),
+            "stage-object.json"
+        );
+    }
+
+    /**
+     * 
+     * @param {string} uri 
+     * @param {string} name 
+     */
+    downloadURI(uri, name) {
+        const link = document.createElement("a");
+        link.download = name;
+        link.href = uri;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    /**
+     * 
+     * @param {Object} exportObj 
+     * @param {string} exportName 
+     */
+    downloadObjectAsJson(exportObj, exportName) {
+        const dataStr =
+            "data:text/json;charset=utf-8," +
+            encodeURIComponent(JSON.stringify(exportObj));
+        const downloadAnchorNode = document.createElement("a");
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", exportName + ".json");
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
     }
 }

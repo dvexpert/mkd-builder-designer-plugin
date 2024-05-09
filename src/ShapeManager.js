@@ -643,7 +643,7 @@ export default class ShapeManager {
                     y += squareObject.height() + 40;
                 }
 
-                widthInput.position({ x, y });
+                widthInput.position({ x: x, y: y });
             });
         }
     }

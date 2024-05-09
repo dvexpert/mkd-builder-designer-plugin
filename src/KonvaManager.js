@@ -3,6 +3,10 @@ import EventManager from "./EventManager.js";
 import ShapeManager from "./ShapeManager.js";
 
 export class KonvaManager {
+    /**
+     * 
+     * @param {HTMLDivElement} container 
+     */
     constructor(container) {
         /**
          * @type {Konva.Stage}

@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 .active-attributes-overlay {
-    @apply z-[150] border-white bg-black/80;
+    @apply z-[150] border-white bg-black/80 shadow;
 }
