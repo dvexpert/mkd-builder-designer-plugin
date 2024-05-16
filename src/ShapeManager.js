@@ -35,11 +35,19 @@ export default class ShapeManager {
         this.createContextMenu();
         this.createActionOverlay();
 
-        this.stage.on("dragmove", (ev) => {
-            const groups = ev.target.getStage().find("#shapeGroup");
+        this.stage.on("dragmove", () => {
+            const groups = this.stage.find("#shapeGroup");
             groups.forEach((group) =>
                 this.updateAttributesOverlayPosition(group)
             );
+        });
+        this.stage.on("scaleChange", (ev) => {
+            setTimeout(() => {
+                const groups = this.stage.find("#shapeGroup");
+                groups.forEach((group) =>
+                    this.updateAttributesOverlayPosition(group)
+                );
+            });
         });
     }
 
