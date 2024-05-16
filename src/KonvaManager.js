@@ -27,7 +27,7 @@ export class KonvaManager {
 
         // ShapeManager instance to handle
         // creating shapes and tbd ...
-        this.shapeManager = new ShapeManager(this.stage, this.layer);
+        this.shapeManager = new ShapeManager(this.stage, this.layer, this.eventManager);
 
         // this.initShapes();
         this.setupBackground();

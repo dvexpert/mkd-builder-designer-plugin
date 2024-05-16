@@ -4,6 +4,8 @@ import RotateIcon from "@/assets/image/rotate.svg?raw";
 import { ShapeActions, SquareShapeIds } from "./enum/ShapeManagerEnum.js";
 import AttributeOverlayTemplate from "@/templates/AttributesOverlay/index.html?raw";
 import AttributeShapeCutOutTemplate from "@/templates/AttributesOverlay/ShapeCutOut.html?raw";
+import EventManager from "./EventManager.js";
+import { SquareHelper as SH } from "./helpers/SquareHelper.js";
 
 const SizeDiff = 3;
 
@@ -14,11 +16,13 @@ export default class ShapeManager {
     /**
      * @param {Konva.Stage} stage
      * @param {Konva.Layer} layer
+     * @param {EventManager} eventManager
      */
-    constructor(stage, layer) {
+    constructor(stage, layer, eventManager) {
         this.currentHoverNode;
         this.stage = stage;
         this.layer = layer;
+        this.eventManager = eventManager;
 
         this.contextMenuNode = null;
         this.actionOverlayNode = null;
@@ -376,11 +380,15 @@ export default class ShapeManager {
             /**
              * Create Height Input
              */
-            this.createHeightInput(shapeGroup);
-            this.createWidthInput(shapeGroup);
+            // this.createHeightInput(shapeGroup);
+            // this.createWidthInput(shapeGroup);
+            this.createEdgeGroups(shapeGroup);
             this.layer.add(shapeGroup);
         } else {
             shapeGroup = this.currentHoverNode;
+            shapeGroup.on("click", () => {
+                this.eventManager.dispatchShapeSelect(shapeGroup);
+            });
 
             // Place image element onto the layer with actual material image
             const placeHolderElm = shapeGroup.findOne(
@@ -407,7 +415,179 @@ export default class ShapeManager {
             placeHolderElm.destroy();
             this.actionOverlayNode.style.display = "none";
             this.createAttributesOverlay(shapeGroup);
+            this.eventManager.dispatchShapeSelect(shapeGroup);
         }
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     */
+    createEdgeGroups(shapeGroup) {
+        const groupShapeObject = this.getShapeObject(shapeGroup);
+        const subgroupNames = SH.sides;
+        // TODO: for demo only. also remove index param from subgroupNames loop callback params
+        // const subgroupColor = ["yellow", "red", "green", "blue"];
+
+        const spacingOffset = 0;
+        subgroupNames.forEach((subgroupName /* index */) => {
+            const isHorizontal = SH.isHorizontal(subgroupName);
+            const attributes = {
+                height: 0,
+                width: 0,
+                x: 0,
+                y: 0,
+            };
+            if (isHorizontal) {
+                attributes.height = 100;
+                attributes.width = groupShapeObject.width();
+            } else {
+                attributes.height = groupShapeObject.height();
+                attributes.width = 100;
+            }
+            const subGroup = new Konva.Group({
+                name: subgroupName,
+                height: attributes.height,
+                width: attributes.width,
+            });
+            shapeGroup.add(subGroup);
+
+            const sideLabel = new Konva.Text({
+                id: `text_node_${subgroupName}`,
+                text: subgroupName.toUpperCase(),
+                fill: "#000",
+                fontSize: 16,
+                stroke: "#000",
+                strokeWidth: 1.2,
+                fontVariant: "",
+            });
+            subGroup.add(sideLabel);
+
+            // TODO: For development purposes only
+            // const tempRect = new Konva.Rect({
+            //     fill: subgroupColor[index],
+            //     width: attributes.width,
+            //     height: attributes.height,
+            // });
+            // subGroup.add(tempRect);
+
+            if (isHorizontal) {
+                if (SH.isFirstInHorizontalOrVertical(subgroupName)) {
+                    attributes.x = groupShapeObject.x();
+                    attributes.y =
+                        groupShapeObject.y() -
+                        subGroup.height() -
+                        spacingOffset;
+
+                    sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
+                    sideLabel.y(subGroup.height() - 30);
+                    this.createWidthInput(subGroup);
+                } else {
+                    attributes.x = groupShapeObject.x();
+                    attributes.y =
+                        groupShapeObject.y() +
+                        groupShapeObject.height() +
+                        spacingOffset;
+
+                    sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
+                    sideLabel.y(30);
+
+                    this.createWidthInput(subGroup);
+                }
+            } else {
+                if (SH.isFirstInHorizontalOrVertical(subgroupName)) {
+                    attributes.x =
+                        groupShapeObject.x() +
+                        groupShapeObject.width() +
+                        spacingOffset;
+                    attributes.y = groupShapeObject.y();
+
+                    sideLabel.x(30);
+                    sideLabel.y(subGroup.height() - subGroup.height() * 0.8);
+                } else {
+                    attributes.x =
+                        groupShapeObject.x() - attributes.width - spacingOffset;
+                    attributes.y = groupShapeObject.y();
+
+                    sideLabel.x(subGroup.width() - subGroup.width() * 0.4);
+                    sideLabel.y(30);
+                }
+            }
+
+            subGroup.height(attributes.height);
+            subGroup.width(attributes.width);
+            subGroup.position({
+                x: attributes.x,
+                y: attributes.y,
+            });
+        });
+    }
+
+    /**
+     *
+     * @param {Konva.Group} SubGroup - border group, containing wall and size input
+     * @param {Konva.Group} shapeGroup - main shape group containing everything, shape, edge group etc.
+     */
+    static addWall(SubGroup, shapeGroup) {
+        if (SubGroup.findOne(`.wall_${SubGroup.name()}`)) {
+            alert("Wall already exists");
+            return;
+        }
+
+        const wall = new Konva.Rect({
+            name: "wall_" + SubGroup.name(),
+            fill: "#3b3b3b",
+            width: SubGroup.width(),
+            height: 10,
+        });
+        SubGroup.add(wall);
+
+        /** @type {import("./helpers/SquareHelper.js").SquareSide} wall */
+        const wallGroupName = SubGroup.name();
+        const attributes = { x: 0, y: 0 };
+        if (SH.isHorizontal(wallGroupName)) {
+            wall.height(5);
+            wall.width(SubGroup.width());
+            if (SH.isFirstInHorizontalOrVertical(wallGroupName)) {
+                attributes.y = SubGroup.height() - wall.height();
+            }
+        } else {
+            wall.height(SubGroup.height());
+            wall.width(5);
+            if (!SH.isFirstInHorizontalOrVertical(wallGroupName)) {
+                attributes.x = SubGroup.width() - wall.width();
+            }
+        }
+
+        wall.position(attributes);
+
+        let againstTheWall = shapeGroup.getAttr("againstTheWall");
+        if (!againstTheWall || typeof againstTheWall !== "object") {
+            againstTheWall = {
+                [SH.SideA]: false,
+                [SH.SideB]: false,
+                [SH.SideC]: false,
+                [SH.SideD]: false,
+            };
+        }
+
+        againstTheWall[SubGroup.name()] = true;
+        shapeGroup.setAttr("againstTheWall", againstTheWall);
+    }
+
+    /**
+     *
+     * @param {Konva.Group} SubGroup - border group, containing wall and size input
+     * @param {Konva.Group} shapeGroup - main shape group, containing everything.
+     * @param {import("./helpers/SquareHelper.js").SquareSide} wall
+     */
+    static removeWall(SubGroup, shapeGroup, wall) {
+        const wallObj = SubGroup.findOne(`.wall_${wall}`);
+        wallObj.destroy();
+
+        let againstTheWall = SubGroup.getAttr("againstTheWall");
+        againstTheWall[SubGroup.name()] = false;
+        shapeGroup.setAttr("againstTheWall", againstTheWall);
     }
 
     /**
@@ -416,6 +596,9 @@ export default class ShapeManager {
      * @param {boolean} enable
      */
     setDragging(element, enable = true) {
+        if (element.id() !== SquareShapeIds.ShapeGroup) {
+            element = element.findAncestor(`#${SquareShapeIds.ShapeGroup}`);
+        }
         element.draggable(enable);
         // ? set the cursors and other side effects of toggling the element draggable
     }
@@ -426,10 +609,10 @@ export default class ShapeManager {
      */
     createHeightInput(shapeGroup) {
         const heightInputs = [];
-        ["150", "150"].forEach((text) => {
+        ["50", "50"].forEach((text) => {
             const heightInput = new Konva.Text({
                 id: SquareShapeIds.ShapeHeightTextLayer,
-                text: "50",
+                text: text,
                 fontSize: 20,
                 fill: "black",
                 width: 40,
@@ -529,121 +712,152 @@ export default class ShapeManager {
 
     /**
      * Create Text and Input box for the Width adjustments
-     * @param {Konva.Group} shapeGroup
+     * @param {Konva.Group} subGroup - edge sub group
      */
-    createWidthInput(shapeGroup) {
-        const widthInputs = [];
-        ["150", "150"].forEach((text) => {
-            const widthText = new Konva.Text({
-                id: SquareShapeIds.ShapeWidthTextLayer,
-                text: text,
-                fontSize: 20,
-                fill: "black",
-                width: 40,
-            });
-            widthInputs.push(widthText);
-            shapeGroup.add(widthText);
+    createWidthInput(subGroup) {
+        console.log(
+            "%ccreateWidthInput",
+            "color:#00ff00;font-size:30px;font-weight:bold;"
+        );
+        console.log(subGroup);
+        const widthInput = new Konva.Text({
+            id: SquareShapeIds.ShapeWidthTextLayer,
+            text: "150",
+            fontSize: 20,
+            fill: "black",
+            width: 40,
+            wall: subGroup.name(),
         });
+        subGroup.add(widthInput);
 
-        this.updateInputsPosition(shapeGroup, false, true);
-        widthInputs.forEach((widthInput) => {
-            // create event listener to show text box to change width
-            widthInput.on("click", (e) => {
-                let wInput = e.target;
-                this.setDragging(shapeGroup, false);
-                // at first lets find position of text node relative to the stage:
-                const textPosition = wInput.getClientRect();
+        this.updateInputsPosition(subGroup, false, true);
+        // create event listener to show text box to change width
+        widthInput.on("click", (e) => {
+            let wInput = e.target;
+            this.setDragging(subGroup, false);
+            // at first lets find position of text node relative to the stage:
+            const textPosition = wInput.getClientRect();
 
-                // then lets find position of stage container on the page:
-                const stageBox = this.stage.container().getBoundingClientRect();
+            // then lets find position of stage container on the page:
+            const stageBox = this.stage.container().getBoundingClientRect();
 
-                // so position of textarea will be the sum of positions above:
-                const areaPosition = {
-                    x: stageBox.left + textPosition.x,
-                    y: stageBox.top + textPosition.y,
-                };
+            // so position of textarea will be the sum of positions above:
+            const areaPosition = {
+                x: stageBox.left + textPosition.x,
+                y: stageBox.top + textPosition.y,
+            };
 
-                // create textarea and style it
-                const inputBox = document.createElement("input");
-                inputBox.type = "number";
-                document.body.appendChild(inputBox);
-                /** @type {CSSStyleDec} */
-                const inputBoxStyle = {
-                    position: "absolute",
-                    top: areaPosition.y + "px",
-                    left: areaPosition.x + "px",
-                    width: "60px",
-                    border: "1px solid",
-                    outline: "0",
-                    padding: "1px 8px",
-                    borderRadius: "4px",
-                };
+            // create textarea and style it
+            const inputBox = document.createElement("input");
+            inputBox.type = "number";
+            document.body.appendChild(inputBox);
+            /** @type {CSSStyleDec} */
+            const inputBoxStyle = {
+                position: "absolute",
+                top: areaPosition.y + "px",
+                left: areaPosition.x + "px",
+                width: "60px",
+                border: "1px solid",
+                outline: "0",
+                padding: "1px 8px",
+                borderRadius: "4px",
+            };
 
-                inputBox.value = widthInput.text();
-                Object.assign(inputBox.style, inputBoxStyle);
-                inputBox.focus();
-                let inputRemoved = false;
-                inputBox.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter") {
-                        inputRemoved = true;
-                        this.handleInputValueChange(
-                            "width",
-                            shapeGroup,
-                            widthInput,
-                            inputBox
-                        );
-                    }
-                });
-                inputBox.addEventListener("blur", () => {
-                    if (inputRemoved) return;
+            inputBox.value = widthInput.text();
+            Object.assign(inputBox.style, inputBoxStyle);
+            inputBox.focus();
+            let inputRemoved = false;
+            inputBox.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    inputRemoved = true;
                     this.handleInputValueChange(
                         "width",
-                        shapeGroup,
+                        subGroup,
                         widthInput,
                         inputBox
                     );
-                });
+                }
+            });
+            inputBox.addEventListener("blur", () => {
+                if (inputRemoved) return;
+                this.handleInputValueChange(
+                    "width",
+                    subGroup,
+                    widthInput,
+                    inputBox
+                );
             });
         });
     }
 
     /**
      *
-     * @param {Konva.Group} shapeGroup
+     * @param {Konva.Group} subGroup - shape edge sub group, containing wall, side label etc.
      */
-    updateInputsPosition(shapeGroup, heightOnly = true, widthOnly = true) {
-        const squareObject = this.getShapeObject(shapeGroup);
+    updateInputsPosition(subGroup, heightOnly = true, widthOnly = true) {
+        /** @type {Konva.Group} shapeGroup */
+        const shapeGroup = subGroup.findAncestor(
+            `#${SquareShapeIds.ShapeGroup}`
+        );
+        console.log(
+            "%cUpdaetg Position",
+            "color:#ad79f2;font-size:30px;font-weight:bold;"
+        );
+        console.log(shapeGroup);
+        // const squareObject = this.getShapeObject(shapeGroup);
 
-        if (heightOnly) {
-            const heightInputs = shapeGroup.find(
-                `#${SquareShapeIds.ShapeHeightTextLayer}`
-            );
-            heightInputs.forEach((heightInput, index) => {
-                let x = squareObject.x() - 35;
-                const y = squareObject.y() + squareObject.height() / 2 - 10;
+        // if (heightOnly) {
+        //     const heightInputs = shapeGroup.find(
+        //         `#${SquareShapeIds.ShapeHeightTextLayer}`
+        //     );
+        //     heightInputs.forEach((heightInput, index) => {
+        //         let x = squareObject.x() - 35;
+        //         const y = squareObject.y() + squareObject.height() / 2 - 10;
 
-                if (index % 2) {
-                    x += squareObject.width() + 40;
-                }
+        //         if (index % 2) {
+        //             x += squareObject.width() + 40;
+        //         }
 
-                heightInput.position({ x, y });
-            });
-        }
+        //         heightInput.position({ x, y });
+        //     });
+        // }
 
         if (widthOnly) {
-            const widthInputs = shapeGroup.find(
+            // let squareObject = this.getShapeObject(shapeGroup);
+            const widthInputs = subGroup.find(
                 `#${SquareShapeIds.ShapeWidthTextLayer}`
             );
             // Update both width input positions
             widthInputs.forEach((widthInput, index) => {
-                const x = squareObject.x() + squareObject.width() / 2;
-                let y = squareObject.y() - 30;
-
-                if (index % 2) {
-                    y += squareObject.height() + 40;
+                let position = {
+                    x: 0,
+                    y: 0,
+                };
+                if (index % 2 === 0 && subGroup.name() === SH.SideA) {
+                    console.log('%cWidth Input Loop', 'color:#d1f279;font-size:30px;font-weight:bold;')
+                    console.log(subGroup)
+                    console.log(subGroup.name())
+                    let textNode = subGroup.findOne(`#text_node_${subGroup.name()}`);
+                    console.log(textNode)
+                    position = { x: textNode.x(), y: textNode.y() };
+                    position.x = position.x + 50;
+                } else {
+                    console.log('%cTwo', 'color:#00ff00;font-size:30px;font-weight:bold;')
+                    console.log(shapeGroup)
+                    let textNode = shapeGroup.findOne(
+                        `#text_node_${SH.SideC}`
+                    );
+                    console.log(textNode)
+                    position = { x: textNode.x(), y: textNode.y() };
+                    console.log(position)
+                    position.x = position.x + 50
+                    console.log( position)
+                    // let edgeGroup = shapeGroup.findOne(`.${SH.SideC}`)
+                    // position.x = (edgeGroup.width() - edgeGroup.width() * 0.8);
+                    // position.y = (30);
                 }
 
-                widthInput.position({ x: x, y: y });
+                widthInput.position(position);
             });
         }
     }
@@ -678,6 +892,10 @@ export default class ShapeManager {
             "text/html"
         ).body.firstChild;
         attributeOverlay.id = `${attributeOverlay.id}-${shapeGroup._id}`;
+        const shapeName = `Shape ${shapeGroup._id}`;
+        attributeOverlay.querySelector("#shape-name").innerHTML = shapeName;
+        shapeGroup.setAttr("shapeName", shapeName);
+
         attributeOverlay.addEventListener("mouseenter", (e) => {
             const elm = e.target;
             elm && elm.classList?.add("active-attributes-overlay");

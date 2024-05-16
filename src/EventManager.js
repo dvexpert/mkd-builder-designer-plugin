@@ -1,5 +1,6 @@
 import Konva from "konva";
 import { KonvaManager } from "./KonvaManager";
+import ShapeManager from "./ShapeManager";
 
 export default class EventManager {
     /**
@@ -30,11 +31,12 @@ export default class EventManager {
             const request = e?.detail;
             try {
                 this.manager.shapeManager.drawSquare(request?.image);
-                if (typeof request?.error === "function") {
+                if (typeof request?.success === "function") {
                     request.success({ message: "Square shape created" });
                 }
             } catch (e) {
-                if (typeof request?.success === "function") {
+                console.error(e);
+                if (typeof request?.error === "function") {
                     request.error({ message: e.message });
                 }
             }
@@ -42,6 +44,41 @@ export default class EventManager {
         document.addEventListener("mkd-plugin:export", (e) => {
             this.export();
         });
+        document.addEventListener("mkd-plugin:toggle-wall", (e) => {
+            const request = e.detail;
+            if (request.addWall) {
+                this.addWall(request.shapeId, request.wall);
+            } else {
+                this.removeWall(request.shapeId, request.wall);
+            }
+        });
+        document.addEventListener("mkd-plugin:shape-name", (e) => {
+            const request = e?.detail;
+            if (!request?.shapeName) {
+                request.error &&
+                    request.error({ message: "Shape name not specified" });
+                return;
+            }
+            if (!request?.shapeId) {
+                request.error && request.error({ message: "No active shape." });
+                return;
+            }
+            this.changeShapeName(request.shapeId, request.shapeName);
+        });
+    }
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     */
+    dispatchShapeSelect(shapeGroup) {
+        const newEvent = new CustomEvent("mkd-plugin:active-shape", {
+            detail: {
+                id: shapeGroup._id,
+                name: shapeGroup.getAttr("shapeName"),
+                againstTheWall: shapeGroup.getAttr("againstTheWall"),
+            },
+        });
+        document.dispatchEvent(newEvent);
     }
     zoomIn() {
         const oldScale = this.stage.scaleX();
@@ -117,6 +154,37 @@ export default class EventManager {
     positionReset() {
         this.stage.position({ x: 0, y: 0 });
     }
+
+    /**
+     *
+     * @param {number} shapeId - this should be node._id and not the node.id()
+     * @param {import("./helpers/SquareHelper").SquareSide} wall - a | b | c | d
+     */
+    addWall(shapeId, wall) {
+        /** @type {Konva.Group} */
+        const shape = this.stage.findOne((node) => {
+            return node._id === shapeId;
+        });
+        /** @type {Konva.Group} */
+        const wallGroup = shape.findOne(`.${wall}`);
+        ShapeManager.addWall(wallGroup, shape);
+    }
+
+    /**
+     *
+     * @param {number} shapeId - this should be node._id and not the node.id()
+     * @param {import("./helpers/SquareHelper").SquareSide} wall - a | b | c | d
+     */
+    removeWall(shapeId, wall) {
+        /** @type {Konva.Group} */
+        const shape = this.stage.findOne((node) => {
+            return node._id === shapeId;
+        });
+        /** @type {Konva.Group} */
+        const wallGroup = shape.findOne(`.${wall}`);
+        ShapeManager.removeWall(wallGroup, shape, wall);
+    }
+
     export() {
         // check has children
         if (!this.stage.findOne("Layer").hasChildren()) {
@@ -126,16 +194,13 @@ export default class EventManager {
 
         const opt = this.stage.toDataURL();
         this.downloadURI(opt, "stage.png");
-        this.downloadObjectAsJson(
-            this.stage.toObject(),
-            "stage-object.json"
-        );
+        this.downloadObjectAsJson(this.stage.toObject(), "stage-object.json");
     }
 
     /**
-     * 
-     * @param {string} uri 
-     * @param {string} name 
+     *
+     * @param {string} uri
+     * @param {string} name
      */
     downloadURI(uri, name) {
         const link = document.createElement("a");
@@ -147,9 +212,9 @@ export default class EventManager {
     }
 
     /**
-     * 
-     * @param {Object} exportObj 
-     * @param {string} exportName 
+     *
+     * @param {Object} exportObj
+     * @param {string} exportName
      */
     downloadObjectAsJson(exportObj, exportName) {
         const dataStr =
@@ -161,5 +226,19 @@ export default class EventManager {
         document.body.appendChild(downloadAnchorNode); // required for firefox
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
+    }
+
+    /**
+     *
+     * @param {number} shapeId
+     * @param {string} shapeName
+     */
+    changeShapeName(shapeId, shapeName) {
+        /** @type {Konva.Group} */
+        const shapeGroup = this.stage.findOne((node) => {
+            return node._id === shapeId;
+        });
+        shapeGroup.setAttr('shapeName', shapeName)
+        document.querySelector(`#attributes-overlay-${shapeGroup._id} #shape-name`).innerHTML = shapeName;
     }
 }
