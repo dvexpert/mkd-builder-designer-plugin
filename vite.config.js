@@ -21,7 +21,10 @@ function minifyEs() {
 }
 
 export default defineConfig({
-    plugins: [minifyEs()],
+    esbuild: {
+        drop: ['console', 'debugger']
+    },
+    plugins: [minifyEs()], // TODO: Disabled for development purpose only.
     build: {
         // emptyOutDir: false,
         outDir: "./dist",
