@@ -1,3 +1,5 @@
+import Konva from "konva";
+
 /**
  * @typedef {"a"|"b"|"c"|"d"} SquareSide
  */
@@ -53,5 +55,20 @@ export class SquareHelper {
         return Boolean(
             side === SquareHelper.SideA || side === SquareHelper.SideB
         );
+    }
+
+    /**
+     *
+     * @param {SquareSide} side
+     * @param {Konva.Group} shapeGroup
+     *
+     * @returns {Array<Konva.Group>}
+     */
+    static getDirectionalEdgeGroups(side, shapeGroup) {
+        if (this.isHorizontal(side)) {
+            return shapeGroup.find(`.${this.SideA}, .${this.SideC}`);
+        }
+
+        return shapeGroup.find(`.${this.SideB}, .${this.SideD}`);
     }
 }
