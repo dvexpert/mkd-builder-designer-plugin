@@ -52,6 +52,14 @@ export default class EventManager {
                 this.removeWall(request.shapeId, request.wall);
             }
         });
+        document.addEventListener("mkd-plugin:toggle-backsplash", (e) => {
+            const request = e.detail;
+            if (request.addWall) {
+                this.addBacksplash(request.shapeId, request.wall);
+            } else {
+                this.removeBacksplash(request.shapeId, request.wall);
+            }
+        });
         document.addEventListener("mkd-plugin:shape-name", (e) => {
             const request = e?.detail;
             if (!request?.shapeName) {
@@ -71,15 +79,25 @@ export default class EventManager {
      * @param {Konva.Group} shapeGroup
      */
     dispatchShapeSelect(shapeGroup) {
+        EventManager.dispatchShapeSelect(shapeGroup);
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     */
+    static dispatchShapeSelect(shapeGroup) {
         const newEvent = new CustomEvent("mkd-plugin:active-shape", {
             detail: {
                 id: shapeGroup._id,
-                name: shapeGroup.getAttr("shapeName"),
+                shapeName: shapeGroup.getAttr("shapeName"),
                 againstTheWall: shapeGroup.getAttr("againstTheWall"),
+                backsplashes: shapeGroup.getAttr("backsplashes"),
             },
         });
         document.dispatchEvent(newEvent);
     }
+
     zoomIn() {
         const oldScale = this.stage.scaleX();
         if (oldScale <= 2) {
@@ -185,6 +203,36 @@ export default class EventManager {
         ShapeManager.removeWall(wallGroup, shape, wall);
     }
 
+    /**
+     *
+     * @param {number} shapeId - this should be node._id and not the node.id()
+     * @param {import("./helpers/SquareHelper").SquareSide} wall - a | b | c | d
+     */
+    addBacksplash(shapeId, wall) {
+        /** @type {Konva.Group} */
+        const shape = this.stage.findOne((node) => {
+            return node._id === shapeId;
+        });
+        /** @type {Konva.Group} */
+        const backsplashGroup = shape.findOne(`.${wall}`);
+        ShapeManager.addBacksplash(backsplashGroup, shape);
+    }
+
+    /**
+     *
+     * @param {number} shapeId - this should be node._id and not the node.id()
+     * @param {import("./helpers/SquareHelper").SquareSide} wall - a | b | c | d
+     */
+    removeBacksplash(shapeId, wall) {
+        /** @type {Konva.Group} */
+        const shape = this.stage.findOne((node) => {
+            return node._id === shapeId;
+        });
+        /** @type {Konva.Group} */
+        const backsplashGroup = shape.findOne(`.${wall}`);
+        ShapeManager.removeBacksplash(backsplashGroup, shape, wall);
+    }
+
     export() {
         // check has children
         if (!this.stage.findOne("Layer").hasChildren()) {
@@ -238,7 +286,9 @@ export default class EventManager {
         const shapeGroup = this.stage.findOne((node) => {
             return node._id === shapeId;
         });
-        shapeGroup.setAttr('shapeName', shapeName)
-        document.querySelector(`#attributes-overlay-${shapeGroup._id} #shape-name`).innerHTML = shapeName;
+        shapeGroup.setAttr("shapeName", shapeName);
+        document.querySelector(
+            `#attributes-overlay-${shapeGroup._id} #shape-name`
+        ).innerHTML = shapeName;
     }
 }

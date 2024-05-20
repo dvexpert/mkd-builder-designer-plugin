@@ -35,6 +35,8 @@ export class SquareHelper {
         SquareHelper.SideD,
     ];
 
+    static wallBacksplashGap = 8;
+
     /**
      *
      * @param {SquareSide} side

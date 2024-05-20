@@ -618,9 +618,106 @@ export default class ShapeManager {
         const wallObj = SubGroup.findOne(`.wall_${wall}`);
         wallObj.destroy();
 
+        const backsplashObj = SubGroup.findOne(`.backsplash_${wall}`);
+        backsplashObj?.destroy();
+
         let againstTheWall = shapeGroup.getAttr("againstTheWall");
         againstTheWall[SubGroup.name()] = false;
         shapeGroup.setAttr("againstTheWall", againstTheWall);
+
+        let backsplashes = shapeGroup.getAttr("backsplashes");
+        backsplashes[SubGroup.name()] = false;
+        shapeGroup.setAttr("backsplashes", backsplashes);
+
+        EventManager.dispatchShapeSelect(shapeGroup);
+    }
+
+    /**
+     *
+     * @param {Konva.Group} SubGroup - border group, containing wall and size input
+     * @param {Konva.Group} shapeGroup - main shape group containing everything, shape, edge group etc.
+     */
+    static async addBacksplash(SubGroup, shapeGroup) {
+        let dispatchShapeSelect = false;
+        if (!SubGroup.findOne(`.wall_${SubGroup.name()}`)) {
+            console.info("[Builder] Adding wall before adding backsplash");
+            await this.addWall(SubGroup, shapeGroup);
+            dispatchShapeSelect = true;
+        }
+        if (SubGroup.findOne(`.backsplash_${SubGroup.name()}`)) {
+            alert("Backsplash already exists");
+            return;
+        }
+
+        const backsplash = new Konva.Rect({
+            name: "backsplash_" + SubGroup.name(),
+            fill: "red", //"#3b3b3b",
+            width: SubGroup.width(),
+            height: 50,
+        });
+        SubGroup.add(backsplash);
+
+        /** @type {import("./helpers/SquareHelper.js").SquareSide} wall */
+        const backsplashGroupName = SubGroup.name();
+        const attributes = { x: 0, y: 0 };
+        if (SH.isHorizontal(backsplashGroupName)) {
+            const wallSizeOffset =
+                SubGroup.findOne(`.wall_${SubGroup.name()}`).height() +
+                SH.wallBacksplashGap;
+            backsplash.height(50);
+            backsplash.width(SubGroup.width());
+            if (SH.isFirstInHorizontalOrVertical(backsplashGroupName)) {
+                attributes.y = SubGroup.height() - backsplash.height();
+                attributes.y -= wallSizeOffset;
+            } else {
+                attributes.y += wallSizeOffset;
+            }
+        } else {
+            const wallSizeOffset =
+                SubGroup.findOne(`.wall_${SubGroup.name()}`).width() +
+                SH.wallBacksplashGap;
+            backsplash.height(SubGroup.height());
+            backsplash.width(50);
+            if (!SH.isFirstInHorizontalOrVertical(backsplashGroupName)) {
+                attributes.x = backsplash.width() - wallSizeOffset;
+            } else {
+                attributes.x = wallSizeOffset;
+            }
+        }
+
+        backsplash.position(attributes);
+
+        let backsplashes = shapeGroup.getAttr("backsplashes");
+        if (!backsplashes || typeof backsplashes !== "object") {
+            backsplashes = {
+                [SH.SideA]: false,
+                [SH.SideB]: false,
+                [SH.SideC]: false,
+                [SH.SideD]: false,
+            };
+        }
+
+        backsplashes[SubGroup.name()] = true;
+        shapeGroup.setAttr("backsplashes", backsplashes);
+
+        if (dispatchShapeSelect) {
+            EventManager.dispatchShapeSelect(shapeGroup);
+        }
+    }
+
+    /**
+     *
+     * @param {Konva.Group} SubGroup - border group, containing wall and size input
+     * @param {Konva.Group} shapeGroup - main shape group, containing everything.
+     * @param {import("./helpers/SquareHelper.js").SquareSide} wall
+     */
+    static removeBacksplash(SubGroup, shapeGroup, wall) {
+        const backsplashObj = SubGroup.findOne(`.backsplash_${wall}`);
+        backsplashObj.destroy();
+
+        let backsplashes = shapeGroup.getAttr("backsplashes");
+        backsplashes[SubGroup.name()] = false;
+        shapeGroup.setAttr("backsplashes", backsplashes);
     }
 
     /**
@@ -653,7 +750,7 @@ export default class ShapeManager {
 
         this.updateInputsPosition(subGroup, true, false);
 
-            // create event listener to show text box to change width
+        // create event listener to show text box to change width
         heightInput.on("click", (e) => {
             let wInput = e.target;
             this.setDragging(subGroup, false);
@@ -848,9 +945,9 @@ export default class ShapeManager {
                     x: 0,
                     y: 0,
                 };
-                if (heightInput.getAttr('wall') === SH.SideB) {
+                if (heightInput.getAttr("wall") === SH.SideB) {
                     const textNode = shapeGroup.findOne(
-                        `#text_node_${heightInput.getAttr('wall')}`
+                        `#text_node_${heightInput.getAttr("wall")}`
                     );
                     if (textNode) {
                         position = { x: textNode.x(), y: textNode.y() };
@@ -858,7 +955,9 @@ export default class ShapeManager {
                         position.y = position.y + 50;
                     }
                 } else {
-                    const textNode = shapeGroup.findOne(`#text_node_${heightInput.getAttr('wall')}`);
+                    const textNode = shapeGroup.findOne(
+                        `#text_node_${heightInput.getAttr("wall")}`
+                    );
                     if (textNode) {
                         position = { x: textNode.x(), y: textNode.y() };
                         position.y = position.y + 50;
@@ -880,9 +979,9 @@ export default class ShapeManager {
                     x: 0,
                     y: 0,
                 };
-                if (widthInput.getAttr('wall') === SH.SideA) {
+                if (widthInput.getAttr("wall") === SH.SideA) {
                     const textNode = shapeGroup.findOne(
-                        `#text_node_${widthInput.getAttr('wall')}`
+                        `#text_node_${widthInput.getAttr("wall")}`
                     );
                     if (textNode) {
                         position = { x: textNode.x(), y: textNode.y() };
@@ -890,7 +989,9 @@ export default class ShapeManager {
                         position.y = position.y - 3;
                     }
                 } else {
-                    const textNode = shapeGroup.findOne(`#text_node_${widthInput.getAttr('wall')}`);
+                    const textNode = shapeGroup.findOne(
+                        `#text_node_${widthInput.getAttr("wall")}`
+                    );
                     if (textNode) {
                         position = { x: textNode.x(), y: textNode.y() };
                         position.x = position.x + 50;

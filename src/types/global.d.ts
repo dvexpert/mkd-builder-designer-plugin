@@ -1,8 +1,17 @@
-import { SquareSide } from "@/helpers/SquareHelper";
+import type { SquareSide } from "@/helpers/SquareHelper";
+import { SquareHelper as SH } from "@/helpers/SquareHelper";
 
 interface CallBackPropsType {
     message: string;
 }
+
+type SquareSideT = SquareSide;
+
+type WallPresence = {
+    [key in SquareSideT]: boolean;
+}
+
+interface BacksplashesPresence extends WallPresence {}
 
 interface RequestObjectType {
     image: string; // for shape draw
@@ -16,6 +25,8 @@ interface RequestObjectType {
     shapeId: number;
     addWall: boolean; // true - add wall, false - remove wall
     shapeName: string; // name of the wall
+    againstTheWall?: WallPresence;
+    backsplashes?: BacksplashesPresence;
 }
 
 declare global {
