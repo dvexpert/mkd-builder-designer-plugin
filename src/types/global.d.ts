@@ -22,6 +22,10 @@ declare global {
     interface Event {
         detail: Partial<RequestObjectType>;
     }
+
+    interface Document {
+        activeShape?: number | null;
+    }
 }
 
 // Ensure this file is a module by adding an empty export statement.

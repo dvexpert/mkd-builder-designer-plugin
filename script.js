@@ -61,7 +61,7 @@ jQuery(document).ready(function ($) {
     });
     $(".wall").on("change", function () {
         if (preventManualTriggeredEvent) return;
-        if (!activeShape) {
+        if (!document.activeShape) {
             alert(
                 "Hey there! Feeling a bit stuck, huh? Let’s tackle one thing at a time. First up: what shape are we dealing with here?"
             );
@@ -70,7 +70,7 @@ jQuery(document).ready(function ($) {
         }
         dispatchCanvasEvent("mkd-plugin:toggle-wall", {
             addWall: this.checked,
-            shapeId: activeShape,
+            shapeId: document.activeShape,
             wall: $(this).data("wall"),
         });
     });
@@ -87,7 +87,7 @@ jQuery(document).ready(function ($) {
     });
     $(document).on("mkd-plugin:active-shape", (e) => {
         const response = e.detail;
-        activeShape = response.id;
+        document.activeShape = response.id;
         const shapeElm = $("#active-shape-customization-block #shapeName");
         shapeElm.val(response.name);
         shapeElm.data("val", response.name);
@@ -120,7 +120,7 @@ jQuery(document).ready(function ($) {
         shapeNameInput.attr("data-val", value);
 
         dispatchCanvasEvent("mkd-plugin:shape-name", {
-            shapeId: activeShape,
+            shapeId: document.activeShape,
             shapeName: value,
             error: (err) => console.error(err.message),
         });
