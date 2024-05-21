@@ -487,7 +487,11 @@ export default class ShapeManager {
      * @param {Konva.Group} shapeGroup
      * @param {boolean} createInputs
      */
-    updateEdgeGroupsPosition(shapeGroup, createInputs = false) {
+    updateEdgeGroupsPosition(
+        shapeGroup,
+        createInputs = false,
+        updateLabelPositionOnly = false
+    ) {
         const groupShapeObject = this.getShapeObject(shapeGroup);
         const subgroupNames = SH.sides;
 
@@ -498,12 +502,20 @@ export default class ShapeManager {
             const sideLabel = shapeGroup.findOne(`#text_node_${subgroupName}`);
             const isHorizontal = SH.isHorizontal(subgroupName);
 
+            const backsplash = shapeGroup.findOne(
+                `.backsplash_${subgroupName}`
+            );
+            let backsplashOffset = 0;
+
             const attributes = {
                 x: subGroup.x(),
                 y: subGroup.y(),
             };
 
             if (isHorizontal) {
+                if (backsplash) {
+                    backsplashOffset = backsplash.height() + SH.wallBacksplashGap;
+                }
                 if (SH.isFirstInHorizontalOrVertical(subgroupName)) {
                     attributes.x = groupShapeObject.x();
                     attributes.y =
@@ -512,7 +524,8 @@ export default class ShapeManager {
                         spacingOffset;
 
                     sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
-                    sideLabel.y(subGroup.height() - 30);
+                    let y = subGroup.height() - 30 - backsplashOffset
+                    sideLabel.y(y);
                     createInputs && this.createWidthInput(subGroup);
                 } else {
                     attributes.x = groupShapeObject.x();
@@ -522,11 +535,14 @@ export default class ShapeManager {
                         spacingOffset;
 
                     sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
-                    sideLabel.y(30);
+                    sideLabel.y(30 + backsplashOffset);
 
                     createInputs && this.createWidthInput(subGroup);
                 }
             } else {
+                if (backsplash) {
+                    backsplashOffset = backsplash.width() + SH.wallBacksplashGap;
+                }
                 if (SH.isFirstInHorizontalOrVertical(subgroupName)) {
                     attributes.x =
                         groupShapeObject.x() +
@@ -534,7 +550,7 @@ export default class ShapeManager {
                         spacingOffset;
                     attributes.y = groupShapeObject.y();
 
-                    sideLabel.x(30);
+                    sideLabel.x(30 + backsplashOffset);
                     sideLabel.y(subGroup.height() - subGroup.height() * 0.8);
                     createInputs && this.createHeightInput(subGroup);
                 } else {
@@ -542,16 +558,18 @@ export default class ShapeManager {
                         groupShapeObject.x() - subGroup.width() - spacingOffset;
                     attributes.y = groupShapeObject.y();
 
-                    sideLabel.x(subGroup.width() - subGroup.width() * 0.4);
+                    sideLabel.x((subGroup.width() - (subGroup.width() * 0.4)) - backsplashOffset);
                     sideLabel.y(30);
                     createInputs && this.createHeightInput(subGroup);
                 }
             }
 
-            subGroup.position({
-                x: attributes.x,
-                y: attributes.y,
-            });
+            if (updateLabelPositionOnly === false) {
+                subGroup.position({
+                    x: attributes.x,
+                    y: attributes.y,
+                });
+            }
             this.updateInputsPosition(subGroup);
         });
     }
@@ -561,7 +579,7 @@ export default class ShapeManager {
      * @param {Konva.Group} SubGroup - border group, containing wall and size input
      * @param {Konva.Group} shapeGroup - main shape group containing everything, shape, edge group etc.
      */
-    static addWall(SubGroup, shapeGroup) {
+    addWall(SubGroup, shapeGroup) {
         if (SubGroup.findOne(`.wall_${SubGroup.name()}`)) {
             alert("Wall already exists");
             return;
@@ -569,6 +587,7 @@ export default class ShapeManager {
 
         const wall = new Konva.Rect({
             name: "wall_" + SubGroup.name(),
+            id: "wall_" + SubGroup.name(),
             fill: "#3b3b3b",
             width: SubGroup.width(),
             height: 10,
@@ -614,20 +633,16 @@ export default class ShapeManager {
      * @param {Konva.Group} shapeGroup - main shape group, containing everything.
      * @param {import("./helpers/SquareHelper.js").SquareSide} wall
      */
-    static removeWall(SubGroup, shapeGroup, wall) {
+    removeWall(SubGroup, shapeGroup, wall) {
         const wallObj = SubGroup.findOne(`.wall_${wall}`);
         wallObj.destroy();
-
-        const backsplashObj = SubGroup.findOne(`.backsplash_${wall}`);
-        backsplashObj?.destroy();
 
         let againstTheWall = shapeGroup.getAttr("againstTheWall");
         againstTheWall[SubGroup.name()] = false;
         shapeGroup.setAttr("againstTheWall", againstTheWall);
 
-        let backsplashes = shapeGroup.getAttr("backsplashes");
-        backsplashes[SubGroup.name()] = false;
-        shapeGroup.setAttr("backsplashes", backsplashes);
+        // remove backsplash also when wall removed.
+        this.removeBacksplash(SubGroup, shapeGroup, wall);
 
         EventManager.dispatchShapeSelect(shapeGroup);
     }
@@ -637,7 +652,7 @@ export default class ShapeManager {
      * @param {Konva.Group} SubGroup - border group, containing wall and size input
      * @param {Konva.Group} shapeGroup - main shape group containing everything, shape, edge group etc.
      */
-    static async addBacksplash(SubGroup, shapeGroup) {
+    async addBacksplash(SubGroup, shapeGroup) {
         let dispatchShapeSelect = false;
         if (!SubGroup.findOne(`.wall_${SubGroup.name()}`)) {
             console.info("[Builder] Adding wall before adding backsplash");
@@ -648,8 +663,8 @@ export default class ShapeManager {
             alert("Backsplash already exists");
             return;
         }
-
         const backsplash = new Konva.Rect({
+            id: "backsplash_" + SubGroup.name(),
             name: "backsplash_" + SubGroup.name(),
             fill: "red", //"#3b3b3b",
             width: SubGroup.width(),
@@ -703,6 +718,8 @@ export default class ShapeManager {
         if (dispatchShapeSelect) {
             EventManager.dispatchShapeSelect(shapeGroup);
         }
+        this.updateInputsPosition(SubGroup);
+        this.updateEdgeGroupsPosition(shapeGroup, false, true);
     }
 
     /**
@@ -711,13 +728,18 @@ export default class ShapeManager {
      * @param {Konva.Group} shapeGroup - main shape group, containing everything.
      * @param {import("./helpers/SquareHelper.js").SquareSide} wall
      */
-    static removeBacksplash(SubGroup, shapeGroup, wall) {
+    removeBacksplash(SubGroup, shapeGroup, wall) {
         const backsplashObj = SubGroup.findOne(`.backsplash_${wall}`);
-        backsplashObj.destroy();
+        if (backsplashObj) {
+            backsplashObj.destroy();
 
-        let backsplashes = shapeGroup.getAttr("backsplashes");
-        backsplashes[SubGroup.name()] = false;
-        shapeGroup.setAttr("backsplashes", backsplashes);
+            let backsplashes = shapeGroup.getAttr("backsplashes");
+            backsplashes[SubGroup.name()] = false;
+            shapeGroup.setAttr("backsplashes", backsplashes);
+
+            this.updateInputsPosition(SubGroup);
+            this.updateEdgeGroupsPosition(shapeGroup, false, true);
+        }
     }
 
     /**
@@ -844,6 +866,20 @@ export default class ShapeManager {
         );
         edgeGroups.forEach((edgeGroup) => {
             edgeGroup.setAttr(attr, Number(inputBox.value) * SizeDiff);
+
+            // Update wall and backsplash size also.
+            const wall = edgeGroup.findOne((node) => {
+                return String(node.id()).startsWith('wall_')
+            })
+            if(wall) {
+                wall.setAttr(attr, Number(inputBox.value) * SizeDiff);
+            }
+            const backsplash = edgeGroup.findOne((node) => {
+                return String(node.id()).startsWith('backsplash_')
+            })
+            if(backsplash) {
+                backsplash.setAttr(attr, Number(inputBox.value) * SizeDiff);
+            }
         });
         this.updateInputsPosition(subGroup);
         this.updateHoverActionOverlayPosition(shapeGroup);

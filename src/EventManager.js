@@ -185,7 +185,7 @@ export default class EventManager {
         });
         /** @type {Konva.Group} */
         const wallGroup = shape.findOne(`.${wall}`);
-        ShapeManager.addWall(wallGroup, shape);
+        this.manager.shapeManager.addWall(wallGroup, shape);
     }
 
     /**
@@ -200,7 +200,7 @@ export default class EventManager {
         });
         /** @type {Konva.Group} */
         const wallGroup = shape.findOne(`.${wall}`);
-        ShapeManager.removeWall(wallGroup, shape, wall);
+        this.manager.shapeManager.removeWall(wallGroup, shape, wall);
     }
 
     /**
@@ -215,7 +215,7 @@ export default class EventManager {
         });
         /** @type {Konva.Group} */
         const backsplashGroup = shape.findOne(`.${wall}`);
-        ShapeManager.addBacksplash(backsplashGroup, shape);
+        this.manager.shapeManager.addBacksplash(backsplashGroup, shape)
     }
 
     /**
@@ -230,7 +230,7 @@ export default class EventManager {
         });
         /** @type {Konva.Group} */
         const backsplashGroup = shape.findOne(`.${wall}`);
-        ShapeManager.removeBacksplash(backsplashGroup, shape, wall);
+        this.manager.shapeManager.removeBacksplash(backsplashGroup, shape, wall)
     }
 
     export() {
