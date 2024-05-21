@@ -674,7 +674,6 @@ export default class ShapeManager {
             name: "backsplash_" + SubGroup.name(),
             fill: "rgba(0, 0, 0, 0.65)",
             width: SubGroup.width(),
-            height: 30,
         });
         SubGroup.add(backsplash);
 
@@ -700,7 +699,7 @@ export default class ShapeManager {
             backsplash.height(SubGroup.height());
             backsplash.width(30);
             if (!SH.isFirstInHorizontalOrVertical(backsplashGroupName)) {
-                attributes.x = backsplash.width() - wallSizeOffset;
+                attributes.x = SubGroup.width() - backsplash.width() - wallSizeOffset;
             } else {
                 attributes.x = wallSizeOffset;
             }
