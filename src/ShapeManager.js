@@ -514,7 +514,8 @@ export default class ShapeManager {
 
             if (isHorizontal) {
                 if (backsplash) {
-                    backsplashOffset = backsplash.height() + SH.wallBacksplashGap;
+                    backsplashOffset =
+                        backsplash.height() + SH.wallBacksplashGap;
                 }
                 if (SH.isFirstInHorizontalOrVertical(subgroupName)) {
                     attributes.x = groupShapeObject.x();
@@ -524,7 +525,7 @@ export default class ShapeManager {
                         spacingOffset;
 
                     sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
-                    let y = subGroup.height() - 30 - backsplashOffset
+                    let y = subGroup.height() - 30 - backsplashOffset;
                     sideLabel.y(y);
                     createInputs && this.createWidthInput(subGroup);
                 } else {
@@ -541,7 +542,8 @@ export default class ShapeManager {
                 }
             } else {
                 if (backsplash) {
-                    backsplashOffset = backsplash.width() + SH.wallBacksplashGap;
+                    backsplashOffset =
+                        backsplash.width() + SH.wallBacksplashGap;
                 }
                 if (SH.isFirstInHorizontalOrVertical(subgroupName)) {
                     attributes.x =
@@ -558,7 +560,11 @@ export default class ShapeManager {
                         groupShapeObject.x() - subGroup.width() - spacingOffset;
                     attributes.y = groupShapeObject.y();
 
-                    sideLabel.x((subGroup.width() - (subGroup.width() * 0.4)) - backsplashOffset);
+                    sideLabel.x(
+                        subGroup.width() -
+                            subGroup.width() * 0.4 -
+                            backsplashOffset
+                    );
                     sideLabel.y(30);
                     createInputs && this.createHeightInput(subGroup);
                 }
@@ -666,9 +672,9 @@ export default class ShapeManager {
         const backsplash = new Konva.Rect({
             id: "backsplash_" + SubGroup.name(),
             name: "backsplash_" + SubGroup.name(),
-            fill: "red", //"#3b3b3b",
+            fill: "rgba(0, 0, 0, 0.65)",
             width: SubGroup.width(),
-            height: 50,
+            height: 30,
         });
         SubGroup.add(backsplash);
 
@@ -679,7 +685,7 @@ export default class ShapeManager {
             const wallSizeOffset =
                 SubGroup.findOne(`.wall_${SubGroup.name()}`).height() +
                 SH.wallBacksplashGap;
-            backsplash.height(50);
+            backsplash.height(30);
             backsplash.width(SubGroup.width());
             if (SH.isFirstInHorizontalOrVertical(backsplashGroupName)) {
                 attributes.y = SubGroup.height() - backsplash.height();
@@ -692,7 +698,7 @@ export default class ShapeManager {
                 SubGroup.findOne(`.wall_${SubGroup.name()}`).width() +
                 SH.wallBacksplashGap;
             backsplash.height(SubGroup.height());
-            backsplash.width(50);
+            backsplash.width(30);
             if (!SH.isFirstInHorizontalOrVertical(backsplashGroupName)) {
                 attributes.x = backsplash.width() - wallSizeOffset;
             } else {
@@ -869,15 +875,15 @@ export default class ShapeManager {
 
             // Update wall and backsplash size also.
             const wall = edgeGroup.findOne((node) => {
-                return String(node.id()).startsWith('wall_')
-            })
-            if(wall) {
+                return String(node.id()).startsWith("wall_");
+            });
+            if (wall) {
                 wall.setAttr(attr, Number(inputBox.value) * SizeDiff);
             }
             const backsplash = edgeGroup.findOne((node) => {
-                return String(node.id()).startsWith('backsplash_')
-            })
-            if(backsplash) {
+                return String(node.id()).startsWith("backsplash_");
+            });
+            if (backsplash) {
                 backsplash.setAttr(attr, Number(inputBox.value) * SizeDiff);
             }
         });
