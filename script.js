@@ -1,6 +1,6 @@
 /**
  *
- * @typedef {"mkd-plugin:zoom-in" | "mkd-plugin:zoom-out" | "mkd-plugin:zoom-reset" | "mkd-plugin:drag" | "mkd-plugin:position-reset" | "mkd-plugin:draw:square" | "mkd-plugin:export" | "mkd-plugin:toggle-wall" | "mkd-plugin:active-shape" | "mkd-plugin:shape-name" | "mkd-plugin:toggle-backsplash"} MKDPluginEvent
+ * @typedef {"mkd-plugin:zoom-in" | "mkd-plugin:zoom-out" | "mkd-plugin:zoom-reset" | "mkd-plugin:drag" | "mkd-plugin:position-reset" | "mkd-plugin:draw:square" | "mkd-plugin:export" | "mkd-plugin:toggle-wall" | "mkd-plugin:active-shape" | "mkd-plugin:shape-name" | "mkd-plugin:toggle-backsplash" | "mkd-plugin:rotate-left" | "mkd-plugin:rotate-right"} MKDPluginEvent
  *
  * @typedef {Object} PayloadType
  * @property {?string} image - image path
@@ -38,6 +38,28 @@ jQuery(document).ready(function ($) {
     });
     $("#zoom-reset").on("click", function () {
         dispatchCanvasEvent("mkd-plugin:zoom-reset");
+    });
+    $("#rotate-left").on("click", function () {
+        if (!document.activeShape) {
+            alert(
+                "Hey there! Feeling a bit stuck, huh? Let’s tackle one thing at a time. First up: what shape are we dealing with here?"
+            );
+            return;
+        }
+        dispatchCanvasEvent("mkd-plugin:rotate-left", {
+            shapeId: document.activeShape,
+        });
+    });
+    $("#rotate-right").on("click", function () {
+        if (!document.activeShape) {
+            alert(
+                "Hey there! Feeling a bit stuck, huh? Let’s tackle one thing at a time. First up: what shape are we dealing with here?"
+            );
+            return;
+        }
+        dispatchCanvasEvent("mkd-plugin:rotate-right", {
+            shapeId: document.activeShape,
+        });
     });
     $("#enable-drag").on("change", function () {
         dispatchCanvasEvent("mkd-plugin:drag", { enable: this.checked });

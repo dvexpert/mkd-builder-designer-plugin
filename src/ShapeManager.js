@@ -182,9 +182,7 @@ export default class ShapeManager {
 
             const action = targetElm.getAttribute("data-action");
             if (action === ShapeActions.Rotate) {
-                const $shape = this.getShapeObject(this.currentHoverNode);
-                rotateGroup(this.currentHoverNode, $shape, 90);
-                this.updateHoverActionOverlayPosition();
+                this.rotateShapeGroup(this.currentHoverNode, 90);
             } else if (action === ShapeActions.Place) {
                 let materialImage = this.currentHoverNode
                     .findOne(`#${SquareShapeIds.ShapePlaceholderObject}`)
@@ -193,6 +191,19 @@ export default class ShapeManager {
                 this.updateHoverActionOverlayPosition();
             }
         });
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     * @param {number} rotation
+     */
+    rotateShapeGroup(shapeGroup, rotation) {
+        const $shape = this.getShapeObject(shapeGroup);
+        rotateGroup(shapeGroup, $shape, rotation);
+
+        this.updateHoverActionOverlayPosition(shapeGroup);
+        this.updateAttributesOverlayPosition(shapeGroup);
     }
 
     /**
@@ -699,7 +710,8 @@ export default class ShapeManager {
             backsplash.height(SubGroup.height());
             backsplash.width(30);
             if (!SH.isFirstInHorizontalOrVertical(backsplashGroupName)) {
-                attributes.x = SubGroup.width() - backsplash.width() - wallSizeOffset;
+                attributes.x =
+                    SubGroup.width() - backsplash.width() - wallSizeOffset;
             } else {
                 attributes.x = wallSizeOffset;
             }

@@ -73,6 +73,22 @@ export default class EventManager {
             }
             this.changeShapeName(request.shapeId, request.shapeName);
         });
+        document.addEventListener("mkd-plugin:rotate-left", (e) => {
+            const request = e?.detail;
+            if (!request?.shapeId) {
+                request.error && request.error({ message: "No active shape." });
+                return;
+            }
+            this.rotate(request.shapeId, -90);
+        });
+        document.addEventListener("mkd-plugin:rotate-right", (e) => {
+            const request = e?.detail;
+            if (!request?.shapeId) {
+                request.error && request.error({ message: "No active shape." });
+                return;
+            }
+            this.rotate(request.shapeId, 90);
+        });
     }
     /**
      *
@@ -176,13 +192,19 @@ export default class EventManager {
     /**
      *
      * @param {number} shapeId - this should be node._id and not the node.id()
+     * @returns {Konva.Group}
+     */
+    getShapeById(shapeId) {
+        return this.stage.findOne((node) => node._id === shapeId);
+    }
+
+    /**
+     *
+     * @param {number} shapeId - this should be node._id and not the node.id()
      * @param {import("./helpers/SquareHelper").SquareSide} wall - a | b | c | d
      */
     addWall(shapeId, wall) {
-        /** @type {Konva.Group} */
-        const shape = this.stage.findOne((node) => {
-            return node._id === shapeId;
-        });
+        const shape = this.getShapeById(shapeId);
         /** @type {Konva.Group} */
         const wallGroup = shape.findOne(`.${wall}`);
         this.manager.shapeManager.addWall(wallGroup, shape);
@@ -194,10 +216,7 @@ export default class EventManager {
      * @param {import("./helpers/SquareHelper").SquareSide} wall - a | b | c | d
      */
     removeWall(shapeId, wall) {
-        /** @type {Konva.Group} */
-        const shape = this.stage.findOne((node) => {
-            return node._id === shapeId;
-        });
+        const shape = this.getShapeById(shapeId);
         /** @type {Konva.Group} */
         const wallGroup = shape.findOne(`.${wall}`);
         this.manager.shapeManager.removeWall(wallGroup, shape, wall);
@@ -209,13 +228,10 @@ export default class EventManager {
      * @param {import("./helpers/SquareHelper").SquareSide} wall - a | b | c | d
      */
     addBacksplash(shapeId, wall) {
-        /** @type {Konva.Group} */
-        const shape = this.stage.findOne((node) => {
-            return node._id === shapeId;
-        });
+        const shape = this.getShapeById(shapeId);
         /** @type {Konva.Group} */
         const backsplashGroup = shape.findOne(`.${wall}`);
-        this.manager.shapeManager.addBacksplash(backsplashGroup, shape)
+        this.manager.shapeManager.addBacksplash(backsplashGroup, shape);
     }
 
     /**
@@ -224,13 +240,14 @@ export default class EventManager {
      * @param {import("./helpers/SquareHelper").SquareSide} wall - a | b | c | d
      */
     removeBacksplash(shapeId, wall) {
-        /** @type {Konva.Group} */
-        const shape = this.stage.findOne((node) => {
-            return node._id === shapeId;
-        });
+        const shape = this.getShapeById(shapeId);
         /** @type {Konva.Group} */
         const backsplashGroup = shape.findOne(`.${wall}`);
-        this.manager.shapeManager.removeBacksplash(backsplashGroup, shape, wall)
+        this.manager.shapeManager.removeBacksplash(
+            backsplashGroup,
+            shape,
+            wall
+        );
     }
 
     export() {
@@ -282,13 +299,24 @@ export default class EventManager {
      * @param {string} shapeName
      */
     changeShapeName(shapeId, shapeName) {
-        /** @type {Konva.Group} */
-        const shapeGroup = this.stage.findOne((node) => {
-            return node._id === shapeId;
-        });
+        const shapeGroup = this.getShapeById(shapeId);
         shapeGroup.setAttr("shapeName", shapeName);
         document.querySelector(
             `#attributes-overlay-${shapeGroup._id} #shape-name`
         ).innerHTML = shapeName;
+    }
+
+    /**
+     *
+     * @param {number} shapeId
+     * @param {number} rotation - +90 or -90 degrees
+     */
+    rotate(shapeId, rotation) {
+        const shape = this.getShapeById(shapeId);
+        if (!shape) {
+            console.error("Shape not found with id " + shapeId);
+            return;
+        }
+        this.manager.shapeManager.rotateShapeGroup(shape, rotation);
     }
 }
