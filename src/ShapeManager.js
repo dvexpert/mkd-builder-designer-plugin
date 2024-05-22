@@ -396,11 +396,6 @@ export default class ShapeManager {
 
             shapeGroup.add(squarePlaceHolderObject);
 
-            /**
-             * Create Height Input
-             */
-            // this.createHeightInput(shapeGroup);
-            // this.createWidthInput(shapeGroup);
             this.createEdgeGroups(shapeGroup);
             this.layer.add(shapeGroup);
         } else {
@@ -410,19 +405,23 @@ export default class ShapeManager {
             });
 
             // Place image element onto the layer with actual material image
+            /** @type {Konva.Rect} */
             const placeHolderElm = shapeGroup.findOne(
                 `#${SquareShapeIds.ShapePlaceholderObject}`
             );
 
             const imageObj = document.createElement("img");
             imageObj.src = materialImage;
+
             const squareObject = new Konva.Image({
                 id: "shapeObject",
                 x: placeHolderElm.position().x,
                 y: placeHolderElm.position().y,
                 width: placeHolderElm.width(),
                 height: placeHolderElm.height(),
+                cornerRadius: placeHolderElm.cornerRadius(),
                 image: imageObj,
+                stroke: '#000',
                 dragBoundFunc: function (pos) {
                     return {
                         x: Math.max(pos.x, 0),
@@ -481,6 +480,8 @@ export default class ShapeManager {
             });
             subGroup.add(sideLabel);
 
+            this.addCheckboxGroup(subGroup, subgroupName, shapeGroup);
+
             // TODO: For development purposes only
             // const tempRect = new Konva.Rect({
             //     fill: subgroupColor[index],
@@ -491,6 +492,68 @@ export default class ShapeManager {
         });
 
         this.updateEdgeGroupsPosition(shapeGroup, true);
+    }
+
+    /**
+     *
+     * @param {Konva.Group} subGroupNode
+     * @param {import("./helpers/SquareHelper.js").SquareSide} subgroupName
+     * @param {Konva.Group} shapeGroup
+     */
+    addCheckboxGroup(subGroupNode, subgroupName, shapeGroup) {
+        const checkboxGroup = new Konva.Group({
+            id: `checkbox_node_${subgroupName}`,
+            name: `checkbox_node_${subgroupName}`,
+        });
+        const checkboxRect = new Konva.Rect({
+            x: 0,
+            y: 0,
+            width: 20,
+            height: 20,
+            stroke: "black",
+            strokeWidth: 2,
+            fill: "white",
+        });
+
+        const checkMarkLine = new Konva.Line({
+            points: [8, 10, 10, 15, 16, 5],
+            stroke: "black",
+            strokeWidth: 2,
+            visible: false, // Initially hidden
+        });
+
+        checkMarkLine.x(-2);
+        checkboxGroup.add(checkboxRect, checkMarkLine);
+        subGroupNode.add(checkboxGroup);
+
+        
+        checkboxGroup.on("click", () => {
+            const isVisible = !checkMarkLine.visible();
+            checkMarkLine.visible(isVisible);
+            /** @type {Konva.Rect} */
+            const shapeObject = this.getShapeObject(shapeGroup);
+            console.log({ shapeObject });
+
+            let roundedCorners = shapeGroup.getAttr("roundedCorners");
+            if (!roundedCorners || typeof roundedCorners !== "object") {
+                roundedCorners = {
+                    [SH.SideA]: false,
+                    [SH.SideB]: false,
+                    [SH.SideC]: false,
+                    [SH.SideD]: false,
+                };
+            }
+
+            roundedCorners[subgroupName] = isVisible;
+            shapeGroup.setAttr("roundedCorners", roundedCorners);
+
+            shapeObject.cornerRadius([
+                roundedCorners[SH.SideA] ? 15 : 0,
+                roundedCorners[SH.SideB] ? 15 : 0,
+                roundedCorners[SH.SideC] ? 15 : 0,
+                roundedCorners[SH.SideD] ? 15 : 0,
+            ]);
+        });
     }
 
     /**
@@ -516,6 +579,10 @@ export default class ShapeManager {
             const backsplash = shapeGroup.findOne(
                 `.backsplash_${subgroupName}`
             );
+            const checkboxGroup = shapeGroup.findOne(
+                `.checkbox_node_${subgroupName}`
+            );
+            const checkboxRect = checkboxGroup.findOne("Rect");
             let backsplashOffset = 0;
 
             const attributes = {
@@ -538,6 +605,9 @@ export default class ShapeManager {
                     sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
                     let y = subGroup.height() - 30 - backsplashOffset;
                     sideLabel.y(y);
+
+                    checkboxGroup.y(y);
+
                     createInputs && this.createWidthInput(subGroup);
                 } else {
                     attributes.x = groupShapeObject.x();
@@ -547,7 +617,10 @@ export default class ShapeManager {
                         spacingOffset;
 
                     sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
-                    sideLabel.y(30 + backsplashOffset);
+                    sideLabel.y(15 + backsplashOffset);
+
+                    checkboxGroup.x(subGroup.width() - checkboxRect.width());
+                    checkboxGroup.y(15 + backsplashOffset);
 
                     createInputs && this.createWidthInput(subGroup);
                 }
@@ -563,20 +636,28 @@ export default class ShapeManager {
                         spacingOffset;
                     attributes.y = groupShapeObject.y();
 
-                    sideLabel.x(30 + backsplashOffset);
-                    sideLabel.y(subGroup.height() - subGroup.height() * 0.8);
+                    const x = 15 + backsplashOffset;
+                    sideLabel.x(x);
+                    sideLabel.y(
+                        subGroup.height() - subGroup.height() * 0.8 + 10
+                    );
+                    checkboxGroup.x(x);
                     createInputs && this.createHeightInput(subGroup);
                 } else {
                     attributes.x =
                         groupShapeObject.x() - subGroup.width() - spacingOffset;
                     attributes.y = groupShapeObject.y();
 
-                    sideLabel.x(
+                    const x =
                         subGroup.width() -
-                            subGroup.width() * 0.4 -
-                            backsplashOffset
-                    );
+                        subGroup.width() * 0.4 -
+                        backsplashOffset;
+                    sideLabel.x(x);
                     sideLabel.y(30);
+
+                    checkboxGroup.x(x);
+                    checkboxGroup.y(subGroup.height() - checkboxRect.height());
+
                     createInputs && this.createHeightInput(subGroup);
                 }
             }

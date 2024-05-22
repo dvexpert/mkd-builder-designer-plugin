@@ -70,7 +70,7 @@ jQuery(document).ready(function ($) {
     $("#draw-square").on("click", function () {
         try {
             dispatchCanvasEvent("mkd-plugin:draw:square", {
-                image: "/dynamicAssets/material-1.png",
+                image: "/dynamicAssets/material-2.jpeg",
                 success: (resp) => console.log(resp),
                 error: (resp) => console.error(resp),
             });
