@@ -519,7 +519,7 @@ export default class ShapeManager {
             points: [8, 10, 10, 15, 16, 5],
             stroke: "black",
             strokeWidth: 2,
-            visible: false, // Initially hidden
+            visible: false,
         });
 
         checkMarkLine.x(-2);
@@ -532,7 +532,6 @@ export default class ShapeManager {
             checkMarkLine.visible(isVisible);
             /** @type {Konva.Rect} */
             const shapeObject = this.getShapeObject(shapeGroup);
-            console.log({ shapeObject });
 
             let roundedCorners = shapeGroup.getAttr("roundedCorners");
             if (!roundedCorners || typeof roundedCorners !== "object") {
