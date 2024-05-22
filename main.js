@@ -5,6 +5,6 @@ document.querySelector("#app").innerHTML = `<div id="canvas-container"></div>`;
 
 /** @type {HTMLDivElement} */
 const container = document.querySelector("#app #canvas-container");
-container.classList.add("border", "w-max", "relative", "overflow-hidden");
+container.classList.add("tw-border", "tw-w-max", "tw-relative", "tw-overflow-hidden");
 
 const konvaManager = new KonvaManager(container);

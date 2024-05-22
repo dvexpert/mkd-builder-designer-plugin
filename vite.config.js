@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
         },
         plugins: isPROD ? [minifyEs()] : [], // TODO: Disabled for development purpose only.
         build: {
-            emptyOutDir: isPROD,
+            emptyOutDir: true,
             outDir: "./dist",
             assetsDir: "assets",
             minify: "terser",

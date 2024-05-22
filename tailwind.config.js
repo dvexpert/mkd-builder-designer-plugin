@@ -1,5 +1,12 @@
 /** @type {import('tailwindcss').Config} */
+
+require('dotenv').config()
+
 export default {
+  prefix: 'tw-',
+  corePlugins: {
+    preflight: process.env?.VITE_BUILDING_FOR_DEMO
+  },
   content: [
     "./index.html",
     "./main.js",

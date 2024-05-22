@@ -26,22 +26,22 @@
         </style>
     </head>
     <body>
-        <div class="flex">
+        <div class="tw-flex">
             <div
-                class="border-black p-2 min-w-[220px] max-w-[220px] border-r h-screen pr-3"
+                class="tw-border-black tw-p-2 tw-min-w-[220px] tw-max-w-[220px] tw-border-r tw-h-screen tw-pr-3"
             >
-                <div class="min-h-20 font-bold text-lg text-center">
+                <div class="tw-min-h-20 tw-font-bold tw-text-lg tw-text-center">
                     MKD Designer Plugin
                 </div>
-                <div class="flex gap-8 flex-col">
-                    <div class="flex gap-2 justify-center items-center">
+                <div class="tw-flex tw-gap-8 tw-flex-col">
+                    <div class="tw-flex tw-gap-2 tw-justify-center tw-items-center">
                         <button
-                            class="p-2 border rounded hover:shadow flex-1"
+                            class="tw-p-2 tw-border tw-rounded hover:tw-shadow tw-flex-1"
                             id="zoom-in"
                             title="Zoom in"
                         >
                             <svg
-                                class="size-6 mx-auto"
+                                class="tw-size-6 tw-mx-auto"
                                 stroke="currentColor"
                                 fill="currentColor"
                                 stroke-width="0"
@@ -64,12 +64,12 @@
                             </svg>
                         </button>
                         <button
-                            class="p-2 border rounded hover:shadow flex-1"
+                            class="tw-p-2 tw-border tw-rounded hover:tw-shadow tw-flex-1"
                             id="zoom-out"
                             title="Zoom out"
                         >
                             <svg
-                                class="size-6 mx-auto"
+                                class="tw-size-6 tw-mx-auto"
                                 stroke="currentColor"
                                 fill="none"
                                 stroke-width="2"
@@ -92,12 +92,12 @@
                         </button>
                     </div>
                     <button
-                        class="p-2 border rounded hover:shadow"
+                        class="tw-p-2 tw-border tw-rounded hover:tw-shadow"
                         id="zoom-reset"
                         title="Reset Zoom"
                     >
                         <svg
-                            class="size-6 mx-auto"
+                            class="tw-size-6 tw-mx-auto"
                             stroke="currentColor"
                             fill="none"
                             stroke-width="2"
@@ -120,14 +120,14 @@
                         id="active-shape-customization-block"
                         style="display: none"
                     >
-                        <div class="flex gap-2 justify-center items-center mb-3">
+                        <div class="tw-flex tw-gap-2 tw-justify-center tw-items-center tw-mb-3">
                             <button
-                                class="p-2 border rounded hover:shadow flex-1"
+                                class="tw-p-2 tw-border tw-rounded hover:tw-shadow tw-flex-1"
                                 id="rotate-left"
                                 title="rotate left"
                             >
                                 <svg
-                                    class="size-5 mx-auto"
+                                    class="tw-size-5 tw-mx-auto"
                                     stroke="currentColor"
                                     fill="currentColor"
                                     stroke-width="0"
@@ -142,12 +142,12 @@
                                 </svg>
                             </button>
                             <button
-                                class="p-2 border rounded hover:shadow flex-1"
+                                class="tw-p-2 tw-border tw-rounded hover:tw-shadow tw-flex-1"
                                 id="rotate-right"
                                 title="Rotate right"
                             >
                                 <svg
-                                    class="size-5 mx-auto"
+                                    class="tw-size-5 tw-mx-auto"
                                     stroke="currentColor"
                                     fill="currentColor"
                                     stroke-width="0"
@@ -162,23 +162,23 @@
                                 </svg>
                             </button>
                         </div>
-                        <h2 class="font-medium">Walls and backsplahes</h2>
+                        <h2 class="tw-font-medium">Walls and backsplahes</h2>
                         <input
                             type="text"
                             id="shapeName"
                             data-val="Shape Name"
-                            class="mt-2 w-full px-2 font-medium border-0 ring-0"
+                            class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border-0 tw-ring-0"
                         />
-                        <div class="mt-6">
+                        <div class="tw-mt-6">
                             <b>A:</b> <br />
-                            <div class="ml-6">
+                            <div class="tw-ml-6">
                                 <input
                                     type="checkbox"
                                     class="wall"
                                     id="wall-a"
                                     data-wall="a"
                                 />
-                                <label for="wall-a" class="ml-2"
+                                <label for="wall-a" class="tw-ml-2"
                                     >Against the wall</label
                                 >
                                 <br />
@@ -188,21 +188,21 @@
                                     id="backsplash-a"
                                     data-wall="a"
                                 />
-                                <label for="backsplash-a" class="ml-2"
+                                <label for="backsplash-a" class="tw-ml-2"
                                     >Backsplash</label
                                 >
                             </div>
                         </div>
-                        <div class="mt-6">
+                        <div class="tw-mt-6">
                             <b>B:</b> <br />
-                            <div class="ml-6">
+                            <div class="tw-ml-6">
                                 <input
                                     type="checkbox"
                                     class="wall"
                                     id="wall-b"
                                     data-wall="b"
                                 />
-                                <label for="wall-b" class="ml-2"
+                                <label for="wall-b" class="tw-ml-2"
                                     >Against the wall</label
                                 >
                                 <br />
@@ -212,21 +212,21 @@
                                     id="backsplash-b"
                                     data-wall="b"
                                 />
-                                <label for="backsplash-b" class="ml-2"
+                                <label for="backsplash-b" class="tw-ml-2"
                                     >Backsplash</label
                                 >
                             </div>
                         </div>
-                        <div class="mt-6">
+                        <div class="tw-mt-6">
                             <b>C:</b> <br />
-                            <div class="ml-6">
+                            <div class="tw-ml-6">
                                 <input
                                     type="checkbox"
                                     class="wall"
                                     id="wall-c"
                                     data-wall="c"
                                 />
-                                <label for="wall-c" class="ml-2"
+                                <label for="wall-c" class="tw-ml-2"
                                     >Against the wall</label
                                 >
                                 <br />
@@ -236,21 +236,21 @@
                                     id="backsplash-c"
                                     data-wall="c"
                                 />
-                                <label for="backsplash-c" class="ml-2"
+                                <label for="backsplash-c" class="tw-ml-2"
                                     >Backsplash</label
                                 >
                             </div>
                         </div>
-                        <div class="mt-6">
+                        <div class="tw-mt-6">
                             <b>D:</b> <br />
-                            <div class="ml-6">
+                            <div class="tw-ml-6">
                                 <input
                                     type="checkbox"
                                     class="wall"
                                     id="wall-d"
                                     data-wall="d"
                                 />
-                                <label for="wall-d" class="ml-2"
+                                <label for="wall-d" class="tw-ml-2"
                                     >Against the wall</label
                                 >
                                 <br />
@@ -260,7 +260,7 @@
                                     id="backsplash-d"
                                     data-wall="d"
                                 />
-                                <label for="backsplash-d" class="ml-2"
+                                <label for="backsplash-d" class="tw-ml-2"
                                     >Backsplash</label
                                 >
                             </div>
@@ -269,12 +269,12 @@
                 </div>
             </div>
 
-            <div class="w-full">
-                <div class="flex gap-4 items-center border-b p-4">
-                    <div class="flex gap-4 items-center">
-                        <h4 class="font-medium">Add Shapes</h4>
-                        <div class="flex gap-6 items-center [&_div]:min-w-32">
-                            <button id="draw-square" class="mx-auto">
+            <div class="tw-w-full">
+                <div class="tw-flex tw-gap-4 tw-items-center tw-border-b tw-p-4">
+                    <div class="tw-flex tw-gap-4 tw-items-center">
+                        <h4 class="tw-font-medium">Add Shapes</h4>
+                        <div class="tw-flex tw-gap-6 tw-items-center [&_div]:tw-min-w-32">
+                            <button id="draw-square" class="tw-mx-auto">
                                 <svg
                                     width="50"
                                     height="50"
@@ -283,8 +283,8 @@
                                     <rect width="50" height="50" fill="gray" />
                                 </svg>
                             </button>
-                            <div class="relative text-center flex">
-                                <button id="draw-l" class="mx-auto disabled">
+                            <div class="tw-relative tw-text-center tw-flex">
+                                <button id="draw-l" class="tw-mx-auto disabled">
                                     <svg
                                         width="50"
                                         height="50"
@@ -301,8 +301,8 @@
                                     </svg>
                                 </button>
                             </div>
-                            <div class="relative text-center flex">
-                                <button id="draw-l" class="mx-auto disabled">
+                            <div class="tw-relative tw-text-center tw-flex">
+                                <button id="draw-l" class="tw-mx-auto disabled">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         width="50"
@@ -319,8 +319,8 @@
                                     </svg>
                                 </button>
                             </div>
-                            <div class="relative text-center flex">
-                                <button id="draw-l" class="mx-auto disabled">
+                            <div class="tw-relative tw-text-center tw-flex">
+                                <button id="draw-l" class="tw-mx-auto disabled">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         width="50"
@@ -338,19 +338,19 @@
                                     </svg>
                                 </button>
                             </div>
-                            <div class="flex justify-center">
+                            <div class="tw-flex tw-justify-center">
                                 <input
                                     type="checkbox"
                                     id="enable-drag"
-                                    class="peer hidden"
+                                    class="tw-peer tw-hidden"
                                 />
                                 <label
                                     for="enable-drag"
-                                    class="text-gray-500 peer-checked:text-black cursor-pointer"
+                                    class="tw-text-gray-500 tw-peer-checked:tw-text-black tw-cursor-pointer"
                                     title="Enable Stage Drag"
                                 >
                                     <svg
-                                        class="size-10"
+                                        class="tw-size-10"
                                         stroke="currentColor"
                                         fill="currentColor"
                                         stroke-width="0"
@@ -366,7 +366,7 @@
                                 </label>
 
                                 <button
-                                    class="p-2 border rounded hover:shadow ml-4"
+                                    class="tw-p-2 tw-border tw-rounded hover:tw-shadow tw-ml-4"
                                     id="position-reset"
                                 >
                                     Position Reset
@@ -375,14 +375,14 @@
                         </div>
                     </div>
                     <button
-                        class="p-2 px-4 border rounded text-xl hover:shadow ml-auto"
+                        class="tw-p-2 tw-px-4 tw-border tw-rounded tw-text-xl hover:tw-shadow tw-ml-auto"
                         id="export"
                         title="Export canvas png and json data"
                     >
                         Export
                     </button>
                 </div>
-                <div id="app" class="w-max mx-auto"></div>
+                <div id="app" class="tw-w-max tw-mx-auto"></div>
             </div>
         </div>
 
