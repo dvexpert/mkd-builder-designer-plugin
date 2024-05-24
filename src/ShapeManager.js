@@ -122,6 +122,9 @@ export default class ShapeManager {
     deleteShape(shapeGroup) {
         this.getShapeGroupAttributeOverlay(shapeGroup)?.remove();
         shapeGroup.destroy();
+
+        // dispatch shape deleted event for external side effects.
+        this.eventManager.dispatchShapeDelete(shapeGroup._id);
     }
 
     createActionOverlay() {
@@ -1177,7 +1180,9 @@ export default class ShapeManager {
         ).body.firstChild;
         attributeOverlay.id = `${attributeOverlay.id}-${shapeGroup._id}`;
         const shapeName = `Shape ${shapeGroup._id}`;
-        attributeOverlay.querySelector("#shape-name").innerHTML = shapeName;
+        const shapeNameElm = attributeOverlay.querySelector("#shape-name")
+        shapeNameElm.innerHTML = shapeName;
+        shapeNameElm.setAttribute('title', shapeName);
         shapeGroup.setAttr("shapeName", shapeName);
 
         attributeOverlay.addEventListener("mouseenter", (e) => {

@@ -81,7 +81,10 @@ export default class EventManager {
                 request.error && request.error({ message: e.message });
                 return;
             }
-            request.success && request.success({ message: "Shape name updated successfully." });
+            request.success &&
+                request.success({
+                    message: "Shape name updated successfully.",
+                });
         });
         document.addEventListener("mkd-plugin:rotate-left", (e) => {
             const request = e?.detail;
@@ -116,7 +119,7 @@ export default class EventManager {
     deleteShape(shapeId) {
         const shapeGroup = this.getShapeById(shapeId);
         if (shapeGroup) {
-            this.manager.shapeManager.deleteShape(shapeGroup)
+            this.manager.shapeManager.deleteShape(shapeGroup);
         }
     }
 
@@ -126,6 +129,19 @@ export default class EventManager {
      */
     dispatchShapeSelect(shapeGroup) {
         EventManager.dispatchShapeSelect(shapeGroup);
+    }
+
+    /**
+     *
+     * @param {number} shapeId
+     */
+    dispatchShapeDelete(shapeId) {
+        const newEvent = new CustomEvent("mkd-plugin:shape-deleted", {
+            detail: {
+                shapeId: shapeId,
+            },
+        });
+        document.dispatchEvent(newEvent);
     }
 
     /**
@@ -332,9 +348,11 @@ export default class EventManager {
     changeShapeName(shapeId, shapeName) {
         const shapeGroup = this.getShapeById(shapeId);
         shapeGroup.setAttr("shapeName", shapeName);
-        document.querySelector(
+        const shapeNameElm = document.querySelector(
             `#attributes-overlay-${shapeGroup._id} #shape-name`
-        ).innerHTML = shapeName;
+        );
+        shapeNameElm.innerHTML = shapeName;
+        shapeNameElm.setAttribute('title', shapeName);
     }
 
     /**
