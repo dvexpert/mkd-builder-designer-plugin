@@ -34,7 +34,9 @@
                     MKD Designer Plugin
                 </div>
                 <div class="tw-flex tw-gap-8 tw-flex-col">
-                    <div class="tw-flex tw-gap-2 tw-justify-center tw-items-center">
+                    <div
+                        class="tw-flex tw-gap-2 tw-justify-center tw-items-center"
+                    >
                         <button
                             class="tw-p-2 tw-border tw-rounded hover:tw-shadow tw-flex-1"
                             id="zoom-in"
@@ -120,7 +122,9 @@
                         id="active-shape-customization-block"
                         style="display: none"
                     >
-                        <div class="tw-flex tw-gap-2 tw-justify-center tw-items-center tw-mb-3">
+                        <div
+                            class="tw-flex tw-gap-2 tw-justify-center tw-items-center tw-mb-3"
+                        >
                             <button
                                 class="tw-p-2 tw-border tw-rounded hover:tw-shadow tw-flex-1"
                                 id="rotate-left"
@@ -270,10 +274,14 @@
             </div>
 
             <div class="tw-w-full">
-                <div class="tw-flex tw-gap-4 tw-items-center tw-border-b tw-p-4">
+                <div
+                    class="tw-flex tw-gap-4 tw-items-center tw-border-b tw-p-4"
+                >
                     <div class="tw-flex tw-gap-4 tw-items-center">
                         <h4 class="tw-font-medium">Add Shapes</h4>
-                        <div class="tw-flex tw-gap-6 tw-items-center [&_div]:tw-min-w-32">
+                        <div
+                            class="tw-flex tw-gap-6 tw-items-center [&_div]:tw-min-w-32"
+                        >
                             <button id="draw-square" class="tw-mx-auto">
                                 <svg
                                     width="50"
@@ -346,7 +354,7 @@
                                 />
                                 <label
                                     for="enable-drag"
-                                    class="tw-text-gray-500 tw-peer-checked:tw-text-black tw-cursor-pointer"
+                                    class="tw-text-gray-500 peer-checked:tw-text-black tw-cursor-pointer"
                                     title="Enable Stage Drag"
                                 >
                                     <svg
@@ -394,5 +402,25 @@
 
         <script type="text/javascript" src="script.js" defer></script>
         <script type="module" src="./dist/mkd-plugin.es.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                document.querySelector(
+                    "#app"
+                ).innerHTML = `<div id="canvas-container"></div>`;
+
+                /** @type {HTMLDivElement} */
+                const container = document.querySelector(
+                    "#app #canvas-container"
+                );
+                container.classList.add(
+                    "tw-border",
+                    "tw-w-max",
+                    "tw-relative",
+                    "tw-overflow-hidden"
+                );
+
+                const konvaManager = new KonvaManager(container);
+            });
+        </script>
     </body>
 </html>

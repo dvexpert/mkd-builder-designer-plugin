@@ -1,3 +1,4 @@
+import { KonvaManager } from "@/KonvaManager";
 import type { SquareSide } from "@/helpers/SquareHelper";
 import { SquareHelper as SH } from "@/helpers/SquareHelper";
 
@@ -19,6 +20,7 @@ interface RequestObjectType {
     error: (prop: CallBackPropsType) => void;
     enable: boolean;
     wall: SquareSide;
+    materialId: number | string | unknown;
 
     // Response
     id: number;
@@ -36,6 +38,10 @@ declare global {
 
     interface Document {
         activeShape?: number | null;
+    }
+
+    interface Window {
+        KonvaManager?: typeof KonvaManager;
     }
 }
 

@@ -81,10 +81,10 @@ export default class ShapeManager {
         contextMenuItem_DeleteAction.innerText = "Delete";
         contextMenuItem_DeleteAction.addEventListener("click", () => {
             if (this.currentShape) {
+                /** @type {Konva.Group} */
                 const shapeGroup =
                     this.currentShape.findAncestor("#shapeGroup");
-                this.getShapeGroupAttributeOverlay(shapeGroup)?.remove();
-                shapeGroup.destroy();
+                this.deleteShape(shapeGroup);
             }
         });
         // Append menu items to menu
@@ -113,6 +113,15 @@ export default class ShapeManager {
             this.contextMenuNode.style.left =
                 this.stage.getPointerPosition().x + 4 + "px";
         });
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     */
+    deleteShape(shapeGroup) {
+        this.getShapeGroupAttributeOverlay(shapeGroup)?.remove();
+        shapeGroup.destroy();
     }
 
     createActionOverlay() {
@@ -230,7 +239,7 @@ export default class ShapeManager {
         this.actionOverlayNode.style.top = `${overlayNewPosition.top}px`;
     }
 
-    drawSquare(materialImage = "", onlyPlaceholder = true) {
+    drawSquare(materialImage = "", onlyPlaceholder = true, materialId = "") {
         if (!materialImage) {
             throw new Error("Material Image is required.");
         }
@@ -253,6 +262,7 @@ export default class ShapeManager {
                 y: 10,
                 draggable: true,
                 id: SquareShapeIds.ShapeGroup,
+                materialId: materialId,
             });
             const squarePlaceHolderObject = new Konva.Rect({
                 x: posX,
@@ -421,7 +431,7 @@ export default class ShapeManager {
                 height: placeHolderElm.height(),
                 cornerRadius: placeHolderElm.cornerRadius(),
                 image: imageObj,
-                stroke: '#000',
+                stroke: "#000",
                 dragBoundFunc: function (pos) {
                     return {
                         x: Math.max(pos.x, 0),
@@ -526,7 +536,6 @@ export default class ShapeManager {
         checkboxGroup.add(checkboxRect, checkMarkLine);
         subGroupNode.add(checkboxGroup);
 
-        
         checkboxGroup.on("click", () => {
             const isVisible = !checkMarkLine.visible();
             checkMarkLine.visible(isVisible);
@@ -1184,14 +1193,16 @@ export default class ShapeManager {
         this.updateAttributesOverlayPosition(shapeGroup);
 
         // TODO: For demo purpose only
-        Array.from(Array(4)).forEach(() =>
-            this.appendShapeCutOut(
-                shapeGroup,
-                undefined,
-                undefined,
-                attributeOverlay
-            )
-        );
+        if (import.meta.env.VITE_BUILDING_FOR_DEMO === "true") {
+            Array.from(Array(4)).forEach(() =>
+                this.appendShapeCutOut(
+                    shapeGroup,
+                    undefined,
+                    undefined,
+                    attributeOverlay
+                )
+            );
+        }
     }
 
     /**

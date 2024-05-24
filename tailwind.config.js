@@ -5,7 +5,7 @@ require('dotenv').config()
 export default {
   prefix: 'tw-',
   corePlugins: {
-    preflight: process.env?.VITE_BUILDING_FOR_DEMO
+    preflight: process.env?.VITE_BUILDING_FOR_DEMO === 'true'
   },
   content: [
     "./index.html",

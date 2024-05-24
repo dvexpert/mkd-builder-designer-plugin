@@ -30,7 +30,11 @@ export default class EventManager {
         document.addEventListener("mkd-plugin:draw:square", (e) => {
             const request = e?.detail;
             try {
-                this.manager.shapeManager.drawSquare(request?.image);
+                this.manager.shapeManager.drawSquare(
+                    request?.image,
+                    true,
+                    request.materialId
+                );
                 if (typeof request?.success === "function") {
                     request.success({ message: "Square shape created" });
                 }
@@ -71,7 +75,13 @@ export default class EventManager {
                 request.error && request.error({ message: "No active shape." });
                 return;
             }
-            this.changeShapeName(request.shapeId, request.shapeName);
+            try {
+                this.changeShapeName(request.shapeId, request.shapeName);
+            } catch (e) {
+                request.error && request.error({ message: e.message });
+                return;
+            }
+            request.success && request.success({ message: "Shape name updated successfully." });
         });
         document.addEventListener("mkd-plugin:rotate-left", (e) => {
             const request = e?.detail;
@@ -89,7 +99,27 @@ export default class EventManager {
             }
             this.rotate(request.shapeId, 90);
         });
+        document.addEventListener("mkd-plugin:delete-shape", (e) => {
+            const request = e?.detail;
+            if (!request?.shapeId) {
+                request.error && request.error({ message: "No active shape." });
+                return;
+            }
+            this.deleteShape(request.shapeId);
+        });
     }
+
+    /**
+     *
+     * @param {number} shapeId
+     */
+    deleteShape(shapeId) {
+        const shapeGroup = this.getShapeById(shapeId);
+        if (shapeGroup) {
+            this.manager.shapeManager.deleteShape(shapeGroup)
+        }
+    }
+
     /**
      *
      * @param {Konva.Group} shapeGroup
@@ -106,6 +136,7 @@ export default class EventManager {
         const newEvent = new CustomEvent("mkd-plugin:active-shape", {
             detail: {
                 id: shapeGroup._id,
+                materialId: shapeGroup.getAttr("materialId"),
                 shapeName: shapeGroup.getAttr("shapeName"),
                 againstTheWall: shapeGroup.getAttr("againstTheWall"),
                 backsplashes: shapeGroup.getAttr("backsplashes"),

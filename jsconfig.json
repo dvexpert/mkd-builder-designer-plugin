@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "module": "ESNext",
         "checkJs": true, // to enable type checking in js files.
         "baseUrl": ".",
         "paths": {

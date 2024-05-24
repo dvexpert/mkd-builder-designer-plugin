@@ -6,8 +6,10 @@ export class KonvaManager {
     /**
      * 
      * @param {HTMLDivElement} container 
+     * @param {string} backgroundPath 
      */
-    constructor(container) {
+    constructor(container, backgroundPath = '/dist/image/background-grid.jpg') {
+        this.backgroundPath = backgroundPath;
         /**
          * @type {Konva.Stage}
          */
@@ -29,28 +31,13 @@ export class KonvaManager {
         // creating shapes and tbd ...
         this.shapeManager = new ShapeManager(this.stage, this.layer, this.eventManager);
 
-        // this.initShapes();
         this.setupBackground();
         this.layer.draw();
     }
 
-    /** @deprecated - for initial implementation only */
-    initShapes() {
-        const circle = new Konva.Circle({
-            x: this.stage.width() / 2,
-            y: this.stage.height() / 2,
-            radius: 70,
-            fill: "red",
-            stroke: "black",
-            strokeWidth: 4,
-        });
-
-        this.layer.add(circle);
-    }
-
     setupBackground() {
         this.stage.container().style.backgroundImage =
-            "url('/dist/image/background-grid.jpg')";
+            `url('${this.backgroundPath}')`;
         this.stage.container().style.backgroundRepeat = "repeat";
     }
 }
