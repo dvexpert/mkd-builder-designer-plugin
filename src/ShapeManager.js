@@ -263,7 +263,7 @@ export default class ShapeManager {
             shapeGroup = new Konva.Group({
                 x: 100,
                 y: 10,
-                draggable: true,
+                draggable: this.stage.getAttr('shapeDraggable') === true,
                 id: SquareShapeIds.ShapeGroup,
                 materialId: materialId,
             });

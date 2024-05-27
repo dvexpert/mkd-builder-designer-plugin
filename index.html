@@ -280,7 +280,7 @@
                     <div class="tw-flex tw-gap-4 tw-items-center">
                         <h4 class="tw-font-medium">Add Shapes</h4>
                         <div
-                            class="tw-flex tw-gap-6 tw-items-center [&_div]:tw-min-w-32"
+                            class="tw-flex tw-gap-6 tw-items-center [&>div]:tw-min-w-32"
                         >
                             <button id="draw-square" class="tw-mx-auto">
                                 <svg
@@ -347,6 +347,34 @@
                                 </button>
                             </div>
                             <div class="tw-flex tw-justify-center">
+                                <div>
+                                    <input
+                                        type="checkbox"
+                                        id="enable-shape-drag"
+                                        class="tw-peer tw-hidden"
+                                    />
+                                    <label
+                                        for="enable-shape-drag"
+                                        class="tw-text-gray-500 peer-checked:tw-brightness-0 tw-cursor-pointer"
+                                        title="Enable Shape Drag"
+                                    >
+                                        <svg
+                                            class="tw-size-10"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="19"
+                                            height="30"
+                                            viewBox="0 0 19 30"
+                                            fill="none"
+                                        >
+                                            <script xmlns="" />
+                                            <path
+                                                d="M18.7265 17.1354L1.57303 0.202157C0.94465 -0.290406 0 0.179848 0 0.916639V24.0577C0 24.5755 0.425657 24.9959 0.95 24.9959C1.19671 24.9959 1.43392 24.902 1.56946 24.7669L6.32184 20.6779L10.1979 29.6204C10.2639 29.773 10.3882 29.8934 10.5439 29.9556C10.62 29.9844 10.6997 29.9996 10.7793 29.9996C10.8644 29.9996 10.9494 29.982 11.029 29.9485L15.1079 28.2225C15.4295 28.0875 15.5793 27.72 15.4414 27.4024L11.6895 18.7423H18.0506C18.5749 18.7423 19.0006 18.3219 19.0006 17.8041C19.0006 17.6526 18.9614 17.4249 18.7271 17.136L18.7265 17.1354Z"
+                                                fill="#797979"
+                                            />
+                                            <script xmlns="" />
+                                        </svg>
+                                    </label>
+                                </div>
                                 <input
                                     type="checkbox"
                                     id="enable-drag"

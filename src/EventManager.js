@@ -1,6 +1,6 @@
 import Konva from "konva";
 import { KonvaManager } from "./KonvaManager";
-import ShapeManager from "./ShapeManager";
+import { SquareShapeIds } from "./enum/ShapeManagerEnum";
 
 export default class EventManager {
     /**
@@ -110,6 +110,21 @@ export default class EventManager {
             }
             this.deleteShape(request.shapeId);
         });
+        document.addEventListener("mkd-plugin:enable-shape-drag", (e) => {
+            const request = e?.detail;
+            this.setShapeDrag(request?.enable);
+        });
+    }
+
+    /**
+     *
+     * @param {Boolean} enable
+     */
+    setShapeDrag(enable) {
+        this.stage.setAttr('shapeDraggable', enable)
+        /** @type {Konva.Group[]} */
+        const shapes = this.stage.find(`#${SquareShapeIds.ShapeGroup}`);
+        shapes.forEach((shape) => shape.draggable(enable))
     }
 
     /**
@@ -352,7 +367,7 @@ export default class EventManager {
             `#attributes-overlay-${shapeGroup._id} #shape-name`
         );
         shapeNameElm.innerHTML = shapeName;
-        shapeNameElm.setAttribute('title', shapeName);
+        shapeNameElm.setAttribute("title", shapeName);
     }
 
     /**

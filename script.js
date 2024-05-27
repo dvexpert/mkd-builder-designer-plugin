@@ -1,6 +1,6 @@
 /**
  *
- * @typedef {"mkd-plugin:zoom-in" | "mkd-plugin:zoom-out" | "mkd-plugin:zoom-reset" | "mkd-plugin:drag" | "mkd-plugin:position-reset" | "mkd-plugin:draw:square" | "mkd-plugin:export" | "mkd-plugin:toggle-wall" | "mkd-plugin:active-shape" | "mkd-plugin:shape-name" | "mkd-plugin:toggle-backsplash" | "mkd-plugin:rotate-left" | "mkd-plugin:rotate-right" | "mkd-plugin:delete-shape"} MKDPluginEvent
+ * @typedef {"mkd-plugin:zoom-in" | "mkd-plugin:zoom-out" | "mkd-plugin:zoom-reset" | "mkd-plugin:drag" | "mkd-plugin:position-reset" | "mkd-plugin:draw:square" | "mkd-plugin:export" | "mkd-plugin:toggle-wall" | "mkd-plugin:active-shape" | "mkd-plugin:shape-name" | "mkd-plugin:toggle-backsplash" | "mkd-plugin:rotate-left" | "mkd-plugin:rotate-right" | "mkd-plugin:delete-shape" | "mkd-plugin:enable-shape-drag"} MKDPluginEvent
  *
  * @typedef {Object} PayloadType
  * @property {?string} image - image path
@@ -63,6 +63,9 @@ jQuery(document).ready(function ($) {
     });
     $("#enable-drag").on("change", function () {
         dispatchCanvasEvent("mkd-plugin:drag", { enable: this.checked });
+    });
+    $("#enable-shape-drag").on("change", function () {
+        dispatchCanvasEvent("mkd-plugin:enable-shape-drag", { enable: this.checked });
     });
     $("#position-reset").on("click", function () {
         dispatchCanvasEvent("mkd-plugin:position-reset");
