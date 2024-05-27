@@ -1,6 +1,6 @@
 /**
  *
- * @typedef {"mkd-plugin:zoom-in" | "mkd-plugin:zoom-out" | "mkd-plugin:zoom-reset" | "mkd-plugin:drag" | "mkd-plugin:position-reset" | "mkd-plugin:draw:square" | "mkd-plugin:export" | "mkd-plugin:toggle-wall" | "mkd-plugin:shape-name" | "mkd-plugin:toggle-backsplash" | "mkd-plugin:rotate-left" | "mkd-plugin:rotate-right" | "mkd-plugin:delete-shape" | "mkd-plugin:enable-shape-drag" | "mkd-plugin:shape-size"} MKDPluginEvent
+ * @typedef {"mkd-plugin:zoom-in" | "mkd-plugin:zoom-out" | "mkd-plugin:zoom-reset" | "mkd-plugin:drag" | "mkd-plugin:position-reset" | "mkd-plugin:draw:square" | "mkd-plugin:export" | "mkd-plugin:toggle-wall" | "mkd-plugin:shape-name" | "mkd-plugin:toggle-backsplash" | "mkd-plugin:rotate-left" | "mkd-plugin:rotate-right" | "mkd-plugin:delete-shape" | "mkd-plugin:enable-shape-drag" | "mkd-plugin:shape-size" | "mkd-plugin:toggle-rounded-box"} MKDPluginEvent
  *
  * @typedef {"mkd-plugin:active-shape" | "mkd-plugin:shape-deleted"} MKDPluginDispatchEvent
  *
@@ -156,11 +156,23 @@ jQuery(document).ready(function ($) {
             } else {
                 $(".backsplash")?.prop("checked", false);
             }
+            const haveRoundedCorners = response.haveRoundedCorners;
+            if (haveRoundedCorners) {
+                Object.entries(haveRoundedCorners)?.map(([wall, value]) => {
+                    $("#can-be-rounded-" + wall)?.prop("checked", value);
+                });
+            } else {
+                $(".can-be-rounded")?.prop("checked", false);
+            }
             $("#active-shape-customization-block").fadeIn();
 
-            const shapeWidth = $("#active-shape-customization-block #shapeWidth");
+            const shapeWidth = $(
+                "#active-shape-customization-block #shapeWidth"
+            );
             shapeWidth.val(response.shapeSize.width);
-            const shapeHeight = $("#active-shape-customization-block #shapeHeight");
+            const shapeHeight = $(
+                "#active-shape-customization-block #shapeHeight"
+            );
             shapeHeight.val(response.shapeSize.height);
         }
     );
@@ -234,16 +246,35 @@ jQuery(document).ready(function ($) {
         "mkd-plugin:shape-size-change",
         /** @param {Event} e */
         (e) => {
-            console.log("mkd-plugin:shape-size-change")
             const response = e.detail;
             if (response.id !== document.activeShape) {
                 return;
             }
 
-            const shapeWidth = $("#active-shape-customization-block #shapeWidth");
+            const shapeWidth = $(
+                "#active-shape-customization-block #shapeWidth"
+            );
             shapeWidth.val(response.shapeSize.width);
-            const shapeHeight = $("#active-shape-customization-block #shapeHeight");
+            const shapeHeight = $(
+                "#active-shape-customization-block #shapeHeight"
+            );
             shapeHeight.val(response.shapeSize.height);
         }
     );
+
+    $(document).on("change", ".can-be-rounded", function () {
+        if (!document.activeShape) {
+            alert(
+                "Hey there! Feeling a bit stuck, huh? Let’s tackle one thing at a time. First up: what shape are we dealing with here?"
+            );
+            $(this).prop("checked", false);
+            return;
+        }
+        dispatchCanvasEvent("mkd-plugin:toggle-rounded-box", {
+            addWall: this.checked,
+            shapeId: document.activeShape,
+            wall: $(this).data("wall"),
+            error: (e) => console.warn(`[MKD] ${e.message}`),
+        });
+    });
 });

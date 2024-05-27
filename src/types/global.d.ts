@@ -1,6 +1,5 @@
 import { KonvaManager } from "@/KonvaManager";
 import type { SquareSide } from "@/helpers/SquareHelper";
-import { SquareHelper as SH } from "@/helpers/SquareHelper";
 
 interface CallBackPropsType {
     message: string;
@@ -8,11 +7,12 @@ interface CallBackPropsType {
 
 type SquareSideT = SquareSide;
 
-type WallPresence = {
+export type WallPresence = {
     [key in SquareSideT]: boolean;
 }
 
 interface BacksplashesPresence extends WallPresence {}
+interface HaveRoundedCornersPresence extends WallPresence {}
 
 interface ShapeSizeType {
     height: string
@@ -36,6 +36,7 @@ interface RequestObjectType {
     shapeName: string; // name of the wall
     againstTheWall?: WallPresence;
     backsplashes?: BacksplashesPresence;
+    haveRoundedCorners?: HaveRoundedCornersPresence;
     shapeSize?: ShapeSizeType;
 }
 

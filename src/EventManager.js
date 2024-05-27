@@ -137,6 +137,14 @@ export default class EventManager {
 
             this.setShapeSize(request.shapeId, payload);
         });
+        document.addEventListener("mkd-plugin:toggle-rounded-box", (e) => {
+            const request = e.detail;
+            try {
+                this.toggleRoundedCheckbox(request.shapeId, request.wall, request.addWall);
+            } catch (e) {
+                request.error && request.error({ message: e.message });
+            }
+        });
     }
 
     /**
@@ -219,6 +227,7 @@ export default class EventManager {
                 shapeName: shapeGroup.getAttr("shapeName"),
                 againstTheWall: shapeGroup.getAttr("againstTheWall"),
                 backsplashes: shapeGroup.getAttr("backsplashes"),
+                haveRoundedCorners: shapeGroup.getAttr("haveRoundedCorners"),
                 shapeSize: Object.keys(shapeSize).length > 0 ? shapeSize : {},
             },
         });
@@ -446,5 +455,29 @@ export default class EventManager {
             return;
         }
         this.manager.shapeManager.rotateShapeGroup(shape, rotation);
+    }
+
+    /**
+     *
+     * @param {number} shapeId - this should be node._id and not the node.id()
+     * @param {import("./helpers/SquareHelper").SquareSide} wall - a | b | c | d
+     */
+    toggleRoundedCheckbox(shapeId, wall, add) {
+        const shape = this.getShapeById(shapeId);
+        /** @type {Konva.Group} */
+        const edgeSubGroup = shape.findOne(`.${wall}`);
+
+        if (add === true) {
+            if (shape.findOne(`#checkbox_node_${wall}`)) {
+                throw new Error("Checkbox group already exists!");
+            }
+            this.manager.shapeManager.addCheckboxGroup(edgeSubGroup, wall, shape);
+        } else {
+            if (!shape.findOne(`#checkbox_node_${wall}`)) {
+                throw new Error("Checkbox group does not exists!");
+            }
+            this.manager.shapeManager.removeCheckboxGroup(wall, shape);
+
+        }
     }
 }
