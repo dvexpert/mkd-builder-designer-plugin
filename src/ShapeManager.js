@@ -557,6 +557,7 @@ export default class ShapeManager {
             ]);
             checkboxGroup.destroy();
         }
+        this.eventManager.dispatchShapeSelect(shapeGroup);
     }
     /**
      *
@@ -611,6 +612,12 @@ export default class ShapeManager {
         const haveRoundedCorners = this.initializeCorners(shapeGroup.getAttr("haveRoundedCorners"), false);
         haveRoundedCorners[subgroupName] = true;
         shapeGroup.setAttr("haveRoundedCorners", haveRoundedCorners);
+
+        /**
+         * While Adding check box group this side must not be against the wall.
+         * and because not against the wall then it cannot have backsplash either.
+         */
+        this.removeWall(subGroupNode, shapeGroup, subgroupName);
         this.updateEdgeGroupsPosition(shapeGroup);
     }
 
@@ -772,6 +779,25 @@ export default class ShapeManager {
         let againstTheWall = this.initializeCorners(shapeGroup.getAttr("againstTheWall"), false);
         againstTheWall[SubGroup.name()] = true;
         shapeGroup.setAttr("againstTheWall", againstTheWall);
+
+        /**
+         * While adding wall, wall edge corners, must not be rounded.
+         * for ex: if we add Wall on edge "A" Then corner radius for 
+         * "A" and "B" must be disabled.
+         */
+        const groupMappings = {
+            [SH.SideA]: [SH.SideA, SH.SideB],
+            [SH.SideB]: [SH.SideB, SH.SideC],
+            [SH.SideC]: [SH.SideC, SH.SideD],
+            [SH.SideD]: [SH.SideD, SH.SideA]
+        };
+        
+        const groupName = SubGroup.name();
+        const groupsToRemove = groupMappings[groupName] || [];
+        
+        groupsToRemove.forEach(group => {
+            this.removeCheckboxGroup(group, shapeGroup);
+        });
     }
 
     /**
@@ -782,6 +808,9 @@ export default class ShapeManager {
      */
     removeWall(SubGroup, shapeGroup, wall) {
         const wallObj = SubGroup.findOne(`.wall_${wall}`);
+        if (!wallObj) {
+            return;
+        }
         wallObj.destroy();
 
         let againstTheWall = shapeGroup.getAttr("againstTheWall");
