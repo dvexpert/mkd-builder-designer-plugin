@@ -263,9 +263,13 @@ export default class ShapeManager {
             shapeGroup = new Konva.Group({
                 x: 100,
                 y: 10,
-                draggable: this.stage.getAttr('shapeDraggable') === true,
+                draggable: this.stage.getAttr("shapeDraggable") === true,
                 id: SquareShapeIds.ShapeGroup,
                 materialId: materialId,
+                shapeSize: {
+                    height: 50,
+                    width: 150,
+                },
             });
             const squarePlaceHolderObject = new Konva.Rect({
                 x: posX,
@@ -945,54 +949,80 @@ export default class ShapeManager {
      * @param {string} attr - "height" or "width"
      * @param {Konva.Group} subGroup
      * @param {Konva.Text} labelNode
-     * @param {HTMLInputElement} inputBox
+     * @param {HTMLInputElement | string} inputBox
      */
-    handleInputValueChange = (attr, subGroup, labelNode, inputBox) => {
+    handleInputValueChange = (
+        attr,
+        subGroup,
+        labelNode = null,
+        inputBox = null
+    ) => {
         /** @type {Konva.Group} */
-        // @ts-ignore
-        const shapeGroup = subGroup.findAncestor(
-            `#${SquareShapeIds.ShapeGroup}`
-        );
+        let shapeGroup;
+        if (subGroup.id() === SquareShapeIds.ShapeGroup) {
+            shapeGroup = subGroup;
+        } else {
+            /** @type {Konva.Group} */
+            // @ts-ignore
+            shapeGroup = subGroup.findAncestor(`#${SquareShapeIds.ShapeGroup}`);
+        }
+        console.log(shapeGroup);
         const squarePlaceHolderObject = this.getShapeObject(shapeGroup);
 
+        const dynamicLabelNodeId = `shape${
+            attr.charAt(0).toUpperCase() + attr.slice(1)
+        }TextLayer`;
         /** @type {Konva.Text[]} */
+        const labelNodes = shapeGroup.find(
+            `#${labelNode ? labelNode.id() : dynamicLabelNodeId}`
+        );
 
-        const labelNodes = shapeGroup.find(`#${labelNode.id()}`);
-
+        let inputBoxValue = "";
+        if (typeof inputBox === "string") {
+            inputBoxValue = inputBox;
+        } else {
+            inputBoxValue = inputBox?.value;
+            document.body.removeChild(inputBox);
+        }
         // Update both width input positions
         labelNodes.forEach((labelNode) => {
-            labelNode.text(inputBox.value);
+            labelNode.text(inputBoxValue);
         });
-        document.body.removeChild(inputBox);
+
         this.setDragging(shapeGroup, true);
-        squarePlaceHolderObject.setAttr(
-            attr,
-            Number(inputBox.value) * SizeDiff
-        );
+        squarePlaceHolderObject.setAttr(attr, Number(inputBoxValue) * SizeDiff);
+
         const edgeGroups = SH.getDirectionalEdgeGroups(
-            subGroup.name(),
+            subGroup.name() ? subGroup.name() : attr,
             shapeGroup
         );
+        console.log(edgeGroups);
         edgeGroups.forEach((edgeGroup) => {
-            edgeGroup.setAttr(attr, Number(inputBox.value) * SizeDiff);
+            edgeGroup.setAttr(attr, Number(inputBoxValue) * SizeDiff);
 
             // Update wall and backsplash size also.
             const wall = edgeGroup.findOne((node) => {
                 return String(node.id()).startsWith("wall_");
             });
             if (wall) {
-                wall.setAttr(attr, Number(inputBox.value) * SizeDiff);
+                wall.setAttr(attr, Number(inputBoxValue) * SizeDiff);
             }
             const backsplash = edgeGroup.findOne((node) => {
                 return String(node.id()).startsWith("backsplash_");
             });
             if (backsplash) {
-                backsplash.setAttr(attr, Number(inputBox.value) * SizeDiff);
+                backsplash.setAttr(attr, Number(inputBoxValue) * SizeDiff);
             }
         });
         this.updateInputsPosition(subGroup);
         this.updateHoverActionOverlayPosition(shapeGroup);
         this.updateEdgeGroupsPosition(shapeGroup);
+
+        const shapeSize = shapeGroup.getAttr("shapeSize");
+        shapeSize[attr] = inputBoxValue;
+        shapeGroup.setAttr("shapeSize", shapeSize);
+
+        this.eventManager.dispatchSizeUpdate(shapeGroup);
     };
 
     /**
@@ -1075,10 +1105,15 @@ export default class ShapeManager {
      * @param {Konva.Group} subGroup - shape edge sub group, containing wall, side label etc.
      */
     updateInputsPosition(subGroup, heightOnly = true, widthOnly = true) {
-        /** @type {Konva.Group} shapeGroup */
-        const shapeGroup = subGroup.findAncestor(
-            `#${SquareShapeIds.ShapeGroup}`
-        );
+        /** @type {Konva.Group} */
+        let shapeGroup;
+        if (subGroup.id() === SquareShapeIds.ShapeGroup) {
+            shapeGroup = subGroup;
+        } else {
+            /** @type {Konva.Group} */
+            // @ts-ignore
+            shapeGroup = subGroup.findAncestor(`#${SquareShapeIds.ShapeGroup}`);
+        }
 
         if (heightOnly) {
             const heightInputs = shapeGroup.find(
@@ -1180,9 +1215,9 @@ export default class ShapeManager {
         ).body.firstChild;
         attributeOverlay.id = `${attributeOverlay.id}-${shapeGroup._id}`;
         const shapeName = `Shape ${shapeGroup._id}`;
-        const shapeNameElm = attributeOverlay.querySelector("#shape-name")
+        const shapeNameElm = attributeOverlay.querySelector("#shape-name");
         shapeNameElm.innerHTML = shapeName;
-        shapeNameElm.setAttribute('title', shapeName);
+        shapeNameElm.setAttribute("title", shapeName);
         shapeGroup.setAttr("shapeName", shapeName);
 
         attributeOverlay.addEventListener("mouseenter", (e) => {

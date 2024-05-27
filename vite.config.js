@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
         plugins: isPROD ? [minifyEs()] : [], // TODO: Disabled for development purpose only.
         build: {
             emptyOutDir: true,
-            outDir: "./dist",
+            outDir: `./${env?.VITE_OUTPUT_DIR ?? 'dist'}`,
             assetsDir: "assets",
             minify: "terser",
             lib: {

@@ -1,6 +1,8 @@
 /**
  *
- * @typedef {"mkd-plugin:zoom-in" | "mkd-plugin:zoom-out" | "mkd-plugin:zoom-reset" | "mkd-plugin:drag" | "mkd-plugin:position-reset" | "mkd-plugin:draw:square" | "mkd-plugin:export" | "mkd-plugin:toggle-wall" | "mkd-plugin:active-shape" | "mkd-plugin:shape-name" | "mkd-plugin:toggle-backsplash" | "mkd-plugin:rotate-left" | "mkd-plugin:rotate-right" | "mkd-plugin:delete-shape" | "mkd-plugin:enable-shape-drag"} MKDPluginEvent
+ * @typedef {"mkd-plugin:zoom-in" | "mkd-plugin:zoom-out" | "mkd-plugin:zoom-reset" | "mkd-plugin:drag" | "mkd-plugin:position-reset" | "mkd-plugin:draw:square" | "mkd-plugin:export" | "mkd-plugin:toggle-wall" | "mkd-plugin:shape-name" | "mkd-plugin:toggle-backsplash" | "mkd-plugin:rotate-left" | "mkd-plugin:rotate-right" | "mkd-plugin:delete-shape" | "mkd-plugin:enable-shape-drag" | "mkd-plugin:shape-size"} MKDPluginEvent
+ *
+ * @typedef {"mkd-plugin:active-shape" | "mkd-plugin:shape-deleted"} MKDPluginDispatchEvent
  *
  * @typedef {Object} PayloadType
  * @property {?string} image - image path
@@ -9,12 +11,12 @@
  * @property {?boolean} enable - to enable of disable the drag
  * @property {?boolean} addWall - to add wall or remove
  * @property {?number} shapeId - shape unique id
- * @property {"a"| "b" | "c" | "d" | null} wall - wall name. (a | b | c | d)
+ * @property {"a" | "b" | "c" | "d" | null} wall - wall name. (a | b | c | d)
  * @property {?string} shapeName - name of the shape
  */
 
 /**
- * @param {MKDPluginEvent} event
+ * @param {MKDPluginEvent | MKDPluginDispatchEvent} event
  * @param {Partial<PayloadType>} event
  *
  * @returns {CustomEvent<any>}
@@ -65,7 +67,9 @@ jQuery(document).ready(function ($) {
         dispatchCanvasEvent("mkd-plugin:drag", { enable: this.checked });
     });
     $("#enable-shape-drag").on("change", function () {
-        dispatchCanvasEvent("mkd-plugin:enable-shape-drag", { enable: this.checked });
+        dispatchCanvasEvent("mkd-plugin:enable-shape-drag", {
+            enable: this.checked,
+        });
     });
     $("#position-reset").on("click", function () {
         dispatchCanvasEvent("mkd-plugin:position-reset");
@@ -153,6 +157,11 @@ jQuery(document).ready(function ($) {
                 $(".backsplash")?.prop("checked", false);
             }
             $("#active-shape-customization-block").fadeIn();
+
+            const shapeWidth = $("#active-shape-customization-block #shapeWidth");
+            shapeWidth.val(response.shapeSize.width);
+            const shapeHeight = $("#active-shape-customization-block #shapeHeight");
+            shapeHeight.val(response.shapeSize.height);
         }
     );
 
@@ -195,4 +204,46 @@ jQuery(document).ready(function ($) {
             }, 100);
         }
     });
+
+    $("#shapeWidth").on("change", function () {
+        const value = $(this).val();
+        if (value <= 0) {
+            alert("Please select a value greater than 0.");
+            return;
+        }
+        dispatchCanvasEvent("mkd-plugin:shape-size", {
+            shapeId: document.activeShape,
+            width: value,
+            error: (e) => console.log(`[MKD]: ${e.message}`),
+        });
+    });
+    $("#shapeHeight").on("change", function () {
+        const value = $(this).val();
+        if (value <= 0) {
+            alert("Please select a value greater than 0.");
+            return;
+        }
+        dispatchCanvasEvent("mkd-plugin:shape-size", {
+            shapeId: document.activeShape,
+            height: value,
+            error: (e) => console.log(`[MKD]: ${e.message}`),
+        });
+    });
+
+    $(document).on(
+        "mkd-plugin:shape-size-change",
+        /** @param {Event} e */
+        (e) => {
+            console.log("mkd-plugin:shape-size-change")
+            const response = e.detail;
+            if (response.id !== document.activeShape) {
+                return;
+            }
+
+            const shapeWidth = $("#active-shape-customization-block #shapeWidth");
+            shapeWidth.val(response.shapeSize.width);
+            const shapeHeight = $("#active-shape-customization-block #shapeHeight");
+            shapeHeight.val(response.shapeSize.height);
+        }
+    );
 });

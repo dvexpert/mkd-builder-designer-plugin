@@ -14,6 +14,11 @@ type WallPresence = {
 
 interface BacksplashesPresence extends WallPresence {}
 
+interface ShapeSizeType {
+    height: string
+    width: string
+}
+
 interface RequestObjectType {
     image: string; // for shape draw
     success: (prop: CallBackPropsType) => void;
@@ -21,6 +26,8 @@ interface RequestObjectType {
     enable: boolean;
     wall: SquareSide;
     materialId: number | string | unknown;
+    width: number;
+    height: number;
 
     // Response
     id: number;
@@ -29,6 +36,7 @@ interface RequestObjectType {
     shapeName: string; // name of the wall
     againstTheWall?: WallPresence;
     backsplashes?: BacksplashesPresence;
+    shapeSize?: ShapeSizeType;
 }
 
 declare global {

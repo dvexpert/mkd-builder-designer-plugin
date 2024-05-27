@@ -114,6 +114,53 @@ export default class EventManager {
             const request = e?.detail;
             this.setShapeDrag(request?.enable);
         });
+        document.addEventListener("mkd-plugin:shape-size", (e) => {
+            const request = e?.detail;
+            if (!request?.shapeId) {
+                request.error && request.error({ message: "No active shape." });
+                return;
+            }
+            if (request?.height <= 0 || request?.width <= 0) {
+                request.error &&
+                    request.error({ message: "Invalid size provided" });
+                return;
+            }
+
+            const payload = {};
+            if (request.height) {
+                payload.attr = "height";
+                payload.height = request.height;
+            } else if (request.width) {
+                payload.attr = "width";
+                payload.width = request.width;
+            }
+
+            this.setShapeSize(request.shapeId, payload);
+        });
+    }
+
+    /**
+     *
+     * @typedef {"height" | "width"} AttrType
+     *
+     * @typedef {Object} Payload
+     * @property {string} width
+     * @property {string} height
+     * @property {AttrType} attr
+     *
+     * @param {number} shapeId
+     * @param {Payload} payload
+     */
+    setShapeSize(shapeId, payload) {
+        const shapeGroup = this.getShapeById(shapeId);
+        if (shapeGroup) {
+            this.manager.shapeManager.handleInputValueChange(
+                payload.attr,
+                shapeGroup,
+                null,
+                payload[payload.attr]
+            );
+        }
     }
 
     /**
@@ -121,10 +168,10 @@ export default class EventManager {
      * @param {Boolean} enable
      */
     setShapeDrag(enable) {
-        this.stage.setAttr('shapeDraggable', enable)
+        this.stage.setAttr("shapeDraggable", enable);
         /** @type {Konva.Group[]} */
         const shapes = this.stage.find(`#${SquareShapeIds.ShapeGroup}`);
-        shapes.forEach((shape) => shape.draggable(enable))
+        shapes.forEach((shape) => shape.draggable(enable));
     }
 
     /**
@@ -164,6 +211,7 @@ export default class EventManager {
      * @param {Konva.Group} shapeGroup
      */
     static dispatchShapeSelect(shapeGroup) {
+        const shapeSize = shapeGroup.getAttr("shapeSize");
         const newEvent = new CustomEvent("mkd-plugin:active-shape", {
             detail: {
                 id: shapeGroup._id,
@@ -171,6 +219,22 @@ export default class EventManager {
                 shapeName: shapeGroup.getAttr("shapeName"),
                 againstTheWall: shapeGroup.getAttr("againstTheWall"),
                 backsplashes: shapeGroup.getAttr("backsplashes"),
+                shapeSize: Object.keys(shapeSize).length > 0 ? shapeSize : {},
+            },
+        });
+        document.dispatchEvent(newEvent);
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     */
+    dispatchSizeUpdate(shapeGroup) {
+        const shapeSize = shapeGroup.getAttr("shapeSize");
+        const newEvent = new CustomEvent("mkd-plugin:shape-size-change", {
+            detail: {
+                id: shapeGroup._id,
+                shapeSize: Object.keys(shapeSize).length > 0 ? shapeSize : {},
             },
         });
         document.dispatchEvent(newEvent);

@@ -13,6 +13,7 @@ declare module "*.html?raw" {
 interface ImportMetaEnv {
     readonly VITE_BUILDING_FOR_DEMO: string;
     readonly VITE_NODE_ENVIRONMENT: string;
+    readonly VITE_OUTPUT_DIR: string;
 }
 
 interface ImportMeta {

@@ -61,13 +61,15 @@ export class SquareHelper {
 
     /**
      *
-     * @param {SquareSide} side
+     * @typedef {"width" | "height"} SizeType
+     * 
+     * @param {SquareSide | SizeType} side
      * @param {Konva.Group} shapeGroup
      *
      * @returns {Array<Konva.Group>}
      */
     static getDirectionalEdgeGroups(side, shapeGroup) {
-        if (this.isHorizontal(side)) {
+        if (this.isHorizontal(side) || side === 'width') {
             return shapeGroup.find(`.${this.SideA}, .${this.SideC}`);
         }
 
