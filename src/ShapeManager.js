@@ -966,7 +966,6 @@ export default class ShapeManager {
             // @ts-ignore
             shapeGroup = subGroup.findAncestor(`#${SquareShapeIds.ShapeGroup}`);
         }
-        console.log(shapeGroup);
         const squarePlaceHolderObject = this.getShapeObject(shapeGroup);
 
         const dynamicLabelNodeId = `shape${
