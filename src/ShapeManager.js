@@ -311,11 +311,13 @@ export default class ShapeManager {
                             return;
                         }
                         const shape = this.getShapeObject(group);
-                        const haveIntersection = this.haveIntersection(
-                            shape.getClientRect(),
-                            targetRect
-                        );
-                        group.opacity(haveIntersection ? 0.5 : 1);
+                        if (shape) {
+                            const haveIntersection = this.haveIntersection(
+                                shape.getClientRect(),
+                                targetRect
+                            );
+                            group.opacity(haveIntersection ? 0.5 : 1);
+                        }
                     });
                 }
 
@@ -513,9 +515,9 @@ export default class ShapeManager {
     }
 
     /**
-     * 
-     * @param {import("./types/global.js").WallPresence} corners 
-     * @param {boolean} defaultValue 
+     *
+     * @param {import("./types/global.js").WallPresence} corners
+     * @param {boolean} defaultValue
      * @returns {import("./types/global.js").WallPresence}
      */
     initializeCorners(corners, defaultValue) {
@@ -536,16 +538,24 @@ export default class ShapeManager {
      * @param {Konva.Group} shapeGroup
      */
     removeCheckboxGroup(subgroupName, shapeGroup) {
-        const checkboxGroup = shapeGroup.findOne(`#checkbox_node_${subgroupName}`)
+        const checkboxGroup = shapeGroup.findOne(
+            `#checkbox_node_${subgroupName}`
+        );
         if (checkboxGroup) {
             /** @type {Konva.Rect} */
             const shapeObject = this.getShapeObject(shapeGroup);
 
-            const haveRoundedCorners = this.initializeCorners(shapeGroup.getAttr("haveRoundedCorners"), false);
+            const haveRoundedCorners = this.initializeCorners(
+                shapeGroup.getAttr("haveRoundedCorners"),
+                false
+            );
             haveRoundedCorners[subgroupName] = false;
             shapeGroup.setAttr("haveRoundedCorners", haveRoundedCorners);
 
-            const roundedCorners = this.initializeCorners(shapeGroup.getAttr("roundedCorners"), false);
+            const roundedCorners = this.initializeCorners(
+                shapeGroup.getAttr("roundedCorners"),
+                false
+            );
             roundedCorners[subgroupName] = false;
             shapeGroup.setAttr("roundedCorners", roundedCorners);
 
@@ -597,7 +607,10 @@ export default class ShapeManager {
             /** @type {Konva.Rect} */
             const shapeObject = this.getShapeObject(shapeGroup);
 
-            const roundedCorners = this.initializeCorners(shapeGroup.getAttr("roundedCorners"), false);
+            const roundedCorners = this.initializeCorners(
+                shapeGroup.getAttr("roundedCorners"),
+                false
+            );
             roundedCorners[subgroupName] = isVisible;
             shapeGroup.setAttr("roundedCorners", roundedCorners);
 
@@ -609,7 +622,10 @@ export default class ShapeManager {
             ]);
         });
 
-        const haveRoundedCorners = this.initializeCorners(shapeGroup.getAttr("haveRoundedCorners"), false);
+        const haveRoundedCorners = this.initializeCorners(
+            shapeGroup.getAttr("haveRoundedCorners"),
+            false
+        );
         haveRoundedCorners[subgroupName] = true;
         shapeGroup.setAttr("haveRoundedCorners", haveRoundedCorners);
 
@@ -647,7 +663,9 @@ export default class ShapeManager {
             const checkboxGroup = shapeGroup.findOne(
                 `.checkbox_node_${subgroupName}`
             );
-            const checkboxRect = checkboxGroup ? checkboxGroup.findOne("Rect") : null;
+            const checkboxRect = checkboxGroup
+                ? checkboxGroup.findOne("Rect")
+                : null;
             let backsplashOffset = 0;
 
             const attributes = {
@@ -684,7 +702,9 @@ export default class ShapeManager {
                     sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
                     sideLabel.y(15 + backsplashOffset);
 
-                    checkboxGroup?.x(subGroup.width() - (checkboxRect.width() ?? 0));
+                    checkboxGroup?.x(
+                        subGroup.width() - (checkboxRect.width() ?? 0)
+                    );
                     checkboxGroup?.y(15 + backsplashOffset);
 
                     createInputs && this.createWidthInput(subGroup);
@@ -721,7 +741,9 @@ export default class ShapeManager {
                     sideLabel.y(30);
 
                     checkboxGroup?.x(x);
-                    checkboxGroup?.y(subGroup.height() - (checkboxRect.height() ?? 0));
+                    checkboxGroup?.y(
+                        subGroup.height() - (checkboxRect.height() ?? 0)
+                    );
 
                     createInputs && this.createHeightInput(subGroup);
                 }
@@ -776,26 +798,29 @@ export default class ShapeManager {
 
         wall.position(attributes);
 
-        let againstTheWall = this.initializeCorners(shapeGroup.getAttr("againstTheWall"), false);
+        let againstTheWall = this.initializeCorners(
+            shapeGroup.getAttr("againstTheWall"),
+            false
+        );
         againstTheWall[SubGroup.name()] = true;
         shapeGroup.setAttr("againstTheWall", againstTheWall);
 
         /**
          * While adding wall, wall edge corners, must not be rounded.
-         * for ex: if we add Wall on edge "A" Then corner radius for 
+         * for ex: if we add Wall on edge "A" Then corner radius for
          * "A" and "B" must be disabled.
          */
         const groupMappings = {
             [SH.SideA]: [SH.SideA, SH.SideB],
             [SH.SideB]: [SH.SideB, SH.SideC],
             [SH.SideC]: [SH.SideC, SH.SideD],
-            [SH.SideD]: [SH.SideD, SH.SideA]
+            [SH.SideD]: [SH.SideD, SH.SideA],
         };
-        
+
         const groupName = SubGroup.name();
         const groupsToRemove = groupMappings[groupName] || [];
-        
-        groupsToRemove.forEach(group => {
+
+        groupsToRemove.forEach((group) => {
             this.removeCheckboxGroup(group, shapeGroup);
         });
     }
@@ -878,7 +903,10 @@ export default class ShapeManager {
 
         backsplash.position(attributes);
 
-        const backsplashes = this.initializeCorners(shapeGroup.getAttr("backsplashes"), false);
+        const backsplashes = this.initializeCorners(
+            shapeGroup.getAttr("backsplashes"),
+            false
+        );
         backsplashes[SubGroup.name()] = true;
         shapeGroup.setAttr("backsplashes", backsplashes);
 

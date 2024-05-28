@@ -1,6 +1,7 @@
 import Konva from "konva";
 import EventManager from "./EventManager.js";
 import ShapeManager from "./ShapeManager.js";
+import LShapeManager from "./LShapeManager.js";
 
 export class KonvaManager {
     /**
@@ -30,6 +31,9 @@ export class KonvaManager {
         // ShapeManager instance to handle
         // creating shapes and tbd ...
         this.shapeManager = new ShapeManager(this.stage, this.layer, this.eventManager);
+
+        // L Shape Manager
+        this.lShapeManager = new LShapeManager(this.stage, this.layer, this.eventManager);
 
         this.setupBackground();
         this.layer.draw();

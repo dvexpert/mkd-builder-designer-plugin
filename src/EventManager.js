@@ -145,6 +145,29 @@ export default class EventManager {
                 request.error && request.error({ message: e.message });
             }
         });
+
+        this.handleShapeLEvents();
+    }
+
+    handleShapeLEvents() {
+        document.addEventListener("mkd-plugin:draw:l", (e) => {
+            const request = e?.detail;
+            try {
+                this.manager.lShapeManager.draw(
+                    request?.image,
+                    true,
+                    request.materialId
+                );
+                if (typeof request?.success === "function") {
+                    request.success({ message: "Square shape created" });
+                }
+            } catch (e) {
+                console.error(e);
+                if (typeof request?.error === "function") {
+                    request.error({ message: e.message });
+                }
+            }
+        });
     }
 
     /**

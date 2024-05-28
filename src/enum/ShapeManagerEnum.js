@@ -10,3 +10,14 @@ export const SquareShapeIds = Object.freeze({
     ShapeHeightTextLayer: "shapeHeightTextLayer",
     ShapeWidthTextLayer: "shapeWidthTextLayer",
 });
+
+export const LShapeIds = Object.freeze({
+    LShapeGroup: "LShapeGroup",
+
+    LShapeObject: "LShapeObject",
+    LShapePlaceholderObject: "LShapePlaceholderObject",
+    LShapeHeightTextLayer: "LShapeHeightTextLayer",
+    LShapeWidthTextLayer: "LShapeWidthTextLayer",
+
+    LShapeActionOverlayId: "l-shape-action-overlay",
+});
