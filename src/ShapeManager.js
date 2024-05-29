@@ -104,6 +104,16 @@ export default class ShapeManager {
             // if we are on empty place of the stage we will do nothing
             if (e.target === this.stage) return;
 
+            if (
+                ![
+                    String(SquareShapeIds.ShapeGroup),
+                    String(SquareShapeIds.ShapeObject),
+                    String(SquareShapeIds.ShapePlaceholderObject)
+                ].includes(e.target.id())
+            ) {
+                return
+            }
+
             this.currentShape = e.target;
             // context show menu
             this.contextMenuNode.style.display = "initial";
