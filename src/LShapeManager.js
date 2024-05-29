@@ -36,7 +36,7 @@ export default class LShapeManager {
          * context menu is opened
          */
         this.currentShape = null;
-        // this.createContextMenu();
+        this.createContextMenu();
         this.createActionOverlay();
     }
 
@@ -238,6 +238,92 @@ export default class LShapeManager {
         }
     }
 
+    createContextMenu() {
+        /** @type {CSSStyleDec} */
+        const contextMenuStyles = {
+            border: "1px solid",
+            background: "white",
+            width: "80px",
+            position: "absolute",
+            display: "none",
+            zIndex: "9999",
+        };
+        this.contextMenuNode = document.createElement("div");
+        Object.assign(this.contextMenuNode.style, contextMenuStyles);
+        this.contextMenuNode.id = "image-context-menu";
+
+        /** @type {CSSStyleDec} */
+        const contextMenuItemStyles = {
+            padding: "10px",
+            border: "1px solid",
+            cursor: "pointer",
+            userSelect: "none",
+        };
+        const contextMenuItem_DeleteAction = document.createElement("div");
+        Object.assign(
+            contextMenuItem_DeleteAction.style,
+            contextMenuItemStyles
+        );
+        contextMenuItem_DeleteAction.id = "image-context-item";
+        contextMenuItem_DeleteAction.innerText = "Delete";
+        contextMenuItem_DeleteAction.addEventListener("click", () => {
+            if (this.currentShape) {
+                /** @type {Konva.Group} */
+                const shapeGroup = this.currentShape.findAncestor(
+                    `#${LShapeIds.LShapeGroup}`
+                );
+                this.deleteShape(shapeGroup);
+            }
+        });
+        // Append menu items to menu
+        this.contextMenuNode.append(contextMenuItem_DeleteAction);
+
+        // append menu to the canvas container in dom
+        this.stage.container().append(this.contextMenuNode);
+
+        // on outside click hide the context menu
+        window.addEventListener("click", () => {
+            this.contextMenuNode.style.display = "none";
+        });
+
+        this.stage.on("contextmenu", (e) => {
+            // prevent default behavior
+            e.evt.preventDefault();
+            // if we are on empty place of the stage we will do nothing
+            if (e.target === this.stage) return;
+
+            if (
+                ![
+                    String(LShapeIds.LShapeObject),
+                    String(LShapeIds.LShapePlaceholderObject),
+                ].includes(e.target.id())
+            ) {
+                return;
+            }
+
+            this.currentShape = e.target;
+            // context show menu
+            this.contextMenuNode.style.display = "initial";
+
+            this.contextMenuNode.style.top =
+                this.stage.getPointerPosition().y + 4 + "px";
+            this.contextMenuNode.style.left =
+                this.stage.getPointerPosition().x + 4 + "px";
+        });
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     */
+    deleteShape(shapeGroup) {
+        // this.getShapeGroupAttributeOverlay(shapeGroup)?.remove();
+        shapeGroup?.destroy();
+
+        // ! TODO: dispatch shape deleted event for external side effects.
+        // this.eventManager.dispatchShapeDelete(shapeGroup._id);
+    }
+
     getShapePointsCoordinates(a = 150, b = 50, c = 50, d = 100) {
         let x = 100;
         let y = 100;
@@ -364,9 +450,9 @@ export default class LShapeManager {
             shapeGroup ?? this.currentHoverNode
         );
         if (!shapeGroup) {
-            shapeGroup = shapeNode.findAncestor('Group')
+            shapeGroup = shapeNode.findAncestor("Group");
         }
-        const rotation = shapeGroup.rotation()
+        const rotation = shapeGroup.rotation();
         const boxRect = shapeNode.getClientRect();
         let overlayNewPosition = {
             left: boxRect.x + 30,
@@ -376,12 +462,20 @@ export default class LShapeManager {
         if (rotation === 180) {
             overlayNewPosition = {
                 left: boxRect.x + 30,
-                top: (boxRect.y + shapeNode.height()) - this.actionOverlayNode.clientHeight - 30,
+                top:
+                    boxRect.y +
+                    shapeNode.height() -
+                    this.actionOverlayNode.clientHeight -
+                    30,
             };
         } else if (rotation > 180) {
             overlayNewPosition = {
                 left: boxRect.x + 30,
-                top: (boxRect.y + shapeNode.width()) - this.actionOverlayNode.clientHeight - 30,
+                top:
+                    boxRect.y +
+                    shapeNode.width() -
+                    this.actionOverlayNode.clientHeight -
+                    30,
             };
         }
 
