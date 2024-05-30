@@ -4,6 +4,7 @@ import RotateIcon from "@/assets/image/rotate.svg?raw";
 import {
     LShapeIds,
     ShapeActions,
+    ShapeTypes,
     // SquareShapeIds,
 } from "./enum/ShapeManagerEnum.js";
 import AttributeOverlayTemplate from "@/templates/AttributesOverlay/index.html?raw";
@@ -73,6 +74,7 @@ export default class LShapeManager {
                     [LSH.SideC]: 0,
                     [LSH.SideD]: 0,
                 },
+                shapeType: ShapeTypes.LShape,
             });
 
             const shapeInitialCord = this.getShapePointsCoordinates();
@@ -232,7 +234,9 @@ export default class LShapeManager {
         } else {
             // Replace Placeholder with an image
             shapeGroup = this.currentHoverNode;
-            // TODO: dispatch shape select event here.
+            shapeGroup.on("click", () => {
+                this.eventManager.dispatchShapeSelect(shapeGroup);
+            });
 
             // Place image element onto the layer with actual material image
             /** @type {Konva.Rect} */
@@ -254,7 +258,7 @@ export default class LShapeManager {
             this.actionOverlayNode.style.display = "none";
             // TODO: Dispatch Shape Select Overlay.
             this.createAttributesOverlay(shapeGroup);
-            // this.eventManager.dispatchShapeSelect(shapeGroup);
+            this.eventManager.dispatchShapeSelect(shapeGroup);
         }
     }
 

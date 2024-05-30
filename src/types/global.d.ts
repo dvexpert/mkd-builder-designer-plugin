@@ -19,6 +19,8 @@ interface ShapeSizeType {
     width: string
 }
 
+type ShapeTypes = "SquareShape" | "LShape";
+
 interface RequestObjectType {
     image: string; // for shape draw
     success: (prop: CallBackPropsType) => void;
@@ -38,6 +40,7 @@ interface RequestObjectType {
     backsplashes?: BacksplashesPresence;
     haveRoundedCorners?: HaveRoundedCornersPresence;
     shapeSize?: ShapeSizeType;
+    shapeType?: ShapeTypes;
 }
 
 declare global {

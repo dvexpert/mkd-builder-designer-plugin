@@ -36,3 +36,9 @@ LShapeIdsObject.LShapeTextLayers = {
 };
 
 export const LShapeIds = Object.freeze(LShapeIdsObject);
+
+
+export const ShapeTypes = Object.freeze({
+    SquareShape: "SquareShape",
+    LShape: "LShape",
+});

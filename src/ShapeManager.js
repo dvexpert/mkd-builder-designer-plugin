@@ -1,7 +1,7 @@
 import Konva from "konva";
 import { rotateGroup } from "./Helper.js";
 import RotateIcon from "@/assets/image/rotate.svg?raw";
-import { ShapeActions, SquareShapeIds } from "./enum/ShapeManagerEnum.js";
+import { ShapeActions, ShapeTypes, SquareShapeIds } from "./enum/ShapeManagerEnum.js";
 import AttributeOverlayTemplate from "@/templates/AttributesOverlay/index.html?raw";
 import AttributeShapeCutOutTemplate from "@/templates/AttributesOverlay/ShapeCutOut.html?raw";
 import EventManager from "./EventManager.js";
@@ -280,6 +280,7 @@ export default class ShapeManager {
                     height: 50,
                     width: 150,
                 },
+                shapeType: ShapeTypes.SquareShape,
             });
             const squarePlaceHolderObject = new Konva.Rect({
                 x: posX,

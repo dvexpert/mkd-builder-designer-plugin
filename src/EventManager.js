@@ -140,7 +140,11 @@ export default class EventManager {
         document.addEventListener("mkd-plugin:toggle-rounded-box", (e) => {
             const request = e.detail;
             try {
-                this.toggleRoundedCheckbox(request.shapeId, request.wall, request.addWall);
+                this.toggleRoundedCheckbox(
+                    request.shapeId,
+                    request.wall,
+                    request.addWall
+                );
             } catch (e) {
                 request.error && request.error({ message: e.message });
             }
@@ -201,7 +205,9 @@ export default class EventManager {
     setShapeDrag(enable) {
         this.stage.setAttr("shapeDraggable", enable);
         /** @type {Konva.Group[]} */
-        const shapes = this.stage.find(`#${SquareShapeIds.ShapeGroup},#${LShapeIds.LShapeGroup}`);
+        const shapes = this.stage.find(
+            `#${SquareShapeIds.ShapeGroup},#${LShapeIds.LShapeGroup}`
+        );
         shapes.forEach((shape) => shape.draggable(enable));
     }
 
@@ -243,16 +249,23 @@ export default class EventManager {
      */
     static dispatchShapeSelect(shapeGroup) {
         const shapeSize = shapeGroup.getAttr("shapeSize");
+
+        let request = {
+            id: shapeGroup._id,
+            materialId: shapeGroup.getAttr("materialId"),
+            shapeName: shapeGroup.getAttr("shapeName"),
+            againstTheWall: shapeGroup.getAttr("againstTheWall"),
+            backsplashes: shapeGroup.getAttr("backsplashes"),
+            haveRoundedCorners: shapeGroup.getAttr("haveRoundedCorners"),
+            shapeSize: Object.keys(shapeSize).length > 0 ? shapeSize : {},
+            shapeType: shapeGroup.getAttr("shapeType"),
+        };
+
+        // To remove keys with undefine value (different shape has different attributes).
+        request = JSON.parse(JSON.stringify(request));
+
         const newEvent = new CustomEvent("mkd-plugin:active-shape", {
-            detail: {
-                id: shapeGroup._id,
-                materialId: shapeGroup.getAttr("materialId"),
-                shapeName: shapeGroup.getAttr("shapeName"),
-                againstTheWall: shapeGroup.getAttr("againstTheWall"),
-                backsplashes: shapeGroup.getAttr("backsplashes"),
-                haveRoundedCorners: shapeGroup.getAttr("haveRoundedCorners"),
-                shapeSize: Object.keys(shapeSize).length > 0 ? shapeSize : {},
-            },
+            detail: request,
         });
         document.dispatchEvent(newEvent);
     }
@@ -494,13 +507,16 @@ export default class EventManager {
             if (shape.findOne(`#checkbox_node_${wall}`)) {
                 throw new Error("Checkbox group already exists!");
             }
-            this.manager.shapeManager.addCheckboxGroup(edgeSubGroup, wall, shape);
+            this.manager.shapeManager.addCheckboxGroup(
+                edgeSubGroup,
+                wall,
+                shape
+            );
         } else {
             if (!shape.findOne(`#checkbox_node_${wall}`)) {
                 throw new Error("Checkbox group does not exists!");
             }
             this.manager.shapeManager.removeCheckboxGroup(wall, shape);
-
         }
     }
 }
