@@ -450,7 +450,7 @@ export default class ShapeManager {
                 height: placeHolderElm.height(),
                 cornerRadius: placeHolderElm.cornerRadius(),
                 image: imageObj,
-                stroke: "#000",
+                // stroke: "#000",
                 dragBoundFunc: function (pos) {
                     return {
                         x: Math.max(pos.x, 0),
