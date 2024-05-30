@@ -457,7 +457,11 @@ export default class EventManager {
         const shape = this.getShapeById(shapeId);
         /** @type {Konva.Group} */
         const backsplashGroup = shape.findOne(`.${wall}`);
-        this.manager.shapeManager.addBacksplash(backsplashGroup, shape);
+        if (shape.getAttr('shapeType') === ShapeTypes.SquareShape) {
+            this.manager.shapeManager.addBacksplash(backsplashGroup, shape);
+        } else if (shape.getAttr('shapeType') === ShapeTypes.LShape) {
+            this.manager.lShapeManager.addBacksplash(backsplashGroup, shape);
+        }
     }
 
     /**
@@ -469,11 +473,19 @@ export default class EventManager {
         const shape = this.getShapeById(shapeId);
         /** @type {Konva.Group} */
         const backsplashGroup = shape.findOne(`.${wall}`);
-        this.manager.shapeManager.removeBacksplash(
-            backsplashGroup,
-            shape,
-            wall
-        );
+        if (shape.getAttr('shapeType') === ShapeTypes.SquareShape) {
+            this.manager.shapeManager.removeBacksplash(
+                backsplashGroup,
+                shape,
+                wall
+            );
+        } else if (shape.getAttr('shapeType') === ShapeTypes.LShape) {
+            this.manager.lShapeManager.removeBacksplash(
+                backsplashGroup,
+                shape,
+                wall
+            );
+        }
     }
 
     export() {

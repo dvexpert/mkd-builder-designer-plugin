@@ -631,9 +631,9 @@ export default class LShapeManager {
             const isHorizontal = LSH.isHorizontal(subgroupName);
             const sidePosition = LSH.getSidePoints(subgroupName, points);
 
-            // const backsplash = shapeGroup.findOne(
-            //     `.backsplash_${subgroupName}`
-            // );
+            const backsplash = shapeGroup.findOne(
+                `.backsplash_${subgroupName}`
+            );
             // const checkboxGroup = shapeGroup.findOne(
             //     `.checkbox_node_${subgroupName}`
             // );
@@ -648,10 +648,10 @@ export default class LShapeManager {
             };
 
             if (isHorizontal) {
-                // if (backsplash) {
-                //     backsplashOffset =
-                //         backsplash.height() + LSH.wallBacksplashGap;
-                // }
+                if (backsplash) {
+                    backsplashOffset =
+                        backsplash.height() + LSH.wallBacksplashGap;
+                }
                 if (LSH.isFirstInHorizontalOrVertical(subgroupName)) {
                     const sidePositionS = sidePosition[0];
                     attributes.x = sidePositionS.x;
@@ -681,10 +681,10 @@ export default class LShapeManager {
                     createInputs && this.createWidthInput(subGroup);
                 }
             } else {
-                // if (backsplash) {
-                //     backsplashOffset =
-                //         backsplash.width() + LSH.wallBacksplashGap;
-                // }
+                if (backsplash) {
+                    backsplashOffset =
+                        backsplash.width() + LSH.wallBacksplashGap;
+                }
                 if (LSH.isFirstInHorizontalOrVertical(subgroupName)) {
                     const sidePositionS = sidePosition[0];
                     attributes.x = sidePositionS.x + spacingOffset;
@@ -705,7 +705,7 @@ export default class LShapeManager {
 
                     const x =
                         subGroup.width() -
-                        subGroup.width() * 0.4 -
+                        subGroup.width() * 0.5 -
                         backsplashOffset;
                     sideLabel.x(x);
                     sideLabel.y(30);
@@ -1030,18 +1030,18 @@ export default class LShapeManager {
         // subGroup.findOne(".tempBG").setAttr(attr, Number(inputBoxValue) * LSH.SizeDiff);
 
         // Update wall and backsplash size also.
-        // const wall = edgeGroup.findOne((node) => {
-        //     return String(node.id()).startsWith("wall_");
-        // });
-        // if (wall) {
-        //     wall.setAttr(attr, Number(inputBoxValue) * LSH.SizeDiff);
-        // }
-        // const backsplash = edgeGroup.findOne((node) => {
-        //     return String(node.id()).startsWith("backsplash_");
-        // });
-        // if (backsplash) {
-        //     backsplash.setAttr(attr, Number(inputBoxValue) * LSH.SizeDiff);
-        // }
+        const wall = subGroup.findOne((node) => {
+            return String(node.id()).startsWith("wall_");
+        });
+        if (wall) {
+            wall.setAttr(attr, Number(inputBoxValue) * LSH.SizeDiff);
+        }
+        const backsplash = subGroup.findOne((node) => {
+            return String(node.id()).startsWith("backsplash_");
+        });
+        if (backsplash) {
+            backsplash.setAttr(attr, Number(inputBoxValue) * LSH.SizeDiff);
+        }
 
         this.updateInputsPosition(subGroup);
         this.updateHoverActionOverlayPosition(shapeGroup);
@@ -1306,5 +1306,94 @@ export default class LShapeManager {
             };
         }
         return corners;
+    }
+
+    /**
+     *
+     * @param {Konva.Group} SubGroup - border group, containing wall and size input
+     * @param {Konva.Group} shapeGroup - main shape group containing everything, shape, edge group etc.
+     */
+    async addBacksplash(SubGroup, shapeGroup) {
+        let dispatchShapeSelect = false;
+        if (!SubGroup.findOne(`.wall_${SubGroup.name()}`)) {
+            console.info("[Builder] Adding wall before adding backsplash");
+            await this.addWall(SubGroup, shapeGroup);
+            dispatchShapeSelect = true;
+        }
+        if (SubGroup.findOne(`.backsplash_${SubGroup.name()}`)) {
+            alert("Backsplash already exists");
+            return;
+        }
+        const backsplash = new Konva.Rect({
+            id: "backsplash_" + SubGroup.name(),
+            name: "backsplash_" + SubGroup.name(),
+            fill: "rgba(0, 0, 0, 0.65)",
+            width: SubGroup.width(),
+        });
+        SubGroup.add(backsplash);
+
+        /** @type {import("./helpers/SquareHelper.js").SquareSide} wall */
+        const backsplashGroupName = SubGroup.name();
+        const attributes = { x: 0, y: 0 };
+        if (LSH.isHorizontal(backsplashGroupName)) {
+            const wallSizeOffset =
+                SubGroup.findOne(`.wall_${SubGroup.name()}`).height() +
+                LSH.wallBacksplashGap;
+            backsplash.height(30);
+            backsplash.width(SubGroup.width());
+            if (LSH.isFirstInHorizontalOrVertical(backsplashGroupName)) {
+                attributes.y = SubGroup.height() - backsplash.height();
+                attributes.y -= wallSizeOffset;
+            } else {
+                attributes.y += wallSizeOffset;
+            }
+        } else {
+            const wallSizeOffset =
+                SubGroup.findOne(`.wall_${SubGroup.name()}`).width() +
+                LSH.wallBacksplashGap;
+            backsplash.height(SubGroup.height());
+            backsplash.width(30);
+            if (!LSH.isFirstInHorizontalOrVertical(backsplashGroupName)) {
+                attributes.x =
+                    SubGroup.width() - backsplash.width() - wallSizeOffset;
+            } else {
+                attributes.x = wallSizeOffset;
+            }
+        }
+
+        backsplash.position(attributes);
+
+        const backsplashes = this.initializeCorners(
+            shapeGroup.getAttr("backsplashes"),
+            false
+        );
+        backsplashes[SubGroup.name()] = true;
+        shapeGroup.setAttr("backsplashes", backsplashes);
+
+        if (dispatchShapeSelect) {
+            EventManager.dispatchShapeSelect(shapeGroup);
+        }
+        this.updateInputsPosition(SubGroup);
+        this.updateEdgeGroupsPosition(shapeGroup, false, true);
+    }
+
+    /**
+     *
+     * @param {Konva.Group} SubGroup - border group, containing wall and size input
+     * @param {Konva.Group} shapeGroup - main shape group, containing everything.
+     * @param {import("./helpers/SquareHelper.js").SquareSide} wall
+     */
+    removeBacksplash(SubGroup, shapeGroup, wall) {
+        const backsplashObj = SubGroup.findOne(`.backsplash_${wall}`);
+        if (backsplashObj) {
+            backsplashObj.destroy();
+
+            let backsplashes = shapeGroup.getAttr("backsplashes");
+            backsplashes[SubGroup.name()] = false;
+            shapeGroup.setAttr("backsplashes", backsplashes);
+
+            this.updateInputsPosition(SubGroup);
+            this.updateEdgeGroupsPosition(shapeGroup, false, true);
+        }
     }
 }
