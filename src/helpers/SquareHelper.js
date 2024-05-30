@@ -1,30 +1,34 @@
 import Konva from "konva";
 
 /**
- * @typedef {"a"|"b"|"c"|"d"} SquareSide
+ * @typedef { "a" } SquareSideA
+ * @typedef { "b" } SquareSideB
+ * @typedef { "c" } SquareSideC
+ * @typedef { "d" } SquareSideD
+ * @typedef { SquareSideA | SquareSideB | SquareSideC | SquareSideD } SquareSide
  */
 export class SquareHelper {
     /**
      * @static
-     * @type {SquareSide}
+     * @type {SquareSideA}
      */
     static SideA = "a";
 
     /**
      * @static
-     * @type {SquareSide}
+     * @type {SquareSideB}
      */
     static SideB = "b";
 
     /**
      * @static
-     * @type {SquareSide}
+     * @type {SquareSideC}
      */
     static SideC = "c";
 
     /**
      * @static
-     * @type {SquareSide}
+     * @type {SquareSideD}
      */
     static SideD = "d";
 

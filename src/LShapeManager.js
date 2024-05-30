@@ -623,7 +623,7 @@ export default class LShapeManager {
         const subgroupNames = LSH.sides;
         const points = groupShapeObject.points();
 
-        const spacingOffset = 10;
+        const spacingOffset = 0;
         subgroupNames.forEach((subgroupName, index) => {
             /** @type {Konva.Group} */
             const subGroup = shapeGroup.findOne(`.${subgroupName}`);
@@ -991,7 +991,6 @@ export default class LShapeManager {
         labelNode = null,
         inputBox = null
     ) => {
-
         /** @type {Konva.Group} */
         // @ts-ignore
         let shapeGroup = subGroup.findAncestor(`#${LShapeIds.LShapeGroup}`);
@@ -1200,5 +1199,89 @@ export default class LShapeManager {
         return this.stage
             .container()
             .querySelector(`#attributes-overlay-${shapeGroup._id}`);
+    }
+
+    /**
+     *
+     * @param {Konva.Group} SubGroup - border group, containing wall and size input
+     * @param {Konva.Group} shapeGroup - main shape group containing everything, shape, edge group etc.
+     */
+    addWall(SubGroup, shapeGroup) {
+        if (SubGroup.findOne(`.wall_${SubGroup.name()}`)) {
+            alert("Wall already exists");
+            return;
+        }
+
+        const wall = new Konva.Rect({
+            name: "wall_" + SubGroup.name(),
+            id: "wall_" + SubGroup.name(),
+            fill: "#3b3b3b",
+            width: SubGroup.width(),
+            height: 10,
+        });
+        SubGroup.add(wall);
+
+        /** @type {import("./helpers/SquareHelper.js").SquareSide} wall */
+        const wallGroupName = SubGroup.name();
+        const attributes = { x: 0, y: 0 };
+        if (LSH.isHorizontal(wallGroupName)) {
+            wall.height(5);
+            wall.width(SubGroup.width());
+            if (LSH.isFirstInHorizontalOrVertical(wallGroupName)) {
+                attributes.y = SubGroup.height() - wall.height();
+            }
+        } else {
+            wall.height(SubGroup.height());
+            wall.width(5);
+            if (!LSH.isFirstInHorizontalOrVertical(wallGroupName)) {
+                attributes.x = SubGroup.width() - wall.width();
+            }
+        }
+
+        wall.position(attributes);
+
+        let againstTheWall = this.initializeCorners(
+            shapeGroup.getAttr("againstTheWall"),
+            false
+        );
+        againstTheWall[SubGroup.name()] = true;
+        shapeGroup.setAttr("againstTheWall", againstTheWall);
+
+        /**
+         * While adding wall, wall edge corners, must not be rounded.
+         * for ex: if we add Wall on edge "A" Then corner radius for
+         * "A" and "B" must be disabled.
+         */
+        // const groupMappings = {
+        //     [LSH.SideA]: [LSH.SideA, LSH.SideB],
+        //     [LSH.SideB]: [LSH.SideB, LSH.SideC],
+        //     [LSH.SideC]: [LSH.SideC, LSH.SideD],
+        //     [LSH.SideD]: [LSH.SideD, LSH.SideA],
+        // };
+
+        // const groupName = SubGroup.name();
+        // const groupsToRemove = groupMappings[groupName] || [];
+
+        // groupsToRemove.forEach((group) => {
+        //     this.removeCheckboxGroup(group, shapeGroup);
+        // });
+    }
+
+    /**
+     *
+     * @param {import("./types/global.js").WallPresence} corners
+     * @param {boolean} defaultValue
+     * @returns {{ [key in import("./helpers/LShapeHelper.js").LShapeSide]: boolean}}
+     */
+    initializeCorners(corners, defaultValue) {
+        if (!corners || typeof corners !== "object") {
+            return {
+                [LSH.SideA]: defaultValue,
+                [LSH.SideB]: defaultValue,
+                [LSH.SideC]: defaultValue,
+                [LSH.SideD]: defaultValue,
+            };
+        }
+        return corners;
     }
 }

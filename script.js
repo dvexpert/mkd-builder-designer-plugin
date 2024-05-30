@@ -167,8 +167,8 @@ jQuery(document).ready(function ($) {
             $("#active-shape-customization-block").fadeIn();
 
             if (response.shapeType === "SquareShape") {
-                $("#square-size-container").show();
-                $("#l-shape-size-container").hide();
+                $("#square-size-container").slideDown();
+                $("#l-shape-size-container").slideUp();
                 const shapeWidth = $(
                     "#active-shape-customization-block #shapeWidth"
                 );
@@ -178,8 +178,8 @@ jQuery(document).ready(function ($) {
                 );
                 shapeHeight.val(response.shapeSize.height);
             } else if (response.shapeType === "LShape") {
-                $("#square-size-container").hide();
-                $("#l-shape-size-container").show();
+                $("#square-size-container").slideUp();
+                $("#l-shape-size-container").slideDown();
                 Object.keys(response.shapeSize).forEach((wall) => {
                     $(
                         `#l-shape-size-container input[data-wall="${wall}"]`

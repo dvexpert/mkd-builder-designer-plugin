@@ -424,8 +424,12 @@ export default class EventManager {
     addWall(shapeId, wall) {
         const shape = this.getShapeById(shapeId);
         /** @type {Konva.Group} */
-        const wallGroup = shape.findOne(`.${wall}`);
-        this.manager.shapeManager.addWall(wallGroup, shape);
+        const edgeGroup = shape.findOne(`.${wall}`);
+        if (shape.getAttr('shapeType') === ShapeTypes.SquareShape) {
+            this.manager.shapeManager.addWall(edgeGroup, shape);
+        } else if (shape.getAttr('shapeType') === ShapeTypes.LShape) {
+            this.manager.lShapeManager.addWall(edgeGroup, shape);
+        }
     }
 
     /**

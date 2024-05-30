@@ -529,7 +529,7 @@ export default class ShapeManager {
      *
      * @param {import("./types/global.js").WallPresence} corners
      * @param {boolean} defaultValue
-     * @returns {import("./types/global.js").WallPresence}
+     * @returns {{ [key in import("./helpers/SquareHelper.js").SquareSide]: boolean}}
      */
     initializeCorners(corners, defaultValue) {
         if (!corners || typeof corners !== "object") {
