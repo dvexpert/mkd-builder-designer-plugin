@@ -440,8 +440,12 @@ export default class EventManager {
     removeWall(shapeId, wall) {
         const shape = this.getShapeById(shapeId);
         /** @type {Konva.Group} */
-        const wallGroup = shape.findOne(`.${wall}`);
-        this.manager.shapeManager.removeWall(wallGroup, shape, wall);
+        const edgeGroup = shape.findOne(`.${wall}`);
+        if (shape.getAttr('shapeType') === ShapeTypes.SquareShape) {
+            this.manager.shapeManager.removeWall(edgeGroup, shape, wall);
+        } else if (shape.getAttr('shapeType') === ShapeTypes.LShape) {
+            this.manager.lShapeManager.removeWall(edgeGroup, shape, wall);
+        }
     }
 
     /**

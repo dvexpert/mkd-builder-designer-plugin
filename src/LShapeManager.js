@@ -1269,6 +1269,29 @@ export default class LShapeManager {
 
     /**
      *
+     * @param {Konva.Group} SubGroup - border group, containing wall and size input
+     * @param {Konva.Group} shapeGroup - main shape group, containing everything.
+     * @param {import("./helpers/LShapeHelper.js").LShapeSide} wall
+     */
+    removeWall(SubGroup, shapeGroup, wall) {
+        const wallObj = SubGroup.findOne(`.wall_${wall}`);
+        if (!wallObj) {
+            return;
+        }
+        wallObj.destroy();
+
+        let againstTheWall = shapeGroup.getAttr("againstTheWall");
+        againstTheWall[SubGroup.name()] = false;
+        shapeGroup.setAttr("againstTheWall", againstTheWall);
+
+        // ! remove backsplash also when wall removed.
+        // ? this.removeBacksplash(SubGroup, shapeGroup, wall);
+
+        EventManager.dispatchShapeSelect(shapeGroup);
+    }
+
+    /**
+     *
      * @param {import("./types/global.js").WallPresence} corners
      * @param {boolean} defaultValue
      * @returns {{ [key in import("./helpers/LShapeHelper.js").LShapeSide]: boolean}}
