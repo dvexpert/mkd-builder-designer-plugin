@@ -1,3 +1,5 @@
+import { LShapeHelper as LSH } from "@/helpers/LShapeHelper";
+
 export const ShapeActions = Object.freeze({
     Place: "place",
     Rotate: "rotate",
@@ -11,13 +13,26 @@ export const SquareShapeIds = Object.freeze({
     ShapeWidthTextLayer: "shapeWidthTextLayer",
 });
 
-export const LShapeIds = Object.freeze({
+const LShapeIdsObject = {
     LShapeGroup: "LShapeGroup",
 
     LShapeObject: "LShapeObject",
     LShapePlaceholderObject: "LShapePlaceholderObject",
-    LShapeHeightTextLayer: "LShapeHeightTextLayer",
-    LShapeWidthTextLayer: "LShapeWidthTextLayer",
+    LShapeATextLayer: "LShapeATextLayer",
+    LShapeBTextLayer: "LShapeBTextLayer",
+    LShapeCTextLayer: "LShapeCTextLayer",
+    LShapeDTextLayer: "LShapeDTextLayer",
+
+    LShapeTextLayers: {},
 
     LShapeActionOverlayId: "l-shape-action-overlay",
-});
+};
+
+LShapeIdsObject.LShapeTextLayers = {
+    [LSH.SideA]: LShapeIdsObject.LShapeATextLayer,
+    [LSH.SideB]: LShapeIdsObject.LShapeBTextLayer,
+    [LSH.SideC]: LShapeIdsObject.LShapeCTextLayer,
+    [LSH.SideD]: LShapeIdsObject.LShapeDTextLayer,
+};
+
+export const LShapeIds = Object.freeze(LShapeIdsObject);
