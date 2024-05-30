@@ -166,14 +166,26 @@ jQuery(document).ready(function ($) {
             }
             $("#active-shape-customization-block").fadeIn();
 
-            const shapeWidth = $(
-                "#active-shape-customization-block #shapeWidth"
-            );
-            shapeWidth.val(response.shapeSize.width);
-            const shapeHeight = $(
-                "#active-shape-customization-block #shapeHeight"
-            );
-            shapeHeight.val(response.shapeSize.height);
+            if (response.shapeType === "SquareShape") {
+                $("#square-size-container").show();
+                $("#l-shape-size-container").hide();
+                const shapeWidth = $(
+                    "#active-shape-customization-block #shapeWidth"
+                );
+                shapeWidth.val(response.shapeSize.width);
+                const shapeHeight = $(
+                    "#active-shape-customization-block #shapeHeight"
+                );
+                shapeHeight.val(response.shapeSize.height);
+            } else if (response.shapeType === "LShape") {
+                $("#square-size-container").hide();
+                $("#l-shape-size-container").show();
+                Object.keys(response.shapeSize).forEach((wall) => {
+                    $(
+                        `#l-shape-size-container input[data-wall="${wall}"]`
+                    )?.val(response.shapeSize[wall]);
+                });
+            }
         }
     );
 
@@ -251,14 +263,22 @@ jQuery(document).ready(function ($) {
                 return;
             }
 
-            const shapeWidth = $(
-                "#active-shape-customization-block #shapeWidth"
-            );
-            shapeWidth.val(response.shapeSize.width);
-            const shapeHeight = $(
-                "#active-shape-customization-block #shapeHeight"
-            );
-            shapeHeight.val(response.shapeSize.height);
+            if (response.shapeType === "SquareShape") {
+                const shapeWidth = $(
+                    "#active-shape-customization-block #shapeWidth"
+                );
+                shapeWidth.val(response.shapeSize.width);
+                const shapeHeight = $(
+                    "#active-shape-customization-block #shapeHeight"
+                );
+                shapeHeight.val(response.shapeSize.height);
+            } else if (response.shapeType === "LShape") {
+                Object.keys(response.shapeSize).forEach((wall) => {
+                    $(
+                        `#l-shape-size-container input[data-wall="${wall}"]`
+                    )?.val(response.shapeSize[wall]);
+                });
+            }
         }
     );
 
@@ -279,11 +299,10 @@ jQuery(document).ready(function ($) {
     });
 });
 
-
 // Shape L
 
 // @ts-ignore
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     $("#draw-l").on("click", function () {
         try {
             dispatchCanvasEvent("mkd-plugin:draw:l", {
@@ -294,5 +313,20 @@ jQuery(document).ready(function($) {
         } catch (e) {
             console.log(e.message);
         }
+    });
+
+    // L Shape Size Change Inputs
+    $(document).on("change", "#l-shape-size-container input", function () {
+        const wall = $(this).attr("data-wall");
+        const value = $(this).val();
+        if (value <= 0) {
+            alert("Please select a value greater than 0.");
+            return;
+        }
+        dispatchCanvasEvent("mkd-plugin:shape-size", {
+            shapeId: document.activeShape,
+            [wall]: value,
+            error: (e) => console.log(`[MKD]: ${e.message}`),
+        });
     });
 });

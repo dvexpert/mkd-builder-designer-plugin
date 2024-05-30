@@ -815,7 +815,7 @@ export default class LShapeManager {
 
     /**
      * Create Text and Input box for the height adjustments
-     * @param {Konva.Group} subGroup
+     * @param {Konva.Group} subGroup - edge sub group
      */
     createHeightInput(subGroup) {
         const shapeObject = this.getShapeObject(
@@ -981,7 +981,7 @@ export default class LShapeManager {
     /**
      *
      * @param {string} attr - "height" or "width"
-     * @param {Konva.Group} subGroup
+     * @param {Konva.Group} subGroup - edge group
      * @param {Konva.Text} labelNode
      * @param {HTMLInputElement | string} inputBox
      */
@@ -991,15 +991,10 @@ export default class LShapeManager {
         labelNode = null,
         inputBox = null
     ) => {
+
         /** @type {Konva.Group} */
-        let shapeGroup;
-        if (subGroup.id() === LShapeIds.LShapeGroup) {
-            shapeGroup = subGroup;
-        } else {
-            /** @type {Konva.Group} */
-            // @ts-ignore
-            shapeGroup = subGroup.findAncestor(`#${LShapeIds.LShapeGroup}`);
-        }
+        // @ts-ignore
+        let shapeGroup = subGroup.findAncestor(`#${LShapeIds.LShapeGroup}`);
         const squarePlaceHolderObject = this.getShapeObject(shapeGroup);
 
         let inputBoxValue = "";
@@ -1031,8 +1026,8 @@ export default class LShapeManager {
         );
         squarePlaceHolderObject.points(newCoordinates);
 
-        const edgeGroup = shapeGroup.findOne(`.${subGroup.name()}`);
-        edgeGroup.setAttr(attr, Number(inputBoxValue) * LSH.SizeDiff);
+        // const edgeGroup = shapeGroup.findOne(`.${subGroup.name()}`);
+        subGroup.setAttr(attr, Number(inputBoxValue) * LSH.SizeDiff);
         // subGroup.findOne(".tempBG").setAttr(attr, Number(inputBoxValue) * LSH.SizeDiff);
 
         // Update wall and backsplash size also.
@@ -1054,10 +1049,10 @@ export default class LShapeManager {
         this.updateEdgeGroupsPosition(shapeGroup);
 
         const shapeSize = shapeGroup.getAttr("shapeSize");
-        shapeSize[attr] = inputBoxValue;
+        shapeSize[subGroup.name()] = inputBoxValue;
         shapeGroup.setAttr("shapeSize", shapeSize);
 
-        // this.eventManager.dispatchSizeUpdate(shapeGroup);
+        this.eventManager.dispatchSizeUpdate(shapeGroup);
     };
 
     /**

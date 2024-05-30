@@ -1,6 +1,7 @@
 import Konva from "konva";
 import { KonvaManager } from "./KonvaManager";
-import { LShapeIds, SquareShapeIds } from "./enum/ShapeManagerEnum";
+import { LShapeIds, ShapeTypes, SquareShapeIds } from "./enum/ShapeManagerEnum";
+import { LShapeHelper as LSH } from "./helpers/LShapeHelper";
 
 export default class EventManager {
     /**
@@ -126,16 +127,61 @@ export default class EventManager {
                 return;
             }
 
-            const payload = {};
-            if (request.height) {
-                payload.attr = "height";
-                payload.height = request.height;
-            } else if (request.width) {
-                payload.attr = "width";
-                payload.width = request.width;
-            }
+            const shapeGroup = this.getShapeById(request.shapeId);
+            if (
+                shapeGroup &&
+                shapeGroup.getAttr("shapeType") === ShapeTypes.SquareShape
+            ) {
+                const payload = {};
+                if (request.height) {
+                    payload.attr = "height";
+                    payload.height = request.height;
+                } else if (request.width) {
+                    payload.attr = "width";
+                    payload.width = request.width;
+                }
 
-            this.setShapeSize(request.shapeId, payload);
+                this.manager.shapeManager.handleInputValueChange(
+                    payload.attr,
+                    shapeGroup,
+                    null,
+                    payload[payload.attr]
+                );
+            } else if (
+                shapeGroup &&
+                shapeGroup.getAttr("shapeType") === ShapeTypes.LShape
+            ) {
+                /**
+                 * 
+                 * Extract only sides length property from request object,
+                 * request object has may keys like shapeId and more.
+                 * 
+                 * ```json
+                 * { "a": 10, "b": 10, "c": 10, "d": 10 }
+                 * ```
+                 * can have single side value or all side value.
+                 * @typedef {Partial<{[key in import("./helpers/LShapeHelper").LShapeSide]: number}>} SidesLength
+                 * 
+                 * @type {SidesLength}
+                 */
+                const sidesLength = {};
+                LSH.sides.forEach((key) => {
+                    if (key in request) {
+                        sidesLength[key] = request[key];
+                    }
+                });
+
+                Object.keys(sidesLength).forEach((key) => {
+                    const edgeGroup = shapeGroup.findOne(`.${key}`)
+                    const labelNode = shapeGroup.findOne(`#${LShapeIds.LShapeTextLayers[key]}`)
+                    this.manager.lShapeManager.handleInputValueChange(
+                        LSH.isHorizontal(key) ? 'width' : 'height',
+                        edgeGroup,
+                        labelNode,
+                        sidesLength[key]
+                    )
+                })
+            }
         });
         document.addEventListener("mkd-plugin:toggle-rounded-box", (e) => {
             const request = e.detail;
@@ -280,6 +326,7 @@ export default class EventManager {
             detail: {
                 id: shapeGroup._id,
                 shapeSize: Object.keys(shapeSize).length > 0 ? shapeSize : {},
+                shapeType: shapeGroup.getAttr('shapeType'),
             },
         });
         document.dispatchEvent(newEvent);
