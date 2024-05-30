@@ -6,8 +6,8 @@ import {
     ShapeActions,
     // SquareShapeIds,
 } from "./enum/ShapeManagerEnum.js";
-// import AttributeOverlayTemplate from "@/templates/AttributesOverlay/index.html?raw";
-// import AttributeShapeCutOutTemplate from "@/templates/AttributesOverlay/ShapeCutOut.html?raw";
+import AttributeOverlayTemplate from "@/templates/AttributesOverlay/index.html?raw";
+import AttributeShapeCutOutTemplate from "@/templates/AttributesOverlay/ShapeCutOut.html?raw";
 import EventManager from "./EventManager.js";
 import { LShapeHelper as LSH } from "./helpers/LShapeHelper.js";
 // import { SquareHelper as SH } from "./helpers/SquareHelper.js";
@@ -88,14 +88,14 @@ export default class LShapeManager {
 
             /**
              * @typedef {{ [key in import("./helpers/LShapeHelper.js").LShapeSide]: number}} AllSideLengthsType
-             * 
+             *
              * @type {AllSideLengthsType}
              */
-            const sides = LSH.getSideLength(false, shapeInitialCord)
-            sides.a = sides.a / LSH.SizeDiff
-            sides.b = sides.b / LSH.SizeDiff
-            sides.c = sides.c / LSH.SizeDiff
-            sides.d = sides.d / LSH.SizeDiff
+            const sides = LSH.getSideLength(false, shapeInitialCord);
+            sides.a = sides.a / LSH.SizeDiff;
+            sides.b = sides.b / LSH.SizeDiff;
+            sides.c = sides.c / LSH.SizeDiff;
+            sides.d = sides.d / LSH.SizeDiff;
 
             const shapeSize = sides;
             shapeGroup.setAttr("shapeSize", shapeSize);
@@ -117,27 +117,27 @@ export default class LShapeManager {
             });
             shapeGroup.on("mouseenter dragmove", (e) => {
                 const hoverNode = e.target;
-                // if (e.type === "dragmove") {
-                //     // this.updateAttributesOverlayPosition(shapeGroup);
-                //     const targetShape = this.getShapeObject(hoverNode);
-                //     const targetRect = targetShape.getClientRect();
-                //     this.layer.find("Group").forEach(
-                //         /** @param {Konva.Group} group  */
-                //         (group) => {
-                //             // do not check intersection with itself
-                //             if (group === hoverNode) {
-                //                 group.opacity(1);
-                //                 return;
-                //             }
-                //             const shape = this.getShapeObject(group);
-                //             const haveIntersection = this.haveIntersection(
-                //                 shape.getClientRect(),
-                //                 targetRect
-                //             );
-                //             group.opacity(haveIntersection ? 0.5 : 1);
-                //         }
-                //     );
-                // }
+                if (e.type === "dragmove") {
+                    this.updateAttributesOverlayPosition(shapeGroup);
+                    // const targetShape = this.getShapeObject(hoverNode);
+                    // const targetRect = targetShape.getClientRect();
+                    // this.layer.find("Group").forEach(
+                    //     /** @param {Konva.Group} group  */
+                    //     (group) => {
+                    //         // do not check intersection with itself
+                    //         if (group === hoverNode) {
+                    //             group.opacity(1);
+                    //             return;
+                    //         }
+                    //         const shape = this.getShapeObject(group);
+                    //         const haveIntersection = this.haveIntersection(
+                    //             shape.getClientRect(),
+                    //             targetRect
+                    //         );
+                    //         group.opacity(haveIntersection ? 0.5 : 1);
+                    //     }
+                    // );
+                }
 
                 // const attributeOverlay =
                 //     this.getShapeGroupAttributeOverlay(shapeGroup);
@@ -253,6 +253,8 @@ export default class LShapeManager {
             placeHolderElm.id(LShapeIds.LShapeObject);
             this.actionOverlayNode.style.display = "none";
             // TODO: Dispatch Shape Select Overlay.
+            this.createAttributesOverlay(shapeGroup);
+            // this.eventManager.dispatchShapeSelect(shapeGroup);
         }
     }
 
@@ -261,7 +263,7 @@ export default class LShapeManager {
         const contextMenuStyles = {
             border: "1px solid",
             background: "white",
-            width: "80px",
+            minWidth: "80px",
             position: "absolute",
             display: "none",
             zIndex: "9999",
@@ -462,7 +464,7 @@ export default class LShapeManager {
         rotateGroup(shapeGroup, $shape, rotation);
 
         this.updateHoverActionOverlayPosition(shapeGroup);
-        // this.updateAttributesOverlayPosition(shapeGroup);
+        this.updateAttributesOverlayPosition(shapeGroup);
     }
 
     /**
@@ -687,7 +689,7 @@ export default class LShapeManager {
                     const x = 15 + backsplashOffset;
                     sideLabel.x(x);
                     sideLabel.y(
-                        subGroup.height() - (subGroup.height() * 0.8) + 10
+                        subGroup.height() - subGroup.height() * 0.8 + 10
                     );
                     // checkboxGroup?.x(x);
                     createInputs && this.createHeightInput(subGroup);
@@ -728,8 +730,13 @@ export default class LShapeManager {
      * @param {Konva.Group} subGroup - edge sub group
      */
     createWidthInput(subGroup) {
-        const shapeObject = this.getShapeObject(subGroup.findAncestor(`#${LShapeIds.LShapeGroup}`));
-        const sideLength = LSH.getSideLength(subGroup.name(), shapeObject.points())
+        const shapeObject = this.getShapeObject(
+            subGroup.findAncestor(`#${LShapeIds.LShapeGroup}`)
+        );
+        const sideLength = LSH.getSideLength(
+            subGroup.name(),
+            shapeObject.points()
+        );
         const value = sideLength / LSH.SizeDiff;
 
         const widthInput = new Konva.Text({
@@ -807,8 +814,13 @@ export default class LShapeManager {
      * @param {Konva.Group} subGroup
      */
     createHeightInput(subGroup) {
-        const shapeObject = this.getShapeObject(subGroup.findAncestor(`#${LShapeIds.LShapeGroup}`));
-        const sideLength = LSH.getSideLength(subGroup.name(), shapeObject.points())
+        const shapeObject = this.getShapeObject(
+            subGroup.findAncestor(`#${LShapeIds.LShapeGroup}`)
+        );
+        const sideLength = LSH.getSideLength(
+            subGroup.name(),
+            shapeObject.points()
+        );
         const value = sideLength / LSH.SizeDiff;
 
         const heightInput = new Konva.Text({
@@ -1006,10 +1018,14 @@ export default class LShapeManager {
             b: LSH.getSideLength(LSH.SideB, points) / LSH.SizeDiff,
             c: LSH.getSideLength(LSH.SideC, points) / LSH.SizeDiff,
             d: LSH.getSideLength(LSH.SideD, points) / LSH.SizeDiff,
-            [subGroup.name()]: inputBoxValue
+            [subGroup.name()]: inputBoxValue,
         };
-        const newCoordinates = this.getShapePointsCoordinates(position.x, position.y, sideLengths);
-        squarePlaceHolderObject.points(newCoordinates)
+        const newCoordinates = this.getShapePointsCoordinates(
+            position.x,
+            position.y,
+            sideLengths
+        );
+        squarePlaceHolderObject.points(newCoordinates);
 
         const edgeGroup = shapeGroup.findOne(`.${subGroup.name()}`);
         edgeGroup.setAttr(attr, Number(inputBoxValue) * LSH.SizeDiff);
@@ -1051,5 +1067,139 @@ export default class LShapeManager {
         }
         element.draggable(enable);
         // ? set the cursors and other side effects of toggling the element draggable
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     */
+    createAttributesOverlay(shapeGroup) {
+        let overlayGroup = document.getElementById("attributes-overlay-group");
+        if (!overlayGroup) {
+            overlayGroup = document.createElement("div");
+            overlayGroup.id = "attributes-overlay-group";
+            this.stage.container().append(overlayGroup);
+        }
+
+        /** @type {HTMLElement} */
+        const attributeOverlay = new DOMParser().parseFromString(
+            AttributeOverlayTemplate,
+            "text/html"
+        ).body.firstChild;
+        attributeOverlay.id = `${attributeOverlay.id}-${shapeGroup._id}`;
+        const shapeName = `Shape ${shapeGroup._id}`;
+        const shapeNameElm = attributeOverlay.querySelector("#shape-name");
+        shapeNameElm.innerHTML = shapeName;
+        shapeNameElm.setAttribute("title", shapeName);
+        shapeGroup.setAttr("shapeName", shapeName);
+
+        attributeOverlay.addEventListener("mouseenter", (e) => {
+            const elm = e.target;
+            elm && elm.classList?.add("active-attributes-overlay");
+        });
+        attributeOverlay.addEventListener("mouseleave", (e) => {
+            const elm = e.target;
+            elm && elm.classList?.remove("active-attributes-overlay");
+        });
+        overlayGroup.appendChild(attributeOverlay);
+
+        this.updateAttributesOverlayPosition(shapeGroup);
+
+        // TODO: For demo purpose only
+        if (import.meta.env.VITE_BUILDING_FOR_DEMO === "true") {
+            Array.from(Array(4)).forEach(() =>
+                this.appendShapeCutOut(
+                    shapeGroup,
+                    undefined,
+                    undefined,
+                    attributeOverlay
+                )
+            );
+        }
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     * @param {string} url
+     * @param {string} title
+     * @param {HTMLElement} attributeOverlay - when appending shapeCutout right after placing the attribute overlay element in dom.
+     * in this case getting attribute overlay element from dom might be blank.
+     */
+    appendShapeCutOut(
+        shapeGroup,
+        url = "/dynamicAssets/sinkdropin-1.png",
+        title = "Drop-in Sink",
+        attributeOverlay = null
+    ) {
+        const overlay =
+            attributeOverlay ??
+            document.querySelector(`#attribute-overlay-${shapeGroup._id}`);
+        const container = overlay.querySelector("#shape-cutout-group");
+        /** @type {HTMLElement} */
+        const domObject = new DOMParser().parseFromString(
+            AttributeShapeCutOutTemplate,
+            "text/html"
+        ).body.firstChild;
+        const image = domObject.querySelector("img");
+        const titleElm = domObject.querySelector("span");
+        image.src = url;
+        image.alt = url.split("/").reverse()[0];
+
+        titleElm.innerHTML = title;
+
+        container.appendChild(domObject);
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     */
+    updateAttributesOverlayPosition(shapeGroup) {
+        const ShapeObject = this.getShapeObject(shapeGroup);
+        if (ShapeObject.id() !== LShapeIds.LShapeObject) return;
+
+        const boxRect = ShapeObject.getClientRect();
+        const rotation = shapeGroup.rotation();
+        const attributeOverlay = this.getShapeGroupAttributeOverlay(shapeGroup);
+
+        let overlayNewPosition = {
+            left: boxRect.x + 30,
+            top: boxRect.y + 30,
+        };
+
+        if (rotation === 180) {
+            overlayNewPosition = {
+                left: boxRect.x + 30,
+                top:
+                    boxRect.y +
+                    ShapeObject.height() -
+                    attributeOverlay.clientHeight -
+                    30,
+            };
+        } else if (rotation > 180) {
+            overlayNewPosition = {
+                left: boxRect.x + 30,
+                top:
+                    boxRect.y +
+                    ShapeObject.width() -
+                    attributeOverlay.clientHeight -
+                    30,
+            };
+        }
+
+        attributeOverlay.style.left = `${overlayNewPosition.left}px`;
+        attributeOverlay.style.top = `${overlayNewPosition.top}px`;
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     * @returns {HTMLDivElement}
+     */
+    getShapeGroupAttributeOverlay(shapeGroup) {
+        return this.stage
+            .container()
+            .querySelector(`#attributes-overlay-${shapeGroup._id}`);
     }
 }
