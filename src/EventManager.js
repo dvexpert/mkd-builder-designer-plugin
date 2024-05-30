@@ -1,6 +1,6 @@
 import Konva from "konva";
 import { KonvaManager } from "./KonvaManager";
-import { SquareShapeIds } from "./enum/ShapeManagerEnum";
+import { LShapeIds, SquareShapeIds } from "./enum/ShapeManagerEnum";
 
 export default class EventManager {
     /**
@@ -201,7 +201,7 @@ export default class EventManager {
     setShapeDrag(enable) {
         this.stage.setAttr("shapeDraggable", enable);
         /** @type {Konva.Group[]} */
-        const shapes = this.stage.find(`#${SquareShapeIds.ShapeGroup}`);
+        const shapes = this.stage.find(`#${SquareShapeIds.ShapeGroup},#${LShapeIds.LShapeGroup}`);
         shapes.forEach((shape) => shape.draggable(enable));
     }
 

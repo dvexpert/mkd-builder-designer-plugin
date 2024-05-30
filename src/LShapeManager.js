@@ -63,7 +63,7 @@ export default class LShapeManager {
             shapeGroup = new Konva.Group({
                 x: 100,
                 y: 10,
-                draggable: true, // ! TODO: this.stage.getAttr("shapeDraggable") === true,
+                draggable: this.stage.getAttr("shapeDraggable") === true,
                 id: LShapeIds.LShapeGroup,
                 materialId: materialId,
                 materialImage: materialImage,
