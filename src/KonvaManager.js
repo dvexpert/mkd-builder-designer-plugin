@@ -66,6 +66,7 @@ export class KonvaManager {
             this.layer.add(background);
             background.moveToBottom();
             this.stage.on("dragmove", () => {
+                background.moveToBottom();
                 background.absolutePosition({ x: 0, y: 0 });
             });
         };

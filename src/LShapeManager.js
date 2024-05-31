@@ -62,12 +62,12 @@ export default class LShapeManager {
 
         let posX = 20;
         let posY = 30;
-        if (this.layer.hasChildren()) {
-            const child = this.layer.getChildren();
-            const lastChild = child[child.length - 1];
-            posX = 5 + lastChild.getClientRect().x + lastChild.width();
-            posY = lastChild.getClientRect().y;
-        }
+        // if (this.layer.hasChildren()) {
+        //     const child = this.layer.getChildren();
+        //     const lastChild = child[child.length - 1];
+        //     posX = 5 + lastChild.getClientRect().x + lastChild.width();
+        //     posY = lastChild.getClientRect().y;
+        // }
 
         /** @type {Konva.Group} */
         let shapeGroup;
