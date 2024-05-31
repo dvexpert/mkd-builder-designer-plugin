@@ -1,6 +1,6 @@
 import Konva from "konva";
 import { KonvaManager } from "./KonvaManager";
-import { LShapeIds, ShapeTypes, SquareShapeIds } from "./enum/ShapeManagerEnum";
+import { BackgroundNodeId, LShapeIds, ShapeTypes, SquareShapeIds } from "./enum/ShapeManagerEnum";
 import { LShapeHelper as LSH } from "./helpers/LShapeHelper";
 
 export default class EventManager {
@@ -46,7 +46,7 @@ export default class EventManager {
                 }
             }
         });
-        document.addEventListener("mkd-plugin:export", (e) => {
+        document.addEventListener("mkd-plugin:export-download", (e) => {
             this.export();
         });
         document.addEventListener("mkd-plugin:toggle-wall", (e) => {
@@ -152,16 +152,16 @@ export default class EventManager {
                 shapeGroup.getAttr("shapeType") === ShapeTypes.LShape
             ) {
                 /**
-                 * 
+                 *
                  * Extract only sides length property from request object,
                  * request object has may keys like shapeId and more.
-                 * 
+                 *
                  * ```json
                  * { "a": 10, "b": 10, "c": 10, "d": 10 }
                  * ```
                  * can have single side value or all side value.
                  * @typedef {Partial<{[key in import("./helpers/LShapeHelper").LShapeSide]: number}>} SidesLength
-                 * 
+                 *
                  * @type {SidesLength}
                  */
                 const sidesLength = {};
@@ -172,15 +172,17 @@ export default class EventManager {
                 });
 
                 Object.keys(sidesLength).forEach((key) => {
-                    const edgeGroup = shapeGroup.findOne(`.${key}`)
-                    const labelNode = shapeGroup.findOne(`#${LShapeIds.LShapeTextLayers[key]}`)
+                    const edgeGroup = shapeGroup.findOne(`.${key}`);
+                    const labelNode = shapeGroup.findOne(
+                        `#${LShapeIds.LShapeTextLayers[key]}`
+                    );
                     this.manager.lShapeManager.handleInputValueChange(
-                        LSH.isHorizontal(key) ? 'width' : 'height',
+                        LSH.isHorizontal(key) ? "width" : "height",
                         edgeGroup,
                         labelNode,
                         sidesLength[key]
-                    )
-                })
+                    );
+                });
             }
         });
         document.addEventListener("mkd-plugin:toggle-rounded-box", (e) => {
@@ -197,6 +199,7 @@ export default class EventManager {
         });
 
         this.handleShapeLEvents();
+        this.handleExportEvents();
     }
 
     handleShapeLEvents() {
@@ -326,7 +329,7 @@ export default class EventManager {
             detail: {
                 id: shapeGroup._id,
                 shapeSize: Object.keys(shapeSize).length > 0 ? shapeSize : {},
-                shapeType: shapeGroup.getAttr('shapeType'),
+                shapeType: shapeGroup.getAttr("shapeType"),
             },
         });
         document.dispatchEvent(newEvent);
@@ -425,9 +428,9 @@ export default class EventManager {
         const shape = this.getShapeById(shapeId);
         /** @type {Konva.Group} */
         const edgeGroup = shape.findOne(`.${wall}`);
-        if (shape.getAttr('shapeType') === ShapeTypes.SquareShape) {
+        if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
             this.manager.shapeManager.addWall(edgeGroup, shape);
-        } else if (shape.getAttr('shapeType') === ShapeTypes.LShape) {
+        } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.addWall(edgeGroup, shape);
         }
     }
@@ -441,9 +444,9 @@ export default class EventManager {
         const shape = this.getShapeById(shapeId);
         /** @type {Konva.Group} */
         const edgeGroup = shape.findOne(`.${wall}`);
-        if (shape.getAttr('shapeType') === ShapeTypes.SquareShape) {
+        if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
             this.manager.shapeManager.removeWall(edgeGroup, shape, wall);
-        } else if (shape.getAttr('shapeType') === ShapeTypes.LShape) {
+        } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.removeWall(edgeGroup, shape, wall);
         }
     }
@@ -457,9 +460,9 @@ export default class EventManager {
         const shape = this.getShapeById(shapeId);
         /** @type {Konva.Group} */
         const backsplashGroup = shape.findOne(`.${wall}`);
-        if (shape.getAttr('shapeType') === ShapeTypes.SquareShape) {
+        if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
             this.manager.shapeManager.addBacksplash(backsplashGroup, shape);
-        } else if (shape.getAttr('shapeType') === ShapeTypes.LShape) {
+        } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.addBacksplash(backsplashGroup, shape);
         }
     }
@@ -473,13 +476,13 @@ export default class EventManager {
         const shape = this.getShapeById(shapeId);
         /** @type {Konva.Group} */
         const backsplashGroup = shape.findOne(`.${wall}`);
-        if (shape.getAttr('shapeType') === ShapeTypes.SquareShape) {
+        if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
             this.manager.shapeManager.removeBacksplash(
                 backsplashGroup,
                 shape,
                 wall
             );
-        } else if (shape.getAttr('shapeType') === ShapeTypes.LShape) {
+        } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.removeBacksplash(
                 backsplashGroup,
                 shape,
@@ -507,6 +510,7 @@ export default class EventManager {
      */
     downloadURI(uri, name) {
         const link = document.createElement("a");
+        link.style.display = "none";
         link.download = name;
         link.href = uri;
         document.body.appendChild(link);
@@ -557,9 +561,9 @@ export default class EventManager {
             console.error("Shape not found with id " + shapeId);
             return;
         }
-        if (shape.getAttr('shapeType') === ShapeTypes.SquareShape) {
+        if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
             this.manager.shapeManager.rotateShapeGroup(shape, rotation);
-        } else if (shape.getAttr('shapeType') === ShapeTypes.LShape) {
+        } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.rotateShapeGroup(shape, rotation);
         }
     }
@@ -589,5 +593,44 @@ export default class EventManager {
             }
             this.manager.shapeManager.removeCheckboxGroup(wall, shape);
         }
+    }
+
+    handleExportEvents() {
+        document.addEventListener("mkd-plugin:export", (e) => {
+            const request = e.detail;
+
+            try {
+                const payload = {
+                    image: this.stage.toDataURL(),
+                };
+                const canvasJson = this.stage.toObject();
+                const json = {
+                    stage: {},
+                    shapes: []
+                };
+                // Canvas size and attributes.
+                json.stage = canvasJson.attrs;
+
+
+                canvasJson.children.forEach((child) => {
+                    if (child.className === 'Layer') {
+                        Object.values(child.children).forEach((shapeGroup) => {
+                            if(shapeGroup?.attrs?.id === BackgroundNodeId) {
+                                return;
+                            }
+                            if (shapeGroup.attrs) {
+                                json.shapes.push(shapeGroup.attrs)
+                            }
+                        })
+
+                    }
+                })
+
+                payload.json = JSON.stringify(json);
+                request.success && request.success(payload);
+            } catch (e) {
+                request.error && request.error({ message: e.message, trace: e });
+            }
+        });
     }
 }

@@ -90,7 +90,9 @@ export default class LShapeManager {
                     [LSH.SideD]: 0,
                 },
                 shapeType: ShapeTypes.LShape,
+                canvasShapeId: null
             });
+            shapeGroup.setAttr('canvasShapeId', shapeGroup._id);
 
             const shapeInitialCord = this.getShapePointsCoordinates();
 

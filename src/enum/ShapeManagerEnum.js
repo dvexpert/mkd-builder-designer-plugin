@@ -1,5 +1,7 @@
 import { LShapeHelper as LSH } from "@/helpers/LShapeHelper";
 
+export const BackgroundNodeId = 'BackgroundRect'
+
 export const ShapeActions = Object.freeze({
     Place: "place",
     Rotate: "rotate",

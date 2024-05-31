@@ -281,7 +281,10 @@ export default class ShapeManager {
                     width: 150,
                 },
                 shapeType: ShapeTypes.SquareShape,
+                canvasShapeId: null,
+                materialImage: materialImage,
             });
+            shapeGroup.setAttr('canvasShapeId', shapeGroup._id);
             const squarePlaceHolderObject = new Konva.Rect({
                 x: posX,
                 y: posY,
@@ -315,9 +318,9 @@ export default class ShapeManager {
                     this.updateAttributesOverlayPosition(shapeGroup);
                     const targetShape = this.getShapeObject(hoverNode);
                     const targetRect = targetShape.getClientRect();
-                    this.layer.children.forEach((group) => {
+                    this.layer.find('Group').forEach((group) => {
                         // do not check intersection with itself
-                        if (group === hoverNode) {
+                        if (group === hoverNode || group.id() !== SquareShapeIds.ShapeGroup) {
                             group.opacity(1);
                             return;
                         }
@@ -495,7 +498,7 @@ export default class ShapeManager {
             const subGroup = new Konva.Group({
                 name: subgroupName,
                 height: attributes.height,
-                width: attributes.width,
+                width: attributes.width
             });
             shapeGroup.add(subGroup);
 

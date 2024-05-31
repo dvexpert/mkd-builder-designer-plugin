@@ -2,6 +2,7 @@ import Konva from "konva";
 import EventManager from "./EventManager.js";
 import ShapeManager from "./ShapeManager.js";
 import LShapeManager from "./LShapeManager.js";
+import { BackgroundNodeId } from "./enum/ShapeManagerEnum.js";
 
 export class KonvaManager {
     /**
@@ -53,6 +54,7 @@ export class KonvaManager {
 
         img.onload = () => {
             const background = new Konva.Rect({
+                id: BackgroundNodeId,
                 x: 0,
                 y: 0,
                 width: this.stage.width(),
@@ -62,6 +64,7 @@ export class KonvaManager {
             });
 
             this.layer.add(background);
+            background.moveToBottom();
             this.stage.on("dragmove", () => {
                 background.absolutePosition({ x: 0, y: 0 });
             });

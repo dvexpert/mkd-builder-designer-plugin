@@ -2,21 +2,24 @@ import { KonvaManager } from "@/KonvaManager";
 import type { SquareSide } from "@/helpers/SquareHelper";
 
 interface CallBackPropsType {
-    message: string;
+    message?: string;
+    image?: string; // base64 image
+    json?: string; // stringify JSON
+    [key: string]: any;
 }
 
 type SquareSideT = SquareSide;
 
 export type WallPresence = {
     [key in SquareSideT]: boolean;
-}
+};
 
 interface BacksplashesPresence extends WallPresence {}
 interface HaveRoundedCornersPresence extends WallPresence {}
 
 interface ShapeSizeType {
-    height: string
-    width: string
+    height: string;
+    width: string;
 }
 
 type ShapeTypes = "SquareShape" | "LShape";
