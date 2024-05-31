@@ -557,7 +557,11 @@ export default class EventManager {
             console.error("Shape not found with id " + shapeId);
             return;
         }
-        this.manager.shapeManager.rotateShapeGroup(shape, rotation);
+        if (shape.getAttr('shapeType') === ShapeTypes.SquareShape) {
+            this.manager.shapeManager.rotateShapeGroup(shape, rotation);
+        } else if (shape.getAttr('shapeType') === ShapeTypes.LShape) {
+            this.manager.lShapeManager.rotateShapeGroup(shape, rotation);
+        }
     }
 
     /**

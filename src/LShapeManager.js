@@ -38,6 +38,21 @@ export default class LShapeManager {
         this.currentShape = null;
         this.createContextMenu();
         this.createActionOverlay();
+
+        this.stage.on("dragmove", () => {
+            const groups = this.stage.find(`#${LShapeIds.LShapeGroup}`);
+            groups.forEach((group) =>
+                this.updateAttributesOverlayPosition(group)
+            );
+        });
+        this.stage.on("scaleChange xChange yChange", (ev) => {
+            setTimeout(() => {
+                const groups = this.stage.find(`#${LShapeIds.LShapeGroup}`);
+                groups.forEach((group) =>
+                    this.updateAttributesOverlayPosition(group)
+                );
+            });
+        });
     }
 
     draw(materialImage = "", onlyPlaceholder = true, materialId = "") {
@@ -237,6 +252,7 @@ export default class LShapeManager {
             shapeGroup.on("click", () => {
                 this.eventManager.dispatchShapeSelect(shapeGroup);
             });
+            shapeGroup.setAttr("show_action_overlay", false);
 
             // Place image element onto the layer with actual material image
             /** @type {Konva.Rect} */
@@ -1284,8 +1300,8 @@ export default class LShapeManager {
         againstTheWall[SubGroup.name()] = false;
         shapeGroup.setAttr("againstTheWall", againstTheWall);
 
-        // ! remove backsplash also when wall removed.
-        // ? this.removeBacksplash(SubGroup, shapeGroup, wall);
+        // remove backsplash also when wall removed.
+        this.removeBacksplash(SubGroup, shapeGroup, wall);
 
         EventManager.dispatchShapeSelect(shapeGroup);
     }
