@@ -1,6 +1,11 @@
 import Konva from "konva";
 import { KonvaManager } from "./KonvaManager";
-import { BackgroundNodeId, LShapeIds, ShapeTypes, SquareShapeIds } from "./enum/ShapeManagerEnum";
+import {
+    BackgroundNodeId,
+    LShapeIds,
+    ShapeTypes,
+    SquareShapeIds,
+} from "./enum/ShapeManagerEnum";
 import { LShapeHelper as LSH } from "./helpers/LShapeHelper";
 
 export default class EventManager {
@@ -493,7 +498,11 @@ export default class EventManager {
 
     export() {
         // check has children
-        if (!this.stage.findOne("Layer").hasChildren()) {
+        if (
+            this.stage
+                .findOne("Layer")
+                .find((node) => node.id() !== BackgroundNodeId).length === 0
+        ) {
             alert("Stage has no children to export");
             return;
         }
@@ -600,36 +609,43 @@ export default class EventManager {
             const request = e.detail;
 
             try {
+                if (
+                    this.stage
+                        .findOne("Layer")
+                        .find((node) => node.id() !== BackgroundNodeId)
+                        .length === 0
+                ) {
+                    throw new Error('No Shape Added.');
+                }
                 const payload = {
                     image: this.stage.toDataURL(),
                 };
                 const canvasJson = this.stage.toObject();
                 const json = {
                     stage: {},
-                    shapes: []
+                    shapes: [],
                 };
                 // Canvas size and attributes.
                 json.stage = canvasJson.attrs;
 
-
                 canvasJson.children.forEach((child) => {
-                    if (child.className === 'Layer') {
+                    if (child.className === "Layer") {
                         Object.values(child.children).forEach((shapeGroup) => {
-                            if(shapeGroup?.attrs?.id === BackgroundNodeId) {
+                            if (shapeGroup?.attrs?.id === BackgroundNodeId) {
                                 return;
                             }
                             if (shapeGroup.attrs) {
-                                json.shapes.push(shapeGroup.attrs)
+                                json.shapes.push(shapeGroup.attrs);
                             }
-                        })
-
+                        });
                     }
-                })
+                });
 
                 payload.json = JSON.stringify(json);
                 request.success && request.success(payload);
             } catch (e) {
-                request.error && request.error({ message: e.message, trace: e });
+                request.error &&
+                    request.error({ message: e.message, trace: e });
             }
         });
     }
