@@ -5,11 +5,11 @@ import LShapeManager from "./LShapeManager.js";
 
 export class KonvaManager {
     /**
-     * 
-     * @param {HTMLDivElement} container 
-     * @param {string} backgroundPath 
+     *
+     * @param {HTMLDivElement} container
+     * @param {string} backgroundPath
      */
-    constructor(container, backgroundPath = '/dist/image/background-grid.jpg') {
+    constructor(container, backgroundPath = "/dist/image/background-grid.jpg") {
         this.backgroundPath = backgroundPath;
         /**
          * @type {Konva.Stage}
@@ -30,18 +30,41 @@ export class KonvaManager {
 
         // ShapeManager instance to handle
         // creating shapes and tbd ...
-        this.shapeManager = new ShapeManager(this.stage, this.layer, this.eventManager);
+        this.shapeManager = new ShapeManager(
+            this.stage,
+            this.layer,
+            this.eventManager
+        );
 
         // L Shape Manager
-        this.lShapeManager = new LShapeManager(this.stage, this.layer, this.eventManager);
+        this.lShapeManager = new LShapeManager(
+            this.stage,
+            this.layer,
+            this.eventManager
+        );
 
         this.setupBackground();
         this.layer.draw();
     }
 
     setupBackground() {
-        this.stage.container().style.backgroundImage =
-            `url('${this.backgroundPath}')`;
-        this.stage.container().style.backgroundRepeat = "repeat";
+        const img = document.createElement("img");
+        img.src = this.backgroundPath;
+
+        img.onload = () => {
+            const background = new Konva.Rect({
+                x: 0,
+                y: 0,
+                width: this.stage.width(),
+                height: this.stage.height(),
+                listening: false,
+                fillPatternImage: img,
+            });
+
+            this.layer.add(background);
+            this.stage.on("dragmove", () => {
+                background.absolutePosition({ x: 0, y: 0 });
+            });
+        };
     }
 }
