@@ -36,13 +36,27 @@ export default class EventManager {
         document.addEventListener("mkd-plugin:draw:square", (e) => {
             const request = e?.detail;
             try {
-                this.manager.shapeManager.drawSquare(
+                const shapeGroup = this.manager.shapeManager.drawSquare(
                     request?.image,
                     true,
-                    request.materialId
+                    request.materialId,
+                    null,
+                    request?.prevShapeId,
+                    request?.shapeSize
                 );
+
+                if (shapeGroup && request.placed && request.placed === true) {
+                    this.manager.shapeManager.drawSquare(
+                        request?.image,
+                        false,
+                        request.materialId,
+                        shapeGroup
+                    );
+                    this.manager.shapeManager.updateHoverActionOverlayPosition(shapeGroup)
+                }
+
                 if (typeof request?.success === "function") {
-                    request.success({ message: "Square shape created" });
+                    request.success({ message: "Square shape created", shapeId: shapeGroup._id });
                 }
             } catch (e) {
                 console.error(e);
@@ -107,6 +121,19 @@ export default class EventManager {
                 return;
             }
             this.rotate(request.shapeId, 90);
+        });
+        document.addEventListener("mkd-plugin:rotate", (e) => {
+            const request = e?.detail;
+            if (!request?.shapeId) {
+                request.error && request.error({ message: "No active shape." });
+                return;
+            }
+            if (!request?.rotation) {
+                request.error && request.error({ message: "Invalid request parameter value for `rotate`." });
+                return;
+            }
+            request.success && request.success({ message: "Rotation updated." });
+            this.rotate(request.shapeId, Number(request?.rotation));
         });
         document.addEventListener("mkd-plugin:delete-shape", (e) => {
             const request = e?.detail;
@@ -196,8 +223,19 @@ export default class EventManager {
                 this.toggleRoundedCheckbox(
                     request.shapeId,
                     request.wall,
-                    request.addWall
+                    request.addWall,
+                    request.defaultValue
                 );
+            } catch (e) {
+                request.error && request.error({ message: e.message });
+            }
+        });
+
+        document.addEventListener("mkd-plugin:shape-position", (e) => {
+            const request = e.detail;
+            try {
+                this.setShapePosition(request.id ?? request.shapeId, request.position);
+                request.success && request.success({ message: 'Shape position updated' });
             } catch (e) {
                 request.error && request.error({ message: e.message });
             }
@@ -262,7 +300,7 @@ export default class EventManager {
         const shapes = this.stage.find(
             `#${SquareShapeIds.ShapeGroup},#${LShapeIds.LShapeGroup}`
         );
-        shapes.forEach((shape) => shape.draggable(enable));
+        shapes.forEach((shape) => shape.setDraggable(enable));
     }
 
     /**
@@ -313,6 +351,7 @@ export default class EventManager {
             haveRoundedCorners: shapeGroup.getAttr("haveRoundedCorners"),
             shapeSize: Object.keys(shapeSize).length > 0 ? shapeSize : {},
             shapeType: shapeGroup.getAttr("shapeType"),
+            prevShapeId: shapeGroup.getAttr("prevShapeId"),
         };
 
         // To remove keys with undefine value (different shape has different attributes).
@@ -503,7 +542,7 @@ export default class EventManager {
                 .findOne("Layer")
                 .find((node) => node.id() !== BackgroundNodeId).length === 0
         ) {
-            alert("Stage has no children to export");
+            console.error("Stage has no children to export");
             return;
         }
 
@@ -581,8 +620,10 @@ export default class EventManager {
      *
      * @param {number} shapeId - this should be node._id and not the node.id()
      * @param {import("./helpers/SquareHelper").SquareSide} wall - a | b | c | d
+     * @param {boolean} add - true - To add the checkbox for rounded corners, false - remove the checkbox.
+     * @param {boolean} defaultVal
      */
-    toggleRoundedCheckbox(shapeId, wall, add) {
+    toggleRoundedCheckbox(shapeId, wall, add, defaultVal = false) {
         const shape = this.getShapeById(shapeId);
         /** @type {Konva.Group} */
         const edgeSubGroup = shape.findOne(`.${wall}`);
@@ -594,7 +635,8 @@ export default class EventManager {
             this.manager.shapeManager.addCheckboxGroup(
                 edgeSubGroup,
                 wall,
-                shape
+                shape,
+                defaultVal
             );
         } else {
             if (!shape.findOne(`#checkbox_node_${wall}`)) {
@@ -648,5 +690,22 @@ export default class EventManager {
                     request.error({ message: e.message, trace: e });
             }
         });
+    }
+
+    /**
+     *
+     * @param {number} shapeId - this should be node._id and not the node.id()
+     * @param {{x: number, y: number}} position
+     */
+    setShapePosition(shapeId, position) {
+        const shapeGroup = this.getShapeById(shapeId);
+        if (!shapeGroup) {
+            throw new Error(`Shape ${shapeId} not found`);
+        }
+        if (shapeGroup.getAttr("shapeType") === ShapeTypes.SquareShape) {
+            position?.x && shapeGroup.x(Number(position.x));
+            position.y && shapeGroup.y(Number(position.y));
+            this.manager.shapeManager.updateAttributesOverlayPosition(shapeGroup);
+        } 
     }
 }

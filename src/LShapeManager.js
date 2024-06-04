@@ -90,7 +90,8 @@ export default class LShapeManager {
                     [LSH.SideD]: 0,
                 },
                 shapeType: ShapeTypes.LShape,
-                canvasShapeId: null
+                canvasShapeId: null,
+                isPlaced: false
             });
             shapeGroup.setAttr('canvasShapeId', shapeGroup._id);
 
@@ -277,6 +278,7 @@ export default class LShapeManager {
             // TODO: Dispatch Shape Select Overlay.
             this.createAttributesOverlay(shapeGroup);
             this.eventManager.dispatchShapeSelect(shapeGroup);
+            shapeGroup.setAttr('isPlaced', true);
         }
     }
 
@@ -1226,7 +1228,7 @@ export default class LShapeManager {
      */
     addWall(SubGroup, shapeGroup) {
         if (SubGroup.findOne(`.wall_${SubGroup.name()}`)) {
-            alert("Wall already exists");
+            console.error("Wall already exists");
             return;
         }
 
@@ -1339,7 +1341,7 @@ export default class LShapeManager {
             dispatchShapeSelect = true;
         }
         if (SubGroup.findOne(`.backsplash_${SubGroup.name()}`)) {
-            alert("Backsplash already exists");
+            console.error("Backsplash already exists");
             return;
         }
         const backsplash = new Konva.Rect({

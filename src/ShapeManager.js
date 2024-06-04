@@ -1,7 +1,11 @@
 import Konva from "konva";
 import { rotateGroup } from "./Helper.js";
 import RotateIcon from "@/assets/image/rotate.svg?raw";
-import { ShapeActions, ShapeTypes, SquareShapeIds } from "./enum/ShapeManagerEnum.js";
+import {
+    ShapeActions,
+    ShapeTypes,
+    SquareShapeIds,
+} from "./enum/ShapeManagerEnum.js";
 import AttributeOverlayTemplate from "@/templates/AttributesOverlay/index.html?raw";
 import AttributeShapeCutOutTemplate from "@/templates/AttributesOverlay/ShapeCutOut.html?raw";
 import EventManager from "./EventManager.js";
@@ -108,10 +112,10 @@ export default class ShapeManager {
                 ![
                     String(SquareShapeIds.ShapeGroup),
                     String(SquareShapeIds.ShapeObject),
-                    String(SquareShapeIds.ShapePlaceholderObject)
+                    String(SquareShapeIds.ShapePlaceholderObject),
                 ].includes(e.target.id())
             ) {
-                return
+                return;
             }
 
             this.currentShape = e.target;
@@ -252,7 +256,21 @@ export default class ShapeManager {
         this.actionOverlayNode.style.top = `${overlayNewPosition.top}px`;
     }
 
-    drawSquare(materialImage = "", onlyPlaceholder = true, materialId = "") {
+    /**
+     *
+     * @param {string} materialImage
+     * @param {boolean} onlyPlaceholder
+     * @param {*} materialId
+     * @param {null | Konva.Group} placeholderGroup - passed in from draw square (on re-rendering the canvas)
+     */
+    drawSquare(
+        materialImage = "",
+        onlyPlaceholder = true,
+        materialId = "",
+        placeholderGroup = null, // used on redraw canvas
+        prevShapeId = null, // used on redraw canvas
+        shapeSize = null
+    ) {
         if (!materialImage) {
             throw new Error("Material Image is required.");
         }
@@ -270,6 +288,8 @@ export default class ShapeManager {
         let shapeGroup;
 
         if (onlyPlaceholder) {
+            const height = shapeSize?.height ? Number(shapeSize?.height) : 50;
+            const width = shapeSize?.width ? Number(shapeSize?.width) : 150
             shapeGroup = new Konva.Group({
                 x: 100,
                 y: 10,
@@ -277,20 +297,22 @@ export default class ShapeManager {
                 id: SquareShapeIds.ShapeGroup,
                 materialId: materialId,
                 shapeSize: {
-                    height: 50,
-                    width: 150,
+                    height: height,
+                    width: width,
                 },
                 shapeType: ShapeTypes.SquareShape,
                 canvasShapeId: null,
                 materialImage: materialImage,
+                isPlaced: false,
+                prevShapeId: prevShapeId,
             });
-            shapeGroup.setAttr('canvasShapeId', shapeGroup._id);
+            shapeGroup.setAttr("canvasShapeId", shapeGroup._id);
             const squarePlaceHolderObject = new Konva.Rect({
                 x: posX,
                 y: posY,
-                width: 150 * SizeDiff,
+                width: width * SizeDiff,
                 id: SquareShapeIds.ShapePlaceholderObject,
-                height: 50 * SizeDiff,
+                height: height * SizeDiff,
                 fill: "red",
                 opacity: 0.3,
                 dragBoundFunc: function (pos) {
@@ -318,9 +340,12 @@ export default class ShapeManager {
                     this.updateAttributesOverlayPosition(shapeGroup);
                     const targetShape = this.getShapeObject(hoverNode);
                     const targetRect = targetShape.getClientRect();
-                    this.layer.find('Group').forEach((group) => {
+                    this.layer.find("Group").forEach((group) => {
                         // do not check intersection with itself
-                        if (group === hoverNode || group.id() !== SquareShapeIds.ShapeGroup) {
+                        if (
+                            group === hoverNode ||
+                            group.id() !== SquareShapeIds.ShapeGroup
+                        ) {
                             group.opacity(1);
                             return;
                         }
@@ -432,7 +457,7 @@ export default class ShapeManager {
             this.createEdgeGroups(shapeGroup);
             this.layer.add(shapeGroup);
         } else {
-            shapeGroup = this.currentHoverNode;
+            shapeGroup = placeholderGroup ?? this.currentHoverNode;
             shapeGroup.on("click", () => {
                 this.eventManager.dispatchShapeSelect(shapeGroup);
             });
@@ -467,7 +492,10 @@ export default class ShapeManager {
             this.actionOverlayNode.style.display = "none";
             this.createAttributesOverlay(shapeGroup);
             this.eventManager.dispatchShapeSelect(shapeGroup);
+            shapeGroup.setAttr("isPlaced", true);
         }
+
+        return shapeGroup;
     }
 
     /**
@@ -498,7 +526,7 @@ export default class ShapeManager {
             const subGroup = new Konva.Group({
                 name: subgroupName,
                 height: attributes.height,
-                width: attributes.width
+                width: attributes.width,
             });
             shapeGroup.add(subGroup);
 
@@ -589,7 +617,7 @@ export default class ShapeManager {
      * @param {import("./helpers/SquareHelper.js").SquareSide} subgroupName
      * @param {Konva.Group} shapeGroup
      */
-    addCheckboxGroup(subGroupNode, subgroupName, shapeGroup) {
+    addCheckboxGroup(subGroupNode, subgroupName, shapeGroup, defaultVal = false) {
         const checkboxGroup = new Konva.Group({
             id: `checkbox_node_${subgroupName}`,
             name: `checkbox_node_${subgroupName}`,
@@ -635,6 +663,9 @@ export default class ShapeManager {
                 roundedCorners[SH.SideD] ? 15 : 0,
             ]);
         });
+        if (defaultVal === true) {
+            checkboxGroup.fire('click');
+        }
 
         const haveRoundedCorners = this.initializeCorners(
             shapeGroup.getAttr("haveRoundedCorners"),
@@ -647,8 +678,28 @@ export default class ShapeManager {
          * While Adding check box group this side must not be against the wall.
          * and because not against the wall then it cannot have backsplash either.
          */
-        this.removeWall(subGroupNode, shapeGroup, subgroupName);
+        this.removeWall(shapeGroup, subgroupName);
+
+        /**
+         * While adding wall, wall edge corners, must not be rounded.
+         * for ex: if we add Wall on edge "A" Then corner radius for
+         * "A" and "B" must be disabled.
+         */
+        const groupMappings = {
+            [SH.SideA]: [SH.SideA, SH.SideD],
+            [SH.SideB]: [SH.SideA, SH.SideB],
+            [SH.SideC]: [SH.SideB, SH.SideC],
+            [SH.SideD]: [SH.SideD, SH.SideC],
+        };
+
+        const groupsToRemove = groupMappings[subgroupName] || [];
+
+        groupsToRemove.forEach((group) => {
+            this.removeWall(shapeGroup, group);
+        });
+
         this.updateEdgeGroupsPosition(shapeGroup);
+        this.eventManager.dispatchShapeSelect(shapeGroup);
     }
 
     /**
@@ -780,7 +831,7 @@ export default class ShapeManager {
      */
     addWall(SubGroup, shapeGroup) {
         if (SubGroup.findOne(`.wall_${SubGroup.name()}`)) {
-            alert("Wall already exists");
+            console.error("Wall already exists");
             return;
         }
 
@@ -841,11 +892,12 @@ export default class ShapeManager {
 
     /**
      *
-     * @param {Konva.Group} SubGroup - border group, containing wall and size input
      * @param {Konva.Group} shapeGroup - main shape group, containing everything.
      * @param {import("./helpers/SquareHelper.js").SquareSide} wall
      */
-    removeWall(SubGroup, shapeGroup, wall) {
+    removeWall(shapeGroup, wall) {
+        /** @type {Konva.Group} */
+        const SubGroup = shapeGroup.findOne(`.${wall}`)
         const wallObj = SubGroup.findOne(`.wall_${wall}`);
         if (!wallObj) {
             return;
@@ -875,7 +927,7 @@ export default class ShapeManager {
             dispatchShapeSelect = true;
         }
         if (SubGroup.findOne(`.backsplash_${SubGroup.name()}`)) {
-            alert("Backsplash already exists");
+            console.error("Backsplash already exists");
             return;
         }
         const backsplash = new Konva.Rect({
@@ -969,9 +1021,12 @@ export default class ShapeManager {
      * @param {Konva.Group} subGroup
      */
     createHeightInput(subGroup) {
+        const shapeGroup = subGroup.findAncestor(`#${SquareShapeIds.ShapeGroup}`);
+        const shapeSize = shapeGroup.getAttr("shapeSize");
+
         const heightInput = new Konva.Text({
             id: SquareShapeIds.ShapeHeightTextLayer,
-            text: "50",
+            text: String(shapeSize.height),
             fontSize: 20,
             fill: "black",
             width: 40,
@@ -1091,7 +1146,6 @@ export default class ShapeManager {
             subGroup.name() ? subGroup.name() : attr,
             shapeGroup
         );
-        console.log(edgeGroups);
         edgeGroups.forEach((edgeGroup) => {
             edgeGroup.setAttr(attr, Number(inputBoxValue) * SizeDiff);
 
@@ -1125,9 +1179,12 @@ export default class ShapeManager {
      * @param {Konva.Group} subGroup - edge sub group
      */
     createWidthInput(subGroup) {
+        const shapeGroup = subGroup.findAncestor(`#${SquareShapeIds.ShapeGroup}`);
+        const shapeSize = shapeGroup.getAttr("shapeSize");
+
         const widthInput = new Konva.Text({
             id: SquareShapeIds.ShapeWidthTextLayer,
-            text: "150",
+            text: String(shapeSize.width),
             fontSize: 20,
             fill: "black",
             width: 40,

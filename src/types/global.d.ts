@@ -24,6 +24,11 @@ interface ShapeSizeType {
 
 type ShapeTypes = "SquareShape" | "LShape";
 
+interface PositionType {
+    x: number;
+    y: number;
+}
+
 interface RequestObjectType {
     image: string; // for shape draw
     success: (prop: CallBackPropsType) => void;
@@ -33,6 +38,10 @@ interface RequestObjectType {
     materialId: number | string | unknown;
     width: number;
     height: number;
+    placed: boolean;
+    prevShapeId: string | number;
+    rotation: string | number;
+    defaultValue: any;
 
     // Response
     id: number;
@@ -44,6 +53,7 @@ interface RequestObjectType {
     haveRoundedCorners?: HaveRoundedCornersPresence;
     shapeSize?: ShapeSizeType;
     shapeType?: ShapeTypes;
+    position?: PositionType
 }
 
 declare global {
