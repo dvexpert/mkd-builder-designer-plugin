@@ -523,7 +523,7 @@
                         Export
                     </button>
                 </div>
-                <div id="app" class="tw-w-max tw-mx-auto"></div>
+                <div id="app" class="!tw-size-full tw-w-max tw-mx-auto"></div>
             </div>
         </div>
 
@@ -533,6 +533,7 @@
         <script type="module" src="./dist/mkd-plugin.es.js"></script>
         <script>
             document.addEventListener("DOMContentLoaded", () => {
+                const appElm = document.querySelector("#app")
                 document.querySelector(
                     "#app"
                 ).innerHTML = `<div id="canvas-container"></div>`;
@@ -548,7 +549,10 @@
                     "tw-overflow-hidden"
                 );
 
-                const konvaManager = new KonvaManager(container);
+                const konvaManager = new KonvaManager(container, undefined, {
+                    height: appElm.offsetHeight,
+                    width: appElm.offsetWidth
+                });
             });
         </script>
     </body>

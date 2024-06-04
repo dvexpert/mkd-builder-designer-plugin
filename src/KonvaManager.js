@@ -7,18 +7,24 @@ import { BackgroundNodeId } from "./enum/ShapeManagerEnum.js";
 export class KonvaManager {
     /**
      *
+     * @typedef {Object} SizeType
+     * @property {number} width
+     * @property {number} height
+     * 
      * @param {HTMLDivElement} container
      * @param {string} backgroundPath
+     * @param {SizeType} size
      */
-    constructor(container, backgroundPath = "/dist/image/background-grid.jpg") {
+    constructor(container, backgroundPath = "/dist/image/background-grid.jpg", size = null) {
         this.backgroundPath = backgroundPath;
         /**
          * @type {Konva.Stage}
          */
         this.stage = new Konva.Stage({
             container: container,
-            width: 1500,
-            height: 800,
+            width: size?.width ?? 1500,
+            height: size?.height ?? 800,
+            
         });
 
         this.layer = new Konva.Layer();
@@ -46,6 +52,16 @@ export class KonvaManager {
 
         this.setupBackground();
         this.layer.draw();
+
+        document.addEventListener('mkd-plugin:canvas-size', (e) => {
+            const request = e.detail
+            if (request.height && request.width) {
+                this.stage.width(request.width)
+                this.stage.height(request.height)
+                this.stage.draw()
+                this.stage.fire('widthChange')
+            }
+        })
     }
 
     setupBackground() {
@@ -65,7 +81,7 @@ export class KonvaManager {
 
             this.layer.add(background);
             background.moveToBottom();
-            this.stage.on("dragmove scaleChange", () => {
+            this.stage.on("dragmove scaleChange widthChange heightChange", () => {
                 const newScale = this.stage.scaleX()
                 const stageWidth =  this.stage.width()
                 const stageHeight =  this.stage.height()
