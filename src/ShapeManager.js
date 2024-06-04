@@ -258,18 +258,22 @@ export default class ShapeManager {
 
     /**
      *
+     * @typedef {{materialName : string, productName: string}} AttributeOverlayMaterialName
+     *
      * @param {string} materialImage
      * @param {boolean} onlyPlaceholder
      * @param {*} materialId
      * @param {null | Konva.Group} placeholderGroup - passed in from draw square (on re-rendering the canvas)
+     * @param {AttributeOverlayMaterialName} overlayMaterialProductName - Material and productName to use for Attributes overlay.
      */
     drawSquare(
-        materialImage = "",
+        materialImage,
         onlyPlaceholder = true,
         materialId = "",
         placeholderGroup = null, // used on redraw canvas
         prevShapeId = null, // used on redraw canvas
-        shapeSize = null
+        shapeSize = null,
+        overlayMaterialProductName = null
     ) {
         if (!materialImage) {
             throw new Error("Material Image is required.");
@@ -289,7 +293,7 @@ export default class ShapeManager {
 
         if (onlyPlaceholder) {
             const height = shapeSize?.height ? Number(shapeSize?.height) : 50;
-            const width = shapeSize?.width ? Number(shapeSize?.width) : 150
+            const width = shapeSize?.width ? Number(shapeSize?.width) : 150;
             shapeGroup = new Konva.Group({
                 x: 100,
                 y: 10,
@@ -305,6 +309,8 @@ export default class ShapeManager {
                 materialImage: materialImage,
                 isPlaced: false,
                 prevShapeId: prevShapeId,
+                materialName: overlayMaterialProductName.materialName,
+                productName: overlayMaterialProductName.productName,
             });
             shapeGroup.setAttr("canvasShapeId", shapeGroup._id);
             const squarePlaceHolderObject = new Konva.Rect({
@@ -617,7 +623,12 @@ export default class ShapeManager {
      * @param {import("./helpers/SquareHelper.js").SquareSide} subgroupName
      * @param {Konva.Group} shapeGroup
      */
-    addCheckboxGroup(subGroupNode, subgroupName, shapeGroup, defaultVal = false) {
+    addCheckboxGroup(
+        subGroupNode,
+        subgroupName,
+        shapeGroup,
+        defaultVal = false
+    ) {
         const checkboxGroup = new Konva.Group({
             id: `checkbox_node_${subgroupName}`,
             name: `checkbox_node_${subgroupName}`,
@@ -664,7 +675,7 @@ export default class ShapeManager {
             ]);
         });
         if (defaultVal === true) {
-            checkboxGroup.fire('click');
+            checkboxGroup.fire("click");
         }
 
         const haveRoundedCorners = this.initializeCorners(
@@ -897,7 +908,7 @@ export default class ShapeManager {
      */
     removeWall(shapeGroup, wall) {
         /** @type {Konva.Group} */
-        const SubGroup = shapeGroup.findOne(`.${wall}`)
+        const SubGroup = shapeGroup.findOne(`.${wall}`);
         const wallObj = SubGroup.findOne(`.wall_${wall}`);
         if (!wallObj) {
             return;
@@ -1021,7 +1032,9 @@ export default class ShapeManager {
      * @param {Konva.Group} subGroup
      */
     createHeightInput(subGroup) {
-        const shapeGroup = subGroup.findAncestor(`#${SquareShapeIds.ShapeGroup}`);
+        const shapeGroup = subGroup.findAncestor(
+            `#${SquareShapeIds.ShapeGroup}`
+        );
         const shapeSize = shapeGroup.getAttr("shapeSize");
 
         const heightInput = new Konva.Text({
@@ -1179,7 +1192,9 @@ export default class ShapeManager {
      * @param {Konva.Group} subGroup - edge sub group
      */
     createWidthInput(subGroup) {
-        const shapeGroup = subGroup.findAncestor(`#${SquareShapeIds.ShapeGroup}`);
+        const shapeGroup = subGroup.findAncestor(
+            `#${SquareShapeIds.ShapeGroup}`
+        );
         const shapeSize = shapeGroup.getAttr("shapeSize");
 
         const widthInput = new Konva.Text({
@@ -1372,6 +1387,18 @@ export default class ShapeManager {
         shapeNameElm.setAttribute("title", shapeName);
         shapeGroup.setAttr("shapeName", shapeName);
 
+        const materialName = shapeGroup.getAttr("materialName");
+        if (materialName) {
+            attributeOverlay.querySelector("#material-name").innerHTML =
+                materialName;
+        }
+
+        const productName = shapeGroup.getAttr("productName");
+        if (productName) {
+            attributeOverlay.querySelector("#product-name").innerHTML =
+                productName;
+        }
+
         attributeOverlay.addEventListener("mouseenter", (e) => {
             const elm = e.target;
             elm && elm.classList?.add("active-attributes-overlay");
@@ -1404,22 +1431,42 @@ export default class ShapeManager {
      * @param {string} title
      * @param {HTMLElement} attributeOverlay - when appending shapeCutout right after placing the attribute overlay element in dom.
      * in this case getting attribute overlay element from dom might be blank.
+     * @param {string} propertyId - when appending shapeCutout right after placing the attribute overlay element in dom.
      */
     appendShapeCutOut(
         shapeGroup,
         url = "/dynamicAssets/sinkdropin-1.png",
         title = "Drop-in Sink",
-        attributeOverlay = null
+        attributeOverlay = null,
+        propertyId = null
     ) {
+        // initialize attribute on shape group
+        let attributesItems = shapeGroup.getAttr("attributesItems");
+        if (!attributesItems || Object.keys(attributesItems).length === 0) {
+            attributesItems = [];
+        }
+
+        // Check if already exists
+        if (propertyId && attributesItems.length > 0) {
+            const index = attributesItems.findIndex(
+                (item) => item.id === propertyId
+            );
+            if (index !== -1) {
+                console.warn("Attribute already exists.");
+                return;
+            }
+        }
+
         const overlay =
             attributeOverlay ??
-            document.querySelector(`#attribute-overlay-${shapeGroup._id}`);
+            document.querySelector(`#attributes-overlay-${shapeGroup._id}`);
         const container = overlay.querySelector("#shape-cutout-group");
         /** @type {HTMLElement} */
         const domObject = new DOMParser().parseFromString(
             AttributeShapeCutOutTemplate,
             "text/html"
         ).body.firstChild;
+        domObject.id = `${domObject.id}-${propertyId}`;
         const image = domObject.querySelector("img");
         const titleElm = domObject.querySelector("span");
         image.src = url;
@@ -1428,6 +1475,42 @@ export default class ShapeManager {
         titleElm.innerHTML = title;
 
         container.appendChild(domObject);
+
+        attributesItems.push({ id: propertyId, image: url, name: title });
+        shapeGroup.setAttr("attributesItems", attributesItems);
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     * @param {string} propertyId - when appending shapeCutout right after placing the attribute overlay element in dom.
+     */
+    removeShapeCutOut(
+        shapeGroup,
+        propertyId = null
+    ) {
+        const overlay = document.querySelector(`#attributes-overlay-${shapeGroup._id}`);
+        const container = overlay.querySelector("#shape-cutout-group");
+        const cutOutItem = container.querySelector(`#property-${propertyId}`);
+
+        // initialize attribute on shape group
+        let attributesItems = shapeGroup.getAttr("attributesItems");
+        if (!attributesItems || Object.keys(attributesItems).length === 0) {
+            attributesItems = [];
+        }
+
+        // Check if already exists
+        if (attributesItems.length > 0) {
+            const index = attributesItems.findIndex(
+                (item) => item.id === propertyId
+            );
+            if (index !== -1) {
+                attributesItems.splice(index, 1)
+                shapeGroup.setAttr("attributesItems", attributesItems);
+            }
+        }
+
+        cutOutItem?.remove();
     }
 
     /**

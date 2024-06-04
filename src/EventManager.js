@@ -42,7 +42,11 @@ export default class EventManager {
                     request.materialId,
                     null,
                     request?.prevShapeId,
-                    request?.shapeSize
+                    request?.shapeSize,
+                    {
+                        materialName: request.materialName,
+                        productName: request.productName
+                    }
                 );
 
                 if (shapeGroup && request.placed && request.placed === true) {
@@ -241,6 +245,15 @@ export default class EventManager {
             }
         });
 
+        document.addEventListener("mkd-plugin:toggle-attribute-item", (e) => {
+            const request = e.detail;
+            if (request.addWall) {
+                this.addAttribute(request.shapeId, request);
+            } else {
+                this.removeAttribute(request.shapeId, request.propertyId);
+            }
+        });
+
         this.handleShapeLEvents();
         this.handleExportEvents();
     }
@@ -382,7 +395,7 @@ export default class EventManager {
     zoomIn() {
         const oldScale = this.stage.scaleX();
         if (oldScale <= 2) {
-            const newScale = oldScale * this.scaleBy;
+            const newScale = Number((oldScale * this.scaleBy).toFixed(2));
             const newPos = this.getStageCenterNewPos(oldScale, newScale);
 
             this.stage.scale({
@@ -396,7 +409,8 @@ export default class EventManager {
     }
     zoomOut() {
         const oldScale = this.stage.scaleX();
-        const newScale = oldScale / this.scaleBy;
+        if (oldScale < 0.5) return
+        const newScale = Number((oldScale / this.scaleBy).toFixed(2));
         const newPos = this.getStageCenterNewPos(oldScale, newScale);
 
         this.stage.scale({
@@ -431,6 +445,7 @@ export default class EventManager {
     }
     zoomReset() {
         this.stage.scale({ x: 1, y: 1 });
+        this.stage.position({ x: 0, y: 0 });
     }
     /**
      * @param {boolean} draggable
@@ -489,7 +504,7 @@ export default class EventManager {
         /** @type {Konva.Group} */
         const edgeGroup = shape.findOne(`.${wall}`);
         if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
-            this.manager.shapeManager.removeWall(edgeGroup, shape, wall);
+            this.manager.shapeManager.removeWall(shape, wall);
         } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.removeWall(edgeGroup, shape, wall);
         }
@@ -707,5 +722,44 @@ export default class EventManager {
             position.y && shapeGroup.y(Number(position.y));
             this.manager.shapeManager.updateAttributesOverlayPosition(shapeGroup);
         } 
+    }
+
+    /**
+     * 
+     * @typedef {Object} AttributePayloadType
+     * @property {string} propertyId
+     * @property {string} image
+     * @property {string} name
+     * 
+     * @param {number} shapeId 
+     * @param {Partial<AttributePayloadType>} payload 
+     */
+    addAttribute(shapeId, payload) {
+        const shapeGroup = this.getShapeById(shapeId);
+        if (! shapeGroup) {
+            throw new Error(`Shape ${shapeId} not found`);
+        }
+
+        this.manager.shapeManager.appendShapeCutOut(
+            shapeGroup,
+            payload.image,
+            payload.name,
+            null,
+            payload.propertyId
+        );
+    }
+
+    /**
+     * 
+     * @param {number} shapeId 
+     * @param {string} propertyId 
+     */
+    removeAttribute(shapeId, propertyId) {
+        const shapeGroup = this.getShapeById(shapeId);
+        if (! shapeGroup) {
+            throw new Error(`Shape ${shapeId} not found`);
+        }
+
+        this.manager.shapeManager.removeShapeCutOut(shapeGroup, propertyId)
     }
 }

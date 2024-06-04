@@ -42,6 +42,9 @@ interface RequestObjectType {
     prevShapeId: string | number;
     rotation: string | number;
     defaultValue: any;
+    materialName: string;
+    productName: string;
+    propertyId: string;
 
     // Response
     id: number;
