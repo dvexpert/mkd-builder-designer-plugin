@@ -24,6 +24,7 @@ const LShapeIdsObject = {
     LShapeBTextLayer: "LShapeBTextLayer",
     LShapeCTextLayer: "LShapeCTextLayer",
     LShapeDTextLayer: "LShapeDTextLayer",
+    LShapeITextLayer: "LShapeITextLayer",
 
     LShapeTextLayers: {},
 
@@ -35,6 +36,7 @@ LShapeIdsObject.LShapeTextLayers = {
     [LSH.SideB]: LShapeIdsObject.LShapeBTextLayer,
     [LSH.SideC]: LShapeIdsObject.LShapeCTextLayer,
     [LSH.SideD]: LShapeIdsObject.LShapeDTextLayer,
+    [LSH.SideI]: LShapeIdsObject.LShapeITextLayer,
 };
 
 export const LShapeIds = Object.freeze(LShapeIdsObject);

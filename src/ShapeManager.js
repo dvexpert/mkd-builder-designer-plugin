@@ -617,6 +617,7 @@ export default class ShapeManager {
         }
         this.eventManager.dispatchShapeSelect(shapeGroup);
     }
+
     /**
      *
      * @param {Konva.Group} subGroupNode

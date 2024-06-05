@@ -5,8 +5,9 @@ import Konva from "konva";
  * @typedef { "b" } LShapeSideB
  * @typedef { "c" } LShapeSideC
  * @typedef { "d" } LShapeSideD
- * @typedef { LShapeSideA | LShapeSideB | LShapeSideC | LShapeSideD } LShapeSide
- * @typedef { "a" | "b" | "c" | "d" } LShapeSideO
+ * @typedef { "i" } LShapeSideI
+ * @typedef { LShapeSideA | LShapeSideB | LShapeSideC | LShapeSideD | LShapeSideI } LShapeSide
+ * @typedef { "a" | "b" | "c" | "d" | "i" } LShapeSideO
  */
 export class LShapeHelper {
     /**
@@ -33,11 +34,20 @@ export class LShapeHelper {
      */
     static SideD = "d";
 
+    /**
+     * 
+     * Interior angle group.
+     * @static
+     * @type {LShapeSideI}
+     */
+    static SideI = "i";
+
     static sides = [
         LShapeHelper.SideA,
         LShapeHelper.SideB,
         LShapeHelper.SideC,
         LShapeHelper.SideD,
+        LShapeHelper.SideI,
     ];
 
     static wallBacksplashGap = 8;
@@ -51,7 +61,7 @@ export class LShapeHelper {
      */
     static isHorizontal(side) {
         return Boolean(
-            side === LShapeHelper.SideA || side === LShapeHelper.SideC
+            side === LShapeHelper.SideA || side === LShapeHelper.SideC || side === LShapeHelper.SideI
         );
     }
 
@@ -158,6 +168,9 @@ export class LShapeHelper {
             case this.SideD:
                 sidePoints = [pointGroups[5], pointGroups[6]];
                 break;
+            case this.SideI:
+                sidePoints = [pointGroups[2], pointGroups[3]];
+                break;
         }
 
         return sidePoints;
@@ -183,7 +196,8 @@ export class LShapeHelper {
                 [this.SideA]: this.calculateDistance(pointGroups[0], pointGroups[1]),
                 [this.SideB]: this.calculateDistance(pointGroups[1], pointGroups[2]),
                 [this.SideC]: this.calculateDistance(pointGroups[4], pointGroups[5]),
-                [this.SideD]: this.calculateDistance(pointGroups[5], pointGroups[6])
+                [this.SideD]: this.calculateDistance(pointGroups[5], pointGroups[6]),
+                [this.SideI]: this.calculateDistance(pointGroups[2], pointGroups[3])
             };
 
             return allSideLengths;
@@ -202,6 +216,9 @@ export class LShapeHelper {
                 break;
             case this.SideD:
                 length = this.calculateDistance(pointGroups[5], pointGroups[6]);
+                break;
+            case this.SideI:
+                length = this.calculateDistance(pointGroups[2], pointGroups[3]);
                 break;
         }
 

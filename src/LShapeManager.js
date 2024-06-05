@@ -576,7 +576,7 @@ export default class LShapeManager {
         const subgroupNames = LSH.sides;
         // const subgroupNames = [LSH.SideA, LSH.SideB, LSH.SideC];
         // TODO: for demo only. also remove index param from subgroupNames loop callback params
-        // const subgroupColor = ["yellow", "red", "green", "blue"];
+        // const subgroupColor = ["yellow", "red", "green", "blue", "magenta"];
 
         const points = groupShapeObject.points();
         subgroupNames.forEach((subgroupName, index) => {
@@ -589,9 +589,9 @@ export default class LShapeManager {
             };
             if (isHorizontal) {
                 attributes.height = 100;
-                attributes.width = LSH.getSideLength(subgroupName, points);
+                attributes.width = Number(LSH.getSideLength(subgroupName, points));
             } else {
-                attributes.height = LSH.getSideLength(subgroupName, points);
+                attributes.height = Number(LSH.getSideLength(subgroupName, points));
                 attributes.width = 100;
             }
             const subGroup = new Konva.Group({
@@ -690,7 +690,11 @@ export default class LShapeManager {
                     attributes.x = sidePositionE.x;
                     attributes.y = sidePositionE.y + spacingOffset;
 
-                    sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
+                    if (LSH.SideI === subgroupName) {
+                        sideLabel.x(subGroup.width() - subGroup.width() * 0.95);
+                    } else {
+                        sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
+                    }
                     sideLabel.y(15 + backsplashOffset);
 
                     // checkboxGroup?.x(
@@ -761,7 +765,11 @@ export default class LShapeManager {
             subGroup.name(),
             shapeObject.points()
         );
-        const value = sideLength / LSH.SizeDiff;
+        let value = sideLength / LSH.SizeDiff;
+        if (subGroup.name() === LSH.SideI) {
+            value = 90;
+        }
+
 
         const widthInput = new Konva.Text({
             id: LShapeIds.LShapeTextLayers[subGroup.name()],
@@ -774,6 +782,12 @@ export default class LShapeManager {
         subGroup.add(widthInput);
 
         this.updateInputsPosition(subGroup, false, true);
+
+        if (subGroup.name() === LSH.SideI) {
+            // We don't need click event listeners
+            // for interior angle.
+            return;
+        }
         // create event listener to show text box to change width
         widthInput.on("click", (e) => {
             let wInput = e.target;
@@ -964,7 +978,7 @@ export default class LShapeManager {
             heightInput.position(position);
         }
 
-        if (widthOnly && [LSH.SideA, LSH.SideC].includes(subGroup.name())) {
+        if (widthOnly && [LSH.SideA, LSH.SideC, LSH.SideI].includes(subGroup.name())) {
             const widthInput = shapeGroup.findOne(
                 `#${LShapeIds.LShapeTextLayers[subGroup.name()]}`
             );
@@ -990,6 +1004,16 @@ export default class LShapeManager {
                 if (textNode) {
                     position = { x: textNode.x(), y: textNode.y() };
                     position.x = position.x + 50;
+                    position.y = position.y - 3;
+                }
+            } else if (widthInput.getAttr("wall") === LSH.SideI) {
+                // Interior angle.
+                const textNode = shapeGroup.findOne(
+                    `#text_node_${widthInput.getAttr("wall")}`
+                );
+                if (textNode) {
+                    position = { x: textNode.x(), y: textNode.y() };
+                    position.x = position.x + 30;
                     position.y = position.y - 3;
                 }
             }
@@ -1293,7 +1317,10 @@ export default class LShapeManager {
      * @param {Konva.Group} shapeGroup - main shape group, containing everything.
      * @param {import("./helpers/LShapeHelper.js").LShapeSide} wall
      */
-    removeWall(SubGroup, shapeGroup, wall) {
+    removeWall(SubGroup = null, shapeGroup, wall) {
+        if (!SubGroup) {
+            SubGroup = shapeGroup.findOne(`.${wall}`);
+        }
         const wallObj = SubGroup.findOne(`.wall_${wall}`);
         if (!wallObj) {
             return;
