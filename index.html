@@ -237,6 +237,18 @@
                                     value="100"
                                 />
                             </div>
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-i">I:</label>
+                                <input
+                                    type="number"
+                                    id="size-i"
+                                    data-wall="i"
+                                    data-val="Shape Interior angle"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="90"
+                                    title="Interior angle"
+                                />
+                            </div>
                         </div>
                         <div class="tw-mt-6">
                             <b>A:</b> <br />
@@ -335,9 +347,14 @@
                                     id="can-be-rounded-c"
                                     data-wall="c"
                                 />
-                                <label for="can-be-rounded-c" class="tw-ml-2"
-                                    >Corner B-C Can be Rounded?</label
-                                >
+                                <label
+                                    for="can-be-rounded-c"
+                                    class="tw-ml-2 shape-square-corner-label"
+                                >Corner B-C Can be Rounded?</label>
+                                <label
+                                    for="can-be-rounded-c"
+                                    class="tw-ml-2 shape-l-corner-label"
+                                >Corner B-I Can be Rounded?</label>
                             </div>
                         </div>
                         <div class="tw-mt-6">
@@ -369,7 +386,23 @@
                                     id="can-be-rounded-d"
                                     data-wall="d"
                                 />
-                                <label for="can-be-rounded-d" class="tw-ml-2"
+                                <label
+                                    for="can-be-rounded-d"
+                                    class="tw-ml-2 shape-square-corner-label"
+                                >Corner C-D Can be Rounded?</label>
+                                <label
+                                    for="can-be-rounded-d"
+                                    class="tw-ml-2 shape-l-corner-label"
+                                >Corner I-C Can be Rounded?</label>
+
+                                <br /> <br />
+                                <input
+                                    type="checkbox"
+                                    class="can-be-rounded shape-l-corner-label"
+                                    id="can-be-rounded-e"
+                                    data-wall="e"
+                                />
+                                <label for="can-be-rounded-e" class="tw-ml-2 shape-l-corner-label"
                                     >Corner C-D Can be Rounded?</label
                                 >
                             </div>
@@ -552,6 +585,13 @@
                 const konvaManager = new KonvaManager(container, undefined, {
                     height: appElm.offsetHeight,
                     width: appElm.offsetWidth
+                });
+                window.addEventListener('resize', function(event) {
+                    const appElm = document.querySelector("#app")
+                    dispatchCanvasEvent("mkd-plugin:canvas-size", {
+                        height: appElm.clientHeight,
+                        width: appElm.clientWidth
+                    });
                 });
             });
         </script>
