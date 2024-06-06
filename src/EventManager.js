@@ -583,6 +583,10 @@ export default class EventManager {
         }
     }
 
+    /**
+     * On `mkd-plugin:export-download` to download canvas as image and json data.
+     * Currently only used for demo setup.
+     */
     export() {
         // check has children
         if (
@@ -594,9 +598,94 @@ export default class EventManager {
             return;
         }
 
-        const opt = this.stage.toDataURL();
+        const opt = this.getExportImageDataURL();
         this.downloadURI(opt, "stage.png");
         this.downloadObjectAsJson(this.stage.toObject(), "stage-object.json");
+    }
+
+    getExportImageDataURL() {
+        const offset = 20;
+        const groupNodes = this.stage.find(
+            `#${SquareShapeIds.ShapeGroup}, #${LShapeIds.LShapeGroup}`
+        );
+        const { minX, minY, newWidth, newHeight } = this.getNewStageDimensions(
+            groupNodes,
+            offset
+        );
+
+        const background = this.stage.findOne(`#${BackgroundNodeId}`)
+        background.show();
+
+        // Resize the stage
+        const oldWidth = this.stage.width();
+        const oldHeight = this.stage.height();
+
+        this.stage.width(newWidth);
+        this.stage.height(newHeight);
+
+        background.width(newWidth + 100)
+        background.height(newHeight + 100)
+        // Set the background image position to match the stage's current position
+        background.position({
+            x: -this.stage.x(),
+            y: -this.stage.y()
+        });
+
+        // Move all Shape Groups to adjust for negative minX and minY
+        groupNodes.forEach((group) => {
+            group.x(group.x() - minX + offset);
+            group.y(group.y() - minY + offset);
+        });
+
+        const exportImageDataUrl = this.stage.toDataURL();
+
+        // Hide background rectangle node again.
+        background.hide();
+
+        // reset stage size.
+        this.stage.width(oldWidth);
+        this.stage.height(oldHeight);
+
+        // Reset position of the nodes
+        groupNodes.forEach((group) => {
+            group.x(group.x() + minX - offset);
+            group.y(group.y() + minY - offset);
+        });
+
+        return exportImageDataUrl;
+    }
+
+    /**
+     * 
+     * @param {Konva.Group[]} groupNodes 
+     * @param {number} offset 
+     * @returns 
+     */
+    getNewStageDimensions(groupNodes, offset) {
+        let minX = Infinity,
+            minY = Infinity,
+            maxX = -Infinity,
+            maxY = -Infinity;
+
+        groupNodes.forEach((group) => {
+            const boundingBox = group.getClientRect();
+            if (boundingBox.x < minX) minX = boundingBox.x;
+            if (boundingBox.y < minY) minY = boundingBox.y;
+            if (boundingBox.x + boundingBox.width > maxX)
+                maxX = boundingBox.x + boundingBox.width;
+            if (boundingBox.y + boundingBox.height > maxY)
+                maxY = boundingBox.y + boundingBox.height;
+        });
+
+        const newWidth = maxX - minX + 2 * offset;
+        const newHeight = maxY - minY + 2 * offset;
+
+        return {
+            minX,
+            minY,
+            newWidth: Math.max(1500, newWidth), // Export image minimum width 1500
+            newHeight: Math.max(800, newHeight), // Export image minimum height 800
+        };
     }
 
     /**
@@ -720,7 +809,7 @@ export default class EventManager {
                     throw new Error("No Shape Added.");
                 }
                 const payload = {
-                    image: this.stage.toDataURL(),
+                    image: this.getExportImageDataURL(),
                 };
                 const canvasJson = this.stage.toObject();
                 const json = {

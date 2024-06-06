@@ -65,10 +65,17 @@ export class KonvaManager {
     }
 
     setupBackground() {
+        this.stage.container().style.backgroundImage =
+            `url('${this.backgroundPath}')`;
+        this.stage.container().style.backgroundRepeat = "repeat";
+
         const img = document.createElement("img");
         img.src = this.backgroundPath;
 
         img.onload = () => {
+            // Background image used when exporting as image
+            // setting visible to false, so we don't have to worry about stage position update (on drag)
+            // and stage scale update (on zoom in/out/reset)
             const background = new Konva.Rect({
                 id: BackgroundNodeId,
                 x: 0,
@@ -77,31 +84,11 @@ export class KonvaManager {
                 height: this.stage.height(),
                 listening: false,
                 fillPatternImage: img,
+                visible: false
             });
 
             this.layer.add(background);
             background.moveToBottom();
-            this.stage.on("dragmove scaleChange widthChange heightChange", () => {
-                const newScale = this.stage.scaleX()
-                const stageWidth =  this.stage.width()
-                const stageHeight =  this.stage.height()
-
-                if (newScale === 1) {
-                    background.width(stageWidth);
-                    background.height(stageHeight);
-                    background.position({ x: 0, y: 0 });
-                } else {
-                    // Adjust the position to compensate for the scaling
-                    const offsetX = (stageWidth - stageWidth / newScale) / 2;
-                    const offsetY = (stageHeight - stageHeight / newScale) / 2;
-
-                    background.position({ x: offsetX, y: offsetY });
-                    background.width(stageWidth / newScale);
-                    background.height(stageHeight / newScale);
-                }
-
-                background.moveToBottom();
-            });
         };
     }
 }
