@@ -41,16 +41,18 @@ export default class ShapeManager {
 
         this.stage.on("dragmove", () => {
             const groups = this.stage.find(`#${SquareShapeIds.ShapeGroup}`);
-            groups.forEach((group) =>
+            groups.forEach((group) => {
                 this.updateAttributesOverlayPosition(group)
-            );
+                this.updateHoverActionOverlayPosition(group)
+            });
         });
         this.stage.on("scaleChange xChange yChange", (ev) => {
             setTimeout(() => {
                 const groups = this.stage.find(`#${SquareShapeIds.ShapeGroup}`);
-                groups.forEach((group) =>
+                groups.forEach((group) =>{
                     this.updateAttributesOverlayPosition(group)
-                );
+                    this.updateHoverActionOverlayPosition(group)
+                });
             });
         });
     }

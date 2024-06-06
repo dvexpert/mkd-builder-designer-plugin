@@ -41,16 +41,18 @@ export default class LShapeManager {
 
         this.stage.on("dragmove", () => {
             const groups = this.stage.find(`#${LShapeIds.LShapeGroup}`);
-            groups.forEach((group) =>
+            groups.forEach((group) =>{
                 this.updateAttributesOverlayPosition(group)
-            );
+                this.updateHoverActionOverlayPosition(group)
+            });
         });
         this.stage.on("scaleChange xChange yChange", (ev) => {
             setTimeout(() => {
                 const groups = this.stage.find(`#${LShapeIds.LShapeGroup}`);
-                groups.forEach((group) =>
+                groups.forEach((group) =>{
                     this.updateAttributesOverlayPosition(group)
-                );
+                    this.updateHoverActionOverlayPosition(group)
+                });
             });
         });
     }
