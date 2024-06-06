@@ -55,7 +55,28 @@ export default class LShapeManager {
         });
     }
 
-    draw(materialImage = "", onlyPlaceholder = true, materialId = "") {
+    /**
+     *
+     * @typedef {{materialName : string, productName: string}} AttributeOverlayMaterialName
+     * @typedef {{ [key in import("./helpers/LShapeHelper.js").LShapeSide]: number}} AllSideLengthsType
+     *
+     * @param {string} materialImage
+     * @param {boolean} onlyPlaceholder
+     * @param {*} materialId
+     * @param {null | Konva.Group} placeholderGroup - passed in from draw (on re-rendering the canvas)
+     * @param {string | number | null} prevShapeId - passed in from draw (on re-rendering the canvas)
+     * @param {AllSideLengthsType} shapeSize - passed in from draw (on re-rendering the canvas)
+     * @param {AttributeOverlayMaterialName} overlayMaterialProductName - Material and productName to use for Attributes overlay.
+     */
+    draw(
+        materialImage = "",
+        onlyPlaceholder = true,
+        materialId = "",
+        placeholderGroup = null, // used on redraw canvas
+        prevShapeId = null, // used on redraw canvas
+        shapeSize = null,
+        overlayMaterialProductName = null
+    ) {
         if (!materialImage) {
             throw new Error("Material Image is required.");
         }
@@ -76,6 +97,15 @@ export default class LShapeManager {
         let shapeObject;
 
         if (onlyPlaceholder) {
+            const shapeInitialCord = this.getShapePointsCoordinates();
+            /** @type {AllSideLengthsType} */
+            const sidesLength = LSH.getSideLength(false, shapeInitialCord);
+            sidesLength.a = (shapeSize && shapeSize[LSH.SideA]) ?? sidesLength.a / LSH.SizeDiff;
+            sidesLength.b = (shapeSize && shapeSize[LSH.SideB]) ?? sidesLength.b / LSH.SizeDiff;
+            sidesLength.c = (shapeSize && shapeSize[LSH.SideC]) ?? sidesLength.c / LSH.SizeDiff;
+            sidesLength.d = (shapeSize && shapeSize[LSH.SideD]) ?? sidesLength.d / LSH.SizeDiff;
+            sidesLength.i = (shapeSize && shapeSize[LSH.SideI]) ??  90;
+
             shapeGroup = new Konva.Group({
                 x: 100,
                 y: 10,
@@ -83,20 +113,15 @@ export default class LShapeManager {
                 id: LShapeIds.LShapeGroup,
                 materialId: materialId,
                 materialImage: materialImage,
-                shapeSize: {
-                    [LSH.SideA]: 0,
-                    [LSH.SideB]: 0,
-                    [LSH.SideC]: 0,
-                    [LSH.SideD]: 0,
-                    [LSH.SideI]: 90,
-                },
+                shapeSize: sidesLength,
                 shapeType: ShapeTypes.LShape,
                 canvasShapeId: null,
-                isPlaced: false
+                isPlaced: false,
+                prevShapeId: prevShapeId,
+                materialName: overlayMaterialProductName.materialName,
+                productName: overlayMaterialProductName.productName,
             });
             shapeGroup.setAttr('canvasShapeId', shapeGroup._id);
-
-            const shapeInitialCord = this.getShapePointsCoordinates();
 
             // Create the L-shape using a line polygon
             /** @type {Konva.Line} */
@@ -107,21 +132,6 @@ export default class LShapeManager {
                 fill: "red",
                 opacity: 0.3,
             });
-
-            /**
-             * @typedef {{ [key in import("./helpers/LShapeHelper.js").LShapeSide]: number}} AllSideLengthsType
-             *
-             * @type {AllSideLengthsType}
-             */
-            const sides = LSH.getSideLength(false, shapeInitialCord);
-            sides.a = sides.a / LSH.SizeDiff;
-            sides.b = sides.b / LSH.SizeDiff;
-            sides.c = sides.c / LSH.SizeDiff;
-            sides.d = sides.d / LSH.SizeDiff;
-            sides.i = 90;
-
-            const shapeSize = sides;
-            shapeGroup.setAttr("shapeSize", shapeSize);
 
             shapeGroup.add(shapeObject);
             this.createEdgeGroups(shapeGroup);
@@ -139,7 +149,7 @@ export default class LShapeManager {
                 this.stage.container().style.cursor = "grab";
             });
             shapeGroup.on("mouseenter dragmove", (e) => {
-                const hoverNode = e.target;
+                // const hoverNode = e.target;
                 if (e.type === "dragmove") {
                     this.updateAttributesOverlayPosition(shapeGroup);
                     // const targetShape = this.getShapeObject(hoverNode);
@@ -162,22 +172,22 @@ export default class LShapeManager {
                     // );
                 }
 
-                // const attributeOverlay =
-                //     this.getShapeGroupAttributeOverlay(shapeGroup);
-                // if (e.type === "mouseenter" && attributeOverlay) {
-                //     /**
-                //      * on shape group hover active the current group attribute overlay
-                //      * and in-active other groups attribute overlay
-                //      */
-                //     const overlayGroup = document.getElementById(
-                //         "attributes-overlay-group"
-                //     )?.childNodes;
-                //     overlayGroup.forEach((child) =>
-                //         child.classList.remove("active-attributes-overlay")
-                //     );
+                const attributeOverlay =
+                    this.getShapeGroupAttributeOverlay(shapeGroup);
+                if (e.type === "mouseenter" && attributeOverlay) {
+                    /**
+                     * on shape group hover active the current group attribute overlay
+                     * and in-active other groups attribute overlay
+                     */
+                    const overlayGroup = document.getElementById(
+                        "attributes-overlay-group"
+                    )?.childNodes;
+                    overlayGroup.forEach((child) =>
+                        child.classList.remove("active-attributes-overlay")
+                    );
 
-                //     attributeOverlay.classList.add("active-attributes-overlay");
-                // }
+                    attributeOverlay.classList.add("active-attributes-overlay");
+                }
                 /**
                  * After placement action overlay is not required
                  * rotate will be performed from outside the canvas via events
@@ -254,7 +264,7 @@ export default class LShapeManager {
             });
         } else {
             // Replace Placeholder with an image
-            shapeGroup = this.currentHoverNode;
+            shapeGroup = placeholderGroup ?? this.currentHoverNode;
             shapeGroup.on("click", () => {
                 this.eventManager.dispatchShapeSelect(shapeGroup);
             });
@@ -283,6 +293,8 @@ export default class LShapeManager {
             this.eventManager.dispatchShapeSelect(shapeGroup);
             shapeGroup.setAttr('isPlaced', true);
         }
+
+        return shapeGroup;
     }
 
     createContextMenu() {
@@ -1186,6 +1198,18 @@ export default class LShapeManager {
         shapeNameElm.setAttribute("title", shapeName);
         shapeGroup.setAttr("shapeName", shapeName);
 
+        const materialName = shapeGroup.getAttr("materialName");
+        if (materialName) {
+            attributeOverlay.querySelector("#material-name").innerHTML =
+                materialName;
+        }
+
+        const productName = shapeGroup.getAttr("productName");
+        if (productName) {
+            attributeOverlay.querySelector("#product-name").innerHTML =
+                productName;
+        }
+
         attributeOverlay.addEventListener("mouseenter", (e) => {
             const elm = e.target;
             elm && elm.classList?.add("active-attributes-overlay");
@@ -1218,22 +1242,40 @@ export default class LShapeManager {
      * @param {string} title
      * @param {HTMLElement} attributeOverlay - when appending shapeCutout right after placing the attribute overlay element in dom.
      * in this case getting attribute overlay element from dom might be blank.
+     * @param {string} propertyId - when appending shapeCutout right after placing the attribute overlay element in dom.
      */
     appendShapeCutOut(
         shapeGroup,
         url = "/dynamicAssets/sinkdropin-1.png",
         title = "Drop-in Sink",
-        attributeOverlay = null
+        attributeOverlay = null,
+        propertyId = null
     ) {
-        const overlay =
-            attributeOverlay ??
-            document.querySelector(`#attribute-overlay-${shapeGroup._id}`);
+        // initialize attribute on shape group
+        let attributesItems = shapeGroup.getAttr("attributesItems");
+        if (!attributesItems || Object.keys(attributesItems).length === 0) {
+            attributesItems = [];
+        }
+
+        // Check if already exists
+        if (propertyId && attributesItems.length > 0) {
+            const index = attributesItems.findIndex(
+                (item) => item.id === propertyId
+            );
+            if (index !== -1) {
+                console.warn("Attribute already exists.");
+                return;
+            }
+        }
+
+        const overlay = attributeOverlay ?? this.getShapeGroupAttributeOverlay(shapeGroup);
         const container = overlay.querySelector("#shape-cutout-group");
         /** @type {HTMLElement} */
         const domObject = new DOMParser().parseFromString(
             AttributeShapeCutOutTemplate,
             "text/html"
         ).body.firstChild;
+        domObject.id = `${domObject.id}-${propertyId}`;
         const image = domObject.querySelector("img");
         const titleElm = domObject.querySelector("span");
         image.src = url;
@@ -1242,6 +1284,42 @@ export default class LShapeManager {
         titleElm.innerHTML = title;
 
         container.appendChild(domObject);
+
+        attributesItems.push({ id: propertyId, image: url, name: title });
+        shapeGroup.setAttr("attributesItems", attributesItems);
+    }
+
+    /**
+     *
+     * @param {Konva.Group} shapeGroup
+     * @param {string} propertyId - when appending shapeCutout right after placing the attribute overlay element in dom.
+     */
+    removeShapeCutOut(
+        shapeGroup,
+        propertyId = null
+    ) {
+        const overlay = document.querySelector(`#attributes-overlay-${shapeGroup._id}`);
+        const container = overlay.querySelector("#shape-cutout-group");
+        const cutOutItem = container.querySelector(`#property-${propertyId}`);
+
+        // initialize attribute on shape group
+        let attributesItems = shapeGroup.getAttr("attributesItems");
+        if (!attributesItems || Object.keys(attributesItems).length === 0) {
+            attributesItems = [];
+        }
+
+        // Check if already exists
+        if (attributesItems.length > 0) {
+            const index = attributesItems.findIndex(
+                (item) => item.id === propertyId
+            );
+            if (index !== -1) {
+                attributesItems.splice(index, 1)
+                shapeGroup.setAttr("attributesItems", attributesItems);
+            }
+        }
+
+        cutOutItem?.remove();
     }
 
     /**

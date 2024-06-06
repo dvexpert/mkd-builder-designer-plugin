@@ -272,13 +272,36 @@ export default class EventManager {
         document.addEventListener("mkd-plugin:draw:l", (e) => {
             const request = e?.detail;
             try {
-                this.manager.lShapeManager.draw(
+                const shapeGroup = this.manager.lShapeManager.draw(
                     request?.image,
                     true,
-                    request.materialId
+                    request.materialId,
+                    null,
+                    request?.prevShapeId,
+                    request?.shapeSize,
+                    {
+                        materialName: request.materialName,
+                        productName: request.productName
+                    }
                 );
+
+                if (shapeGroup && request.placed && request.placed === true) {
+                    this.manager.lShapeManager.draw(
+                        request?.image,
+                        false,
+                        request.materialId,
+                        shapeGroup
+                    );
+                    this.manager.lShapeManager.updateHoverActionOverlayPosition(
+                        shapeGroup
+                    );
+                }
+
                 if (typeof request?.success === "function") {
-                    request.success({ message: "Square shape created" });
+                    request.success({
+                        message: "Square shape created",
+                        shapeId: shapeGroup._id
+                    });
                 }
             } catch (e) {
                 console.error(e);
@@ -745,6 +768,12 @@ export default class EventManager {
             this.manager.shapeManager.updateAttributesOverlayPosition(
                 shapeGroup
             );
+        } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.LShape) {
+            position?.x && shapeGroup.x(Number(position.x));
+            position.y && shapeGroup.y(Number(position.y));
+            this.manager.lShapeManager.updateAttributesOverlayPosition(
+                shapeGroup
+            );
         }
     }
 
@@ -764,13 +793,23 @@ export default class EventManager {
             throw new Error(`Shape ${shapeId} not found`);
         }
 
-        this.manager.shapeManager.appendShapeCutOut(
-            shapeGroup,
-            payload.image,
-            payload.name,
-            null,
-            payload.propertyId
-        );
+        if (shapeGroup.getAttr("shapeType") === ShapeTypes.SquareShape) {
+            this.manager.shapeManager.appendShapeCutOut(
+                shapeGroup,
+                payload.image,
+                payload.name,
+                null,
+                payload.propertyId
+            );
+        } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.LShape) {
+            this.manager.lShapeManager.appendShapeCutOut(
+                shapeGroup,
+                payload.image,
+                payload.name,
+                null,
+                payload.propertyId
+            );
+        }
     }
 
     /**
@@ -784,6 +823,10 @@ export default class EventManager {
             throw new Error(`Shape ${shapeId} not found`);
         }
 
-        this.manager.shapeManager.removeShapeCutOut(shapeGroup, propertyId);
+        if (shapeGroup.getAttr("shapeType") === ShapeTypes.SquareShape) {
+            this.manager.shapeManager.removeShapeCutOut(shapeGroup, propertyId);
+        } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.LShape) {
+            this.manager.lShapeManager.removeShapeCutOut(shapeGroup, propertyId);
+        }
     }
 }

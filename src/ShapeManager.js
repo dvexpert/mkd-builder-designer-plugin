@@ -264,6 +264,7 @@ export default class ShapeManager {
      * @param {boolean} onlyPlaceholder
      * @param {*} materialId
      * @param {null | Konva.Group} placeholderGroup - passed in from draw square (on re-rendering the canvas)
+     * @param {string | number | null} prevShapeId - passed in from draw square (on re-rendering the canvas)
      * @param {AttributeOverlayMaterialName} overlayMaterialProductName - Material and productName to use for Attributes overlay.
      */
     drawSquare(
@@ -1441,6 +1442,7 @@ export default class ShapeManager {
         attributeOverlay = null,
         propertyId = null
     ) {
+        console.log('%cappendShapeCutOut', 'color:#00ff00;font-size:30px;font-weight:bold;')
         // initialize attribute on shape group
         let attributesItems = shapeGroup.getAttr("attributesItems");
         if (!attributesItems || Object.keys(attributesItems).length === 0) {
@@ -1467,6 +1469,7 @@ export default class ShapeManager {
             AttributeShapeCutOutTemplate,
             "text/html"
         ).body.firstChild;
+        console.log(domObject)
         domObject.id = `${domObject.id}-${propertyId}`;
         const image = domObject.querySelector("img");
         const titleElm = domObject.querySelector("span");
@@ -1476,6 +1479,7 @@ export default class ShapeManager {
         titleElm.innerHTML = title;
 
         container.appendChild(domObject);
+        console.log(domObject)
 
         attributesItems.push({ id: propertyId, image: url, name: title });
         shapeGroup.setAttr("attributesItems", attributesItems);
