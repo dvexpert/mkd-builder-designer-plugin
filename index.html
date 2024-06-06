@@ -23,12 +23,26 @@
                 justify-content: center;
                 border-radius: 4px;
             }
+            ::-webkit-scrollbar {
+                width: 6px;
+            }
+            ::-webkit-scrollbar-button {
+                display: none;
+            }
+            ::-webkit-scrollbar-track {
+                background: #eee;
+            }
+            ::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 12px;
+            }
         </style>
     </head>
     <body>
         <div class="tw-flex">
             <div
-                class="tw-border-black tw-p-2 tw-min-w-[280px] tw-max-w-[280px] tw-border-r tw-h-screen tw-pr-3"
+                id="sidebar"
+                class="tw-border-black tw-p-2 tw-min-w-[290px] tw-max-w-[290px] tw-border-r tw-h-screen tw-pr-3 tw-overflow-y-auto tw-pb-12"
             >
                 <div class="tw-min-h-20 tw-font-bold tw-text-lg tw-text-center">
                     MKD Designer Plugin
@@ -413,6 +427,7 @@
 
             <div class="tw-w-full">
                 <div
+                    id="topbar"
                     class="tw-flex tw-gap-4 tw-items-center tw-border-b tw-p-4"
                 >
                     <div class="tw-flex tw-gap-4 tw-items-center">
@@ -557,7 +572,9 @@
                         Export
                     </button>
                 </div>
-                <div id="app" class="!tw-size-full tw-w-max tw-mx-auto"></div>
+                <div id="app" class="!tw-size-full/ tw-w-max tw-mx-auto">
+                    <div id="canvas-container" class="tw-border tw-w-max tw-relative tw-overflow-hidden"></div>
+                </div>
             </div>
         </div>
 
@@ -567,31 +584,23 @@
         <script type="module" src="./dist/mkd-plugin.es.js"></script>
         <script>
             document.addEventListener("DOMContentLoaded", () => {
-                const appElm = document.querySelector("#app")
-                document.querySelector(
-                    "#app"
-                ).innerHTML = `<div id="canvas-container"></div>`;
-
                 /** @type {HTMLDivElement} */
                 const container = document.querySelector(
                     "#app #canvas-container"
                 );
-                container.classList.add(
-                    "tw-border",
-                    "tw-w-max",
-                    "tw-relative",
-                    "tw-overflow-hidden"
-                );
 
+                const sidebar = document.querySelector('#sidebar')
+                const topBar = document.querySelector('#topbar')
                 const konvaManager = new KonvaManager(container, undefined, {
-                    height: appElm.offsetHeight,
-                    width: appElm.offsetWidth
+                    height: window.innerHeight - topBar.offsetHeight - 10,
+                    width: window.innerWidth - sidebar.offsetWidth - 10
                 });
                 window.addEventListener('resize', function(event) {
-                    const appElm = document.querySelector("#app")
+                    const sidebar = document.querySelector('#sidebar')
+                    const topBar = document.querySelector('#topbar')
                     dispatchCanvasEvent("mkd-plugin:canvas-size", {
-                        height: appElm.clientHeight,
-                        width: appElm.clientWidth
+                        height: window.innerHeight - topBar.offsetHeight - 10,
+                        width: window.innerWidth - sidebar.offsetWidth - 10
                     });
                 });
             });
