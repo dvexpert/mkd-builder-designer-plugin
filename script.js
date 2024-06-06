@@ -254,7 +254,8 @@ jQuery(document).ready(function ($) {
         }
         dispatchCanvasEvent("mkd-plugin:shape-size", {
             shapeId: document.activeShape,
-            width: value,
+            wall: 'a',
+            value,
             error: (e) => console.log(`[MKD]: ${e.message}`),
         });
     });
@@ -266,7 +267,8 @@ jQuery(document).ready(function ($) {
         }
         dispatchCanvasEvent("mkd-plugin:shape-size", {
             shapeId: document.activeShape,
-            height: value,
+            wall: 'b',
+            value,
             error: (e) => console.log(`[MKD]: ${e.message}`),
         });
     });
@@ -342,7 +344,8 @@ jQuery(document).ready(function ($) {
         }
         dispatchCanvasEvent("mkd-plugin:shape-size", {
             shapeId: document.activeShape,
-            [wall]: value,
+            wall,
+            value,
             error: (e) => console.log(`[MKD]: ${e.message}`),
         });
     });

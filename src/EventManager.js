@@ -7,6 +7,7 @@ import {
     SquareShapeIds,
 } from "./enum/ShapeManagerEnum";
 import { LShapeHelper as LSH } from "./helpers/LShapeHelper";
+import { SquareHelper } from "./helpers/SquareHelper";
 
 export default class EventManager {
     /**
@@ -179,69 +180,51 @@ export default class EventManager {
                 shapeGroup.getAttr("shapeType") === ShapeTypes.SquareShape
             ) {
                 const payload = {};
-                if (request.height) {
-                    payload.attr = "height";
-                    payload.height = request.height;
-                } else if (request.width) {
-                    payload.attr = "width";
-                    payload.width = request.width;
-                }
+                payload.attr = SquareHelper.isHorizontal(request.wall) ? "width" : "height";
 
                 this.manager.shapeManager.handleInputValueChange(
                     payload.attr,
                     shapeGroup,
                     null,
-                    payload[payload.attr]
+                    request.value
                 );
             } else if (
                 shapeGroup &&
                 shapeGroup.getAttr("shapeType") === ShapeTypes.LShape
             ) {
+                /** @type {import("./helpers/LShapeHelper").LShapeSideO} - wall */
+                const wall = request.wall
                 /**
                  *
                  * Extract only sides length property from request object,
                  * request object has may keys like shapeId and more.
                  *
                  * ```json
-                 * { "a": 10, "b": 10, "c": 10, "d": 10 }
+                 * { "a" | "b" | "c" | "d" | "i": 10 }
                  * ```
-                 * can have single side value or all side value.
-                 * @typedef {Partial<{[key in import("./helpers/LShapeHelper").LShapeSide]: string}>} SidesLength
-                 *
-                 * @type {SidesLength}
+                 * can have single side value.
                  */
-                const sidesLength = {};
-                LSH.sides.forEach((key) => {
-                    if (key in request) {
-                        sidesLength[key] = request[key];
-                    }
-                });
 
-                Object.keys(sidesLength).forEach(
-                /** @param {import("./helpers/LShapeHelper").LShapeSide} key  */
-                (key) => {
-                    /** @type {Konva.Group} */
-                    const edgeGroup = shapeGroup.findOne(`.${key}`);
-                    /** @type {Konva.Text} */
-                    const labelNode = shapeGroup.findOne(
-                        `#${LShapeIds.LShapeTextLayers[key]}`
-                    );
+                /** @type {Konva.Group} */
+                const edgeGroup = shapeGroup.findOne(`.${wall}`);
+                /** @type {Konva.Text} */
+                const labelNode = shapeGroup.findOne(
+                    `#${LShapeIds.LShapeTextLayers[wall]}`
+                );
 
-                    if (LSH.SideI === key) {
-                        const interiorAngle = LSH.getInteriorAngleText(
-                            sidesLength[key]
-                        );
-                        labelNode.text(interiorAngle);
+                if (LSH.SideI === wall) {
+                    const interiorAngle = LSH.getInteriorAngleText(request.value);
+                    labelNode.text(interiorAngle);
 
-                        return;
-                    }
-                    this.manager.lShapeManager.handleInputValueChange(
-                        LSH.isHorizontal(key) ? "width" : "height",
-                        edgeGroup,
-                        labelNode,
-                        sidesLength[key]
-                    );
-                });
+                    return;
+                }
+
+                this.manager.lShapeManager.handleInputValueChange(
+                    LSH.isHorizontal(wall) ? "width" : "height",
+                    edgeGroup,
+                    labelNode,
+                    request.value
+                );
             }
         });
         document.addEventListener("mkd-plugin:toggle-rounded-box", (e) => {

@@ -45,6 +45,7 @@ interface RequestObjectType {
     materialName: string;
     productName: string;
     propertyId: string;
+    value: any;
 
     // Response
     id: number;

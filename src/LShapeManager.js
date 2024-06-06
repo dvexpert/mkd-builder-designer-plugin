@@ -364,11 +364,10 @@ export default class LShapeManager {
      * @param {Konva.Group} shapeGroup
      */
     deleteShape(shapeGroup) {
-        // this.getShapeGroupAttributeOverlay(shapeGroup)?.remove();
+        this.getShapeGroupAttributeOverlay(shapeGroup)?.remove();
         shapeGroup?.destroy();
 
-        // ! TODO: dispatch shape deleted event for external side effects.
-        // this.eventManager.dispatchShapeDelete(shapeGroup._id);
+        this.eventManager.dispatchShapeDelete(shapeGroup._id);
     }
 
     getShapePointsCoordinates(
