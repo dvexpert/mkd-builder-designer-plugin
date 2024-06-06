@@ -282,14 +282,12 @@ export default class ShapeManager {
             throw new Error("Material Image is required.");
         }
 
-        let posX = 20;
-        let posY = 30;
-        // if (this.layer.hasChildren()) {
-        //     const child = this.layer.getChildren();
-        //     const lastChild = child[child.length - 1];
-        //     posX = 5 + lastChild.getClientRect().x + lastChild.width();
-        //     posY = lastChild.getClientRect().y;
-        // }
+        const stagePos = this.stage.position();
+        const scale = this.stage.scaleX(); // Assuming uniform scaling (scaleX = scaleY)
+
+        // Calculate the center position considering the stage's position and scale
+        const posX = (this.stage.width() / 3 - stagePos.x) / scale;
+        const posY = (this.stage.height() / 3 - stagePos.y) / scale;
 
         /** @type {Konva.Group} */
         let shapeGroup;
@@ -298,8 +296,8 @@ export default class ShapeManager {
             const height = shapeSize?.height ? Number(shapeSize?.height) : 50;
             const width = shapeSize?.width ? Number(shapeSize?.width) : 150;
             shapeGroup = new Konva.Group({
-                x: 100,
-                y: 10,
+                x: posX,
+                y: posY,
                 draggable: this.stage.getAttr("shapeDraggable") === true,
                 id: SquareShapeIds.ShapeGroup,
                 materialId: materialId,
@@ -317,8 +315,8 @@ export default class ShapeManager {
             });
             shapeGroup.setAttr("canvasShapeId", shapeGroup._id);
             const squarePlaceHolderObject = new Konva.Rect({
-                x: posX,
-                y: posY,
+                // x: posX,
+                // y: posY,
                 width: width * SizeDiff,
                 id: SquareShapeIds.ShapePlaceholderObject,
                 height: height * SizeDiff,

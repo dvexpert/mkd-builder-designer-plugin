@@ -83,14 +83,12 @@ export default class LShapeManager {
             throw new Error("Material Image is required.");
         }
 
-        let posX = 20;
-        let posY = 30;
-        // if (this.layer.hasChildren()) {
-        //     const child = this.layer.getChildren();
-        //     const lastChild = child[child.length - 1];
-        //     posX = 5 + lastChild.getClientRect().x + lastChild.width();
-        //     posY = lastChild.getClientRect().y;
-        // }
+        const stagePos = this.stage.position();
+        const scale = this.stage.scaleX(); // Assuming uniform scaling (scaleX = scaleY)
+
+        // Calculate the center position considering the stage's position and scale
+        const posX = (this.stage.width() / 3 - stagePos.x) / scale;
+        const posY = (this.stage.height() / 3 - stagePos.y) / scale;
 
         /** @type {Konva.Group} */
         let shapeGroup;
@@ -109,8 +107,8 @@ export default class LShapeManager {
             sidesLength.i = (shapeSize && shapeSize[LSH.SideI]) ??  90;
 
             shapeGroup = new Konva.Group({
-                x: 100,
-                y: 10,
+                x: posX,
+                y: posY,
                 draggable: this.stage.getAttr("shapeDraggable") === true,
                 id: LShapeIds.LShapeGroup,
                 materialId: materialId,
