@@ -608,6 +608,11 @@ export default class EventManager {
         const groupNodes = this.stage.find(
             `#${SquareShapeIds.ShapeGroup}, #${LShapeIds.LShapeGroup}`
         );
+
+        // Get the current scale of the stage
+        const scale = this.stage.scale(); // assuming uniform scaling (scaleX = scaleY).
+        this.stage.scale({ x: 1, y: 1, });
+
         const { minX, minY, newWidth, newHeight } = this.getNewStageDimensions(
             groupNodes,
             offset
@@ -625,10 +630,15 @@ export default class EventManager {
 
         background.width(newWidth + 100)
         background.height(newHeight + 100)
+
         // Set the background image position to match the stage's current position
         background.position({
             x: -this.stage.x(),
             y: -this.stage.y()
+        });
+        background.size({
+            width: this.stage.width(),
+            height: this.stage.height()
         });
 
         // Move all Shape Groups to adjust for negative minX and minY
@@ -639,6 +649,7 @@ export default class EventManager {
 
         const exportImageDataUrl = this.stage.toDataURL();
 
+        this.stage.scale(scale);
         // Hide background rectangle node again.
         background.hide();
 
