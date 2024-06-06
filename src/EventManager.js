@@ -45,7 +45,7 @@ export default class EventManager {
                     request?.shapeSize,
                     {
                         materialName: request.materialName,
-                        productName: request.productName
+                        productName: request.productName,
                     }
                 );
 
@@ -56,11 +56,16 @@ export default class EventManager {
                         request.materialId,
                         shapeGroup
                     );
-                    this.manager.shapeManager.updateHoverActionOverlayPosition(shapeGroup)
+                    this.manager.shapeManager.updateHoverActionOverlayPosition(
+                        shapeGroup
+                    );
                 }
 
                 if (typeof request?.success === "function") {
-                    request.success({ message: "Square shape created", shapeId: shapeGroup._id });
+                    request.success({
+                        message: "Square shape created",
+                        shapeId: shapeGroup._id,
+                    });
                 }
             } catch (e) {
                 console.error(e);
@@ -133,10 +138,15 @@ export default class EventManager {
                 return;
             }
             if (!request?.rotation) {
-                request.error && request.error({ message: "Invalid request parameter value for `rotate`." });
+                request.error &&
+                    request.error({
+                        message:
+                            "Invalid request parameter value for `rotate`.",
+                    });
                 return;
             }
-            request.success && request.success({ message: "Rotation updated." });
+            request.success &&
+                request.success({ message: "Rotation updated." });
             this.rotate(request.shapeId, Number(request?.rotation));
         });
         document.addEventListener("mkd-plugin:delete-shape", (e) => {
@@ -196,7 +206,7 @@ export default class EventManager {
                  * { "a": 10, "b": 10, "c": 10, "d": 10 }
                  * ```
                  * can have single side value or all side value.
-                 * @typedef {Partial<{[key in import("./helpers/LShapeHelper").LShapeSide]: number}>} SidesLength
+                 * @typedef {Partial<{[key in import("./helpers/LShapeHelper").LShapeSide]: string}>} SidesLength
                  *
                  * @type {SidesLength}
                  */
@@ -207,11 +217,24 @@ export default class EventManager {
                     }
                 });
 
-                Object.keys(sidesLength).forEach((key) => {
+                Object.keys(sidesLength).forEach(
+                /** @param {import("./helpers/LShapeHelper").LShapeSide} key  */
+                (key) => {
+                    /** @type {Konva.Group} */
                     const edgeGroup = shapeGroup.findOne(`.${key}`);
+                    /** @type {Konva.Text} */
                     const labelNode = shapeGroup.findOne(
                         `#${LShapeIds.LShapeTextLayers[key]}`
                     );
+
+                    if (LSH.SideI === key) {
+                        const interiorAngle = LSH.getInteriorAngleText(
+                            sidesLength[key]
+                        );
+                        labelNode.text(interiorAngle);
+
+                        return;
+                    }
                     this.manager.lShapeManager.handleInputValueChange(
                         LSH.isHorizontal(key) ? "width" : "height",
                         edgeGroup,
@@ -238,8 +261,12 @@ export default class EventManager {
         document.addEventListener("mkd-plugin:shape-position", (e) => {
             const request = e.detail;
             try {
-                this.setShapePosition(request.id ?? request.shapeId, request.position);
-                request.success && request.success({ message: 'Shape position updated' });
+                this.setShapePosition(
+                    request.id ?? request.shapeId,
+                    request.position
+                );
+                request.success &&
+                    request.success({ message: "Shape position updated" });
             } catch (e) {
                 request.error && request.error({ message: e.message });
             }
@@ -409,7 +436,7 @@ export default class EventManager {
     }
     zoomOut() {
         const oldScale = this.stage.scaleX();
-        if (oldScale < 0.5) return
+        if (oldScale < 0.5) return;
         const newScale = Number((oldScale / this.scaleBy).toFixed(2));
         const newPos = this.getStageCenterNewPos(oldScale, newScale);
 
@@ -647,17 +674,29 @@ export default class EventManager {
             if (shape.findOne(`#checkbox_node_${wall}`)) {
                 throw new Error("Checkbox group already exists!");
             }
-            this.manager.shapeManager.addCheckboxGroup(
-                edgeSubGroup,
-                wall,
-                shape,
-                defaultVal
-            );
+            if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
+                this.manager.shapeManager.addCheckboxGroup(
+                    edgeSubGroup,
+                    wall,
+                    shape,
+                    defaultVal
+                );
+            } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
+                this.manager.lShapeManager.addCheckboxGroup(
+                    wall,
+                    shape,
+                    defaultVal
+                );
+            }
         } else {
             if (!shape.findOne(`#checkbox_node_${wall}`)) {
                 throw new Error("Checkbox group does not exists!");
             }
-            this.manager.shapeManager.removeCheckboxGroup(wall, shape);
+            if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
+                this.manager.shapeManager.removeCheckboxGroup(wall, shape);
+            } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
+                this.manager.lShapeManager.removeCheckboxGroup(wall, shape);
+            }
         }
     }
 
@@ -672,7 +711,7 @@ export default class EventManager {
                         .find((node) => node.id() !== BackgroundNodeId)
                         .length === 0
                 ) {
-                    throw new Error('No Shape Added.');
+                    throw new Error("No Shape Added.");
                 }
                 const payload = {
                     image: this.stage.toDataURL(),
@@ -720,23 +759,25 @@ export default class EventManager {
         if (shapeGroup.getAttr("shapeType") === ShapeTypes.SquareShape) {
             position?.x && shapeGroup.x(Number(position.x));
             position.y && shapeGroup.y(Number(position.y));
-            this.manager.shapeManager.updateAttributesOverlayPosition(shapeGroup);
-        } 
+            this.manager.shapeManager.updateAttributesOverlayPosition(
+                shapeGroup
+            );
+        }
     }
 
     /**
-     * 
+     *
      * @typedef {Object} AttributePayloadType
      * @property {string} propertyId
      * @property {string} image
      * @property {string} name
-     * 
-     * @param {number} shapeId 
-     * @param {Partial<AttributePayloadType>} payload 
+     *
+     * @param {number} shapeId
+     * @param {Partial<AttributePayloadType>} payload
      */
     addAttribute(shapeId, payload) {
         const shapeGroup = this.getShapeById(shapeId);
-        if (! shapeGroup) {
+        if (!shapeGroup) {
             throw new Error(`Shape ${shapeId} not found`);
         }
 
@@ -750,16 +791,16 @@ export default class EventManager {
     }
 
     /**
-     * 
-     * @param {number} shapeId 
-     * @param {string} propertyId 
+     *
+     * @param {number} shapeId
+     * @param {string} propertyId
      */
     removeAttribute(shapeId, propertyId) {
         const shapeGroup = this.getShapeById(shapeId);
-        if (! shapeGroup) {
+        if (!shapeGroup) {
             throw new Error(`Shape ${shapeId} not found`);
         }
 
-        this.manager.shapeManager.removeShapeCutOut(shapeGroup, propertyId)
+        this.manager.shapeManager.removeShapeCutOut(shapeGroup, propertyId);
     }
 }

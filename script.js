@@ -179,6 +179,9 @@ jQuery(document).ready(function ($) {
             $("#active-shape-customization-block").fadeIn();
 
             if (response.shapeType === "SquareShape") {
+                $(".shape-square-corner-label").fadeIn();
+                $(".shape-l-corner-label").fadeOut();
+
                 $("#square-size-container").slideDown();
                 $("#l-shape-size-container").slideUp();
                 const shapeWidth = $(
@@ -190,6 +193,8 @@ jQuery(document).ready(function ($) {
                 );
                 shapeHeight.val(response.shapeSize.height);
             } else if (response.shapeType === "LShape") {
+                $(".shape-square-corner-label").fadeOut();
+                $(".shape-l-corner-label").fadeIn();
                 $("#square-size-container").slideUp();
                 $("#l-shape-size-container").slideDown();
                 Object.keys(response.shapeSize).forEach((wall) => {

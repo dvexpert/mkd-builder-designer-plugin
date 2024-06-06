@@ -5,9 +5,10 @@ import Konva from "konva";
  * @typedef { "b" } LShapeSideB
  * @typedef { "c" } LShapeSideC
  * @typedef { "d" } LShapeSideD
+ * @typedef { "e" } LShapeSideE
  * @typedef { "i" } LShapeSideI
  * @typedef { LShapeSideA | LShapeSideB | LShapeSideC | LShapeSideD | LShapeSideI } LShapeSide
- * @typedef { "a" | "b" | "c" | "d" | "i" } LShapeSideO
+ * @typedef { "a" | "b" | "c" | "d" | "e" | "i" } LShapeSideO
  */
 export class LShapeHelper {
     /**
@@ -35,6 +36,13 @@ export class LShapeHelper {
     static SideD = "d";
 
     /**
+     * For rounded corner checkbox.
+     * @static
+     * @type {LShapeSideE}
+     */
+    static SideE = "e";
+
+    /**
      * 
      * Interior angle group.
      * @static
@@ -50,9 +58,21 @@ export class LShapeHelper {
         LShapeHelper.SideI,
     ];
 
+    static corners = [
+        LShapeHelper.SideA,
+        LShapeHelper.SideB,
+        LShapeHelper.SideC,
+        LShapeHelper.SideD,
+        LShapeHelper.SideE,
+    ];
+
     static wallBacksplashGap = 8;
 
     static SizeDiff = 3;
+
+    static AnglePrefix = String.fromCharCode(8736)
+
+    static AnglePostfix = String.fromCharCode(176)
 
     /**
      *
@@ -223,5 +243,14 @@ export class LShapeHelper {
         }
 
         return length;
+    }
+
+    /**
+     * 
+     * @param {string | number} angle 
+     * @returns 
+     */
+    static getInteriorAngleText(angle = 90) {
+        return `${this.AnglePrefix} ${angle} ${this.AnglePostfix}`;
     }
 }

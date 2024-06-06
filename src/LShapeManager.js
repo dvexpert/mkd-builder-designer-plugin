@@ -88,6 +88,7 @@ export default class LShapeManager {
                     [LSH.SideB]: 0,
                     [LSH.SideC]: 0,
                     [LSH.SideD]: 0,
+                    [LSH.SideI]: 90,
                 },
                 shapeType: ShapeTypes.LShape,
                 canvasShapeId: null,
@@ -98,6 +99,7 @@ export default class LShapeManager {
             const shapeInitialCord = this.getShapePointsCoordinates();
 
             // Create the L-shape using a line polygon
+            /** @type {Konva.Line} */
             shapeObject = new Konva.Line({
                 id: LShapeIds.LShapePlaceholderObject,
                 points: shapeInitialCord,
@@ -116,6 +118,7 @@ export default class LShapeManager {
             sides.b = sides.b / LSH.SizeDiff;
             sides.c = sides.c / LSH.SizeDiff;
             sides.d = sides.d / LSH.SizeDiff;
+            sides.i = 90;
 
             const shapeSize = sides;
             shapeGroup.setAttr("shapeSize", shapeSize);
@@ -751,6 +754,53 @@ export default class LShapeManager {
             }
             this.updateInputsPosition(subGroup);
         });
+
+        const corners = LSH.corners;
+        corners.forEach((subgroupName, index) => {
+            /** @type {Konva.Group} */
+            const subGroup = shapeGroup.findOne(`.${subgroupName}`);
+            const backsplash = shapeGroup.findOne(
+                `.backsplash_${subgroupName}`
+            );
+
+            /** @type {Konva.Group} */
+            const checkboxGroup = shapeGroup.findOne(
+                `.checkbox_node_${subgroupName}`
+            );
+            if (!checkboxGroup){
+                return;
+            }
+            const checkboxRect = checkboxGroup.findOne("Rect");
+
+            const position = {
+                x: 0,
+                y: 0,
+            };
+
+            if (LSH.SideA === subgroupName) {
+                position.x = 0
+                position.y = subGroup.height() - (checkboxRect.height() + 10)
+            } else if (LSH.SideB === subgroupName) {
+                position.x = 15
+                position.y = 0
+            } else if (LSH.SideC === subgroupName) {
+                /** @type {Konva.Group} */
+                const subGroup = shapeGroup.findOne(`.${LSH.SideB}`);
+                position.x = - (checkboxRect.width())
+                position.y = subGroup.height() + checkboxRect.height()
+            } else if (LSH.SideD === subgroupName) {
+                /** @type {Konva.Group} */
+                const subGroup = shapeGroup.findOne(`.${LSH.SideC}`);
+                position.x = subGroup.width() - checkboxRect.width()
+                position.y = 10
+            } else if (LSH.SideE === subgroupName) {
+                position.x = - (checkboxRect.width() + 10)
+                position.y = - (checkboxRect.height())
+            }
+
+            checkboxGroup.x(position.x)
+            checkboxGroup.y(position.y)
+        })
     }
 
     /**
@@ -765,9 +815,11 @@ export default class LShapeManager {
             subGroup.name(),
             shapeObject.points()
         );
+
+        /** @type {string | number} */
         let value = sideLength / LSH.SizeDiff;
         if (subGroup.name() === LSH.SideI) {
-            value = 90;
+            value = LSH.getInteriorAngleText()
         }
 
 
@@ -776,7 +828,7 @@ export default class LShapeManager {
             text: String(value),
             fontSize: 20,
             fill: "black",
-            width: 40,
+            // width: 80,
             wall: subGroup.name(),
         });
         subGroup.add(widthInput);
@@ -1056,10 +1108,10 @@ export default class LShapeManager {
         const position = LSH.getSidePoints(LSH.SideA, points)[0];
 
         const sideLengths = {
-            a: LSH.getSideLength(LSH.SideA, points) / LSH.SizeDiff,
-            b: LSH.getSideLength(LSH.SideB, points) / LSH.SizeDiff,
-            c: LSH.getSideLength(LSH.SideC, points) / LSH.SizeDiff,
-            d: LSH.getSideLength(LSH.SideD, points) / LSH.SizeDiff,
+            a: Number(LSH.getSideLength(LSH.SideA, points)) / LSH.SizeDiff,
+            b: Number(LSH.getSideLength(LSH.SideB, points)) / LSH.SizeDiff,
+            c: Number(LSH.getSideLength(LSH.SideC, points)) / LSH.SizeDiff,
+            d: Number(LSH.getSideLength(LSH.SideD, points)) / LSH.SizeDiff,
             [subGroup.name()]: inputBoxValue,
         };
         const newCoordinates = this.getShapePointsCoordinates(
@@ -1296,19 +1348,19 @@ export default class LShapeManager {
          * for ex: if we add Wall on edge "A" Then corner radius for
          * "A" and "B" must be disabled.
          */
-        // const groupMappings = {
-        //     [LSH.SideA]: [LSH.SideA, LSH.SideB],
-        //     [LSH.SideB]: [LSH.SideB, LSH.SideC],
-        //     [LSH.SideC]: [LSH.SideC, LSH.SideD],
-        //     [LSH.SideD]: [LSH.SideD, LSH.SideA],
-        // };
+        const groupMappings = {
+            [LSH.SideA]: [LSH.SideA, LSH.SideB],
+            [LSH.SideB]: [LSH.SideB, LSH.SideC],
+            [LSH.SideC]: [LSH.SideD, LSH.SideE],
+            [LSH.SideD]: [LSH.SideA, LSH.SideE],
+        };
 
-        // const groupName = SubGroup.name();
-        // const groupsToRemove = groupMappings[groupName] || [];
+        const groupName = SubGroup.name();
+        const groupsToRemove = groupMappings[groupName] || [];
 
-        // groupsToRemove.forEach((group) => {
-        //     this.removeCheckboxGroup(group, shapeGroup);
-        // });
+        groupsToRemove.forEach((group) => {
+            this.removeCheckboxGroup(group, shapeGroup);
+        });
     }
 
     /**
@@ -1442,5 +1494,147 @@ export default class LShapeManager {
             this.updateInputsPosition(SubGroup);
             this.updateEdgeGroupsPosition(shapeGroup, false, true);
         }
+    }
+
+    /**
+     *
+     * @param {import("./helpers/LShapeHelper.js").LShapeSide} subgroupName
+     * @param {Konva.Group} shapeGroup
+     */
+    addCheckboxGroup(
+        subgroupName,
+        shapeGroup,
+        defaultVal = false
+    ) {
+        /** @type {Konva.Group} */
+        let subGroupNode = shapeGroup.findOne(`.${subgroupName}`)
+
+        if ([LSH.SideB, LSH.SideC].includes(subgroupName)) {
+            subGroupNode = shapeGroup.findOne(`.${LSH.SideB}`)
+        } else if ([LSH.SideD, LSH.SideE].includes(subgroupName)) {
+            subGroupNode = shapeGroup.findOne(`.${LSH.SideC}`)
+        }
+
+        const checkboxGroup = new Konva.Group({
+            id: `checkbox_node_${subgroupName}`,
+            name: `checkbox_node_${subgroupName}`,
+        });
+        const checkboxRect = new Konva.Rect({
+            x: 0,
+            y: 0,
+            width: 20,
+            height: 20,
+            stroke: "black",
+            strokeWidth: 2,
+            fill: "white",
+        });
+
+        const checkMarkLine = new Konva.Line({
+            points: [8, 10, 10, 15, 16, 5],
+            stroke: "black",
+            strokeWidth: 2,
+            visible: false,
+        });
+
+        checkMarkLine.x(-2);
+        checkboxGroup.add(checkboxRect, checkMarkLine);
+        subGroupNode.add(checkboxGroup);
+
+        checkboxGroup.on("click", () => {
+            const isVisible = !checkMarkLine.visible();
+            checkMarkLine.visible(isVisible);
+            // /** @type {Konva.Rect} */
+            // const shapeObject = this.getShapeObject(shapeGroup);
+
+            const roundedCorners = this.initializeCorners(
+                shapeGroup.getAttr("roundedCorners"),
+                false
+            );
+            roundedCorners[subgroupName] = isVisible;
+            shapeGroup.setAttr("roundedCorners", roundedCorners);
+
+            // shapeObject.cornerRadius([
+            //     roundedCorners[LSH.SideA] ? 15 : 0,
+            //     roundedCorners[LSH.SideB] ? 15 : 0,
+            //     roundedCorners[LSH.SideC] ? 15 : 0,
+            //     roundedCorners[LSH.SideD] ? 15 : 0,
+            // ]);
+        });
+        if (defaultVal === true) {
+            checkboxGroup.fire("click");
+        }
+
+        const haveRoundedCorners = this.initializeCorners(
+            shapeGroup.getAttr("haveRoundedCorners"),
+            false
+        );
+        haveRoundedCorners[subgroupName] = true;
+        shapeGroup.setAttr("haveRoundedCorners", haveRoundedCorners);
+
+        /**
+         * While Adding check box group this side must not be against the wall.
+         * and because not against the wall then it cannot have backsplash either.
+         */
+        // this.removeWall(subGroupNode, shapeGroup,subgroupName);
+
+        /**
+         * While adding wall, wall edge corners, must not be rounded.
+         * for ex: if we add Wall on edge "A" Then corner radius for
+         * "A" and "B" must be disabled.
+         */
+        const groupMappings = {
+            [LSH.SideA]: [LSH.SideA, LSH.SideD],
+            [LSH.SideB]: [LSH.SideA, LSH.SideB],
+            [LSH.SideC]: [LSH.SideB],
+            [LSH.SideD]: [LSH.SideC],
+            [LSH.SideE]: [LSH.SideD, LSH.SideC],
+        };
+
+        const groupsToRemove = groupMappings[subgroupName] || [];
+
+        groupsToRemove.forEach((wall) => {
+            this.removeWall(null, shapeGroup, wall);
+        });
+
+        this.updateEdgeGroupsPosition(shapeGroup);
+        this.eventManager.dispatchShapeSelect(shapeGroup);
+    }
+
+    /**
+     *
+     * @param {import("./helpers/SquareHelper.js").SquareSide} subgroupName
+     * @param {Konva.Group} shapeGroup
+     */
+    removeCheckboxGroup(subgroupName, shapeGroup) {
+        const checkboxGroup = shapeGroup.findOne(
+            `#checkbox_node_${subgroupName}`
+        );
+        if (checkboxGroup) {
+            // /** @type {Konva.Rect} */
+            // const shapeObject = this.getShapeObject(shapeGroup);
+
+            const haveRoundedCorners = this.initializeCorners(
+                shapeGroup.getAttr("haveRoundedCorners"),
+                false
+            );
+            haveRoundedCorners[subgroupName] = false;
+            shapeGroup.setAttr("haveRoundedCorners", haveRoundedCorners);
+
+            const roundedCorners = this.initializeCorners(
+                shapeGroup.getAttr("roundedCorners"),
+                false
+            );
+            roundedCorners[subgroupName] = false;
+            shapeGroup.setAttr("roundedCorners", roundedCorners);
+
+            // shapeObject.cornerRadius([
+            //     roundedCorners[SH.SideA] ? 15 : 0,
+            //     roundedCorners[SH.SideB] ? 15 : 0,
+            //     roundedCorners[SH.SideC] ? 15 : 0,
+            //     roundedCorners[SH.SideD] ? 15 : 0,
+            // ]);
+            checkboxGroup.destroy();
+        }
+        this.eventManager.dispatchShapeSelect(shapeGroup);
     }
 }
