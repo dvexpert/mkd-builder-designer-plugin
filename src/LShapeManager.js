@@ -1104,15 +1104,12 @@ export default class LShapeManager {
         const squarePlaceHolderObject = this.getShapeObject(shapeGroup);
 
         let inputBoxValue = "";
-        if (typeof inputBox === "string") {
+        if (['string', 'number'].includes(typeof inputBox)) {
             inputBoxValue = inputBox;
         } else {
             inputBoxValue = inputBox?.value;
             document.body.removeChild(inputBox);
         }
-
-        // Update label text with new value
-        labelNode.text(inputBoxValue);
 
         this.setDragging(shapeGroup, true);
         const points = squarePlaceHolderObject.points();
@@ -1125,6 +1122,18 @@ export default class LShapeManager {
             d: Number(LSH.getSideLength(LSH.SideD, points)) / LSH.SizeDiff,
             [subGroup.name()]: inputBoxValue,
         };
+
+        if (
+            (sideLengths.a < sideLengths.c) ||
+            (sideLengths.d < sideLengths.b)
+        ) {
+            // Validation to maintain L shape proper form
+            return;
+        }
+
+        // Update label text with new value
+        labelNode.text(inputBoxValue);
+
         const newCoordinates = this.getShapePointsCoordinates(
             position.x,
             position.y,

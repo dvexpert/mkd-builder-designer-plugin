@@ -1143,7 +1143,7 @@ export default class ShapeManager {
         );
 
         let inputBoxValue = "";
-        if (typeof inputBox === "string") {
+        if (['string', 'number'].includes(typeof inputBox)) {
             inputBoxValue = inputBox;
         } else {
             inputBoxValue = inputBox?.value;
