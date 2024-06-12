@@ -265,9 +265,11 @@ export default class LShapeManager {
         } else {
             // Replace Placeholder with an image
             shapeGroup = placeholderGroup ?? this.currentHoverNode;
-            shapeGroup.on("click", () => {
-                this.eventManager.dispatchShapeSelect(shapeGroup);
-            });
+            if (import.meta.env.VITE_BUILDING_FOR_DEMO === "true") {
+                shapeGroup.on("click", () => {
+                    this.eventManager.dispatchShapeSelect(shapeGroup);
+                });
+            }
             shapeGroup.setAttr("show_action_overlay", false);
 
             // Place image element onto the layer with actual material image

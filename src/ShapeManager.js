@@ -465,9 +465,11 @@ export default class ShapeManager {
             this.layer.add(shapeGroup);
         } else {
             shapeGroup = placeholderGroup ?? this.currentHoverNode;
-            shapeGroup.on("click", () => {
-                this.eventManager.dispatchShapeSelect(shapeGroup);
-            });
+            if (import.meta.env.VITE_BUILDING_FOR_DEMO === "true") {
+                shapeGroup.on("click", () => {
+                    this.eventManager.dispatchShapeSelect(shapeGroup);
+                });
+            }
 
             // Place image element onto the layer with actual material image
             /** @type {Konva.Rect} */
