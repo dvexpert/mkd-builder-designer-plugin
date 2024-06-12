@@ -1118,7 +1118,7 @@ export default class LShapeManager {
                 );
                 if (textNodeIC) {
                     const sideLength = Number(LSH.getSideLength(LSH.SideIC, points))
-                    textNodeIC.x(textNodeIC.x() + 8);
+                    textNodeIC.x(8);
                     textNodeIC.y(sideLength / 2);
                 }
             }
@@ -1194,11 +1194,11 @@ export default class LShapeManager {
         if (LSH.isHorizontal(labelNode.getAttr('wall'))) {
             const length = Number(LSH.getSideLength(LSH.SideI, newPoints))
             iSubGroup.width(length)
-            iSubGroup.findOne(".tempBG").width(length); // ! TODO: For development purposes only. 
+            // iSubGroup.findOne(".tempBG").width(length); // ! TODO: For development purposes only. 
         } else {
             const length = Number(LSH.getSideLength(LSH.SideIC, newPoints))
             iSubGroup.height(length)
-            iSubGroup.findOne(".tempBG").height(length); // ! TODO: For development purposes only. 
+            // iSubGroup.findOne(".tempBG").height(length); // ! TODO: For development purposes only. 
 
         }
         // Update Interior Sides subgroup end
