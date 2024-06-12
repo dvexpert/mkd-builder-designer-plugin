@@ -7,7 +7,9 @@ import Konva from "konva";
  * @typedef { "d" } LShapeSideD
  * @typedef { "e" } LShapeSideE
  * @typedef { "i" } LShapeSideI
- * @typedef { LShapeSideA | LShapeSideB | LShapeSideC | LShapeSideD | LShapeSideI } LShapeSide
+ * @typedef { "ic" } LShapeSideIC
+ * @typedef { "ib" } LShapeSideIB
+ * @typedef { LShapeSideA | LShapeSideB | LShapeSideC | LShapeSideD | LShapeSideI | LShapeSideIC | LShapeSideIB } LShapeSide
  * @typedef { "a" | "b" | "c" | "d" | "e" | "i" } LShapeSideO
  */
 export class LShapeHelper {
@@ -43,12 +45,28 @@ export class LShapeHelper {
     static SideE = "e";
 
     /**
-     * 
+     *
      * Interior angle group.
      * @static
      * @type {LShapeSideI}
      */
     static SideI = "i";
+
+    /**
+     *
+     * Interior side.
+     * @static
+     * @type {LShapeSideIC}
+     */
+    static SideIC = "ic";
+
+    /**
+     *
+     * Interior side.
+     * @static
+     * @type {LShapeSideIB}
+     */
+    static SideIB = "ib";
 
     static sides = [
         LShapeHelper.SideA,
@@ -70,9 +88,9 @@ export class LShapeHelper {
 
     static SizeDiff = 3;
 
-    static AnglePrefix = String.fromCharCode(8736)
+    static AnglePrefix = String.fromCharCode(8736);
 
-    static AnglePostfix = String.fromCharCode(176)
+    static AnglePostfix = String.fromCharCode(176);
 
     /**
      *
@@ -81,7 +99,10 @@ export class LShapeHelper {
      */
     static isHorizontal(side) {
         return Boolean(
-            side === LShapeHelper.SideA || side === LShapeHelper.SideC || side === LShapeHelper.SideI
+            side === LShapeHelper.SideA ||
+                side === LShapeHelper.SideC ||
+                side === LShapeHelper.SideI ||
+                side === LShapeHelper.SideIB
         );
     }
 
@@ -158,7 +179,7 @@ export class LShapeHelper {
 
     /**
      * To get the starting and ending points coordinates.
-     * 
+     *
      * @param {LShapeSide} side
      * @param {number[]} points - Konva.Line.points
      *
@@ -203,7 +224,7 @@ export class LShapeHelper {
      *
      * @typedef {{ [key in LShapeSide]: number}} AllSideLengthsType
      *
-     * @returns {AllSideLengthsType | number}
+     * @returns {Partial<AllSideLengthsType> | number}
      */
     static getSideLength(side, points) {
         const pointGroups =
@@ -211,7 +232,7 @@ export class LShapeHelper {
 
         if (side === false) {
             // prettier-ignore
-            /** @type {AllSideLengthsType} */
+            /** @type {Partial<AllSideLengthsType>} */
             const allSideLengths = {
                 [this.SideA]: this.calculateDistance(pointGroups[0], pointGroups[1]),
                 [this.SideB]: this.calculateDistance(pointGroups[1], pointGroups[2]),
@@ -240,15 +261,21 @@ export class LShapeHelper {
             case this.SideI:
                 length = this.calculateDistance(pointGroups[2], pointGroups[3]);
                 break;
+            case this.SideIB:
+                length = this.calculateDistance(pointGroups[2], pointGroups[3]);
+                break;
+            case this.SideIC:
+                length = this.calculateDistance(pointGroups[3], pointGroups[4]);
+                break;
         }
 
         return length;
     }
 
     /**
-     * 
-     * @param {string | number} angle 
-     * @returns 
+     *
+     * @param {string | number} angle
+     * @returns
      */
     static getInteriorAngleText(angle = 90) {
         return `${this.AnglePrefix} ${angle} ${this.AnglePostfix}`;

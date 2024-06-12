@@ -610,6 +610,11 @@ export default class LShapeManager {
                 attributes.height = Number(LSH.getSideLength(subgroupName, points));
                 attributes.width = 100;
             }
+
+            if (subgroupName === LSH.SideI) {
+                attributes.height = Number(LSH.getSideLength(LSH.SideIC, points));
+            }
+
             const subGroup = new Konva.Group({
                 name: subgroupName,
                 height: attributes.height,
@@ -627,6 +632,21 @@ export default class LShapeManager {
                 fontVariant: "",
             });
             subGroup.add(sideLabel);
+
+            if (subgroupName === LSH.SideI) {
+                [LSH.SideIB, LSH.SideIC].forEach((iSubgroupName) => {
+                    const sideLabel = new Konva.Text({
+                        id: `text_node_${iSubgroupName}`,
+                        text: iSubgroupName.toUpperCase(),
+                        fill: "#000",
+                        fontSize: 16,
+                        stroke: "#000",
+                        strokeWidth: 1.2,
+                        fontVariant: "",
+                    });
+                    subGroup.add(sideLabel);
+                })
+            }
 
             // To Add Border Radius checkbox by default.
             // this.addCheckboxGroup(subGroup, subgroupName, shapeGroup);
@@ -1012,6 +1032,8 @@ export default class LShapeManager {
             shapeGroup = subGroup.findAncestor(`#${LShapeIds.LShapeGroup}`);
         }
 
+        const points = this.getShapeObject(shapeGroup).points();
+
         if (heightOnly && [LSH.SideB, LSH.SideD].includes(subGroup.name())) {
             const heightInput = shapeGroup.findOne(
                 `#${LShapeIds.LShapeTextLayers[subGroup.name()]}`
@@ -1081,6 +1103,24 @@ export default class LShapeManager {
                     position.x = position.x + 30;
                     position.y = position.y - 3;
                 }
+
+                const textNodeIB = shapeGroup.findOne(
+                    `#text_node_${LSH.SideIB}`
+                );
+                if (textNodeIB) {
+                    const sideLength = Number(LSH.getSideLength(LSH.SideIB, points))
+                    textNodeIB.x(sideLength / 2);
+                    textNodeIB.y(position.y);
+                }
+
+                const textNodeIC = shapeGroup.findOne(
+                    `#text_node_${LSH.SideIC}`
+                );
+                if (textNodeIC) {
+                    const sideLength = Number(LSH.getSideLength(LSH.SideIC, points))
+                    textNodeIC.x(textNodeIC.x() + 8);
+                    textNodeIC.y(sideLength / 2);
+                }
             }
 
             widthInput.position(position);
@@ -1145,7 +1185,23 @@ export default class LShapeManager {
 
         // const edgeGroup = shapeGroup.findOne(`.${subGroup.name()}`);
         subGroup.setAttr(attr, Number(inputBoxValue) * LSH.SizeDiff);
-        // subGroup.findOne(".tempBG").setAttr(attr, Number(inputBoxValue) * LSH.SizeDiff);
+        // subGroup.findOne(".tempBG").setAttr(attr, Number(inputBoxValue) * LSH.SizeDiff); // ! TODO: For development purposes only. 
+
+        // Update Interior Sides subgroup start
+        /** @type {Konva.Group} */
+        const iSubGroup = shapeGroup.findOne(`.${LSH.SideI}`)
+        const newPoints = squarePlaceHolderObject.points();
+        if (LSH.isHorizontal(labelNode.getAttr('wall'))) {
+            const length = Number(LSH.getSideLength(LSH.SideI, newPoints))
+            iSubGroup.width(length)
+            iSubGroup.findOne(".tempBG").width(length); // ! TODO: For development purposes only. 
+        } else {
+            const length = Number(LSH.getSideLength(LSH.SideIC, newPoints))
+            iSubGroup.height(length)
+            iSubGroup.findOne(".tempBG").height(length); // ! TODO: For development purposes only. 
+
+        }
+        // Update Interior Sides subgroup end
 
         // Update wall and backsplash size also.
         const wall = subGroup.findOne((node) => {
