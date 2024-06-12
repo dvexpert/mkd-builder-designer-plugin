@@ -1166,8 +1166,8 @@ export default class LShapeManager {
         };
 
         if (
-            (sideLengths.a < sideLengths.c) ||
-            (sideLengths.d < sideLengths.b)
+            (sideLengths.a <= sideLengths.c) ||
+            (sideLengths.d <= sideLengths.b)
         ) {
             // Validation to maintain L shape proper form
             return;
