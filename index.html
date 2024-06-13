@@ -482,7 +482,7 @@
                                 </button>
                             </div>
                             <div class="tw-relative tw-text-center tw-flex">
-                                <button id="draw-circle" class="tw-mx-auto disabled" aria-label="draw-circle-button">
+                                <button id="draw-circle" class="tw-mx-auto" aria-label="draw-circle-button">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         width="50"
@@ -603,6 +603,11 @@
                         width: window.innerWidth - sidebar.offsetWidth - 10
                     });
                 });
+
+                setTimeout(() => {
+                    // For testing purpose only
+                    $('#enable-shape-drag').click();
+                }, 500)
             });
         </script>
     </body>
