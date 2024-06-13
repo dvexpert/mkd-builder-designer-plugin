@@ -265,6 +265,7 @@ export default class EventManager {
         });
 
         this.handleShapeLEvents();
+        this.handleCircleShapeEvents();
         this.handleExportEvents();
     }
 
@@ -300,6 +301,50 @@ export default class EventManager {
                 if (typeof request?.success === "function") {
                     request.success({
                         message: "Square shape created",
+                        shapeId: shapeGroup._id
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+                if (typeof request?.error === "function") {
+                    request.error({ message: e.message });
+                }
+            }
+        });
+    }
+
+    handleCircleShapeEvents() {
+        document.addEventListener("mkd-plugin:draw:circle", (e) => {
+            const request = e?.detail;
+            try {
+                const shapeGroup = this.manager.circleShapeManager.draw(
+                    request?.image,
+                    true,
+                    request.materialId,
+                    null,
+                    request?.prevShapeId,
+                    request?.shapeSize,
+                    {
+                        materialName: request.materialName,
+                        productName: request.productName
+                    }
+                );
+
+                // if (shapeGroup && request.placed && request.placed === true) {
+                //     this.manager.lShapeManager.draw(
+                //         request?.image,
+                //         false,
+                //         request.materialId,
+                //         shapeGroup
+                //     );
+                //     this.manager.lShapeManager.updateHoverActionOverlayPosition(
+                //         shapeGroup
+                //     );
+                // }
+
+                if (typeof request?.success === "function") {
+                    request.success({
+                        message: "Circle shape created",
                         shapeId: shapeGroup._id
                     });
                 }

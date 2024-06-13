@@ -1,6 +1,6 @@
 /**
  *
- * @typedef {"mkd-plugin:zoom-in" | "mkd-plugin:zoom-out" | "mkd-plugin:zoom-reset" | "mkd-plugin:drag" | "mkd-plugin:position-reset" | "mkd-plugin:draw:square" | "mkd-plugin:export-download" | "mkd-plugin:export" | "mkd-plugin:toggle-wall" | "mkd-plugin:shape-name" | "mkd-plugin:toggle-backsplash" | "mkd-plugin:rotate-left" | "mkd-plugin:rotate-right" | "mkd-plugin:delete-shape" | "mkd-plugin:enable-shape-drag" | "mkd-plugin:shape-size" | "mkd-plugin:toggle-rounded-box" | "mkd-plugin:draw:l" | "mkd-plugin:rotate"} MKDPluginEvent
+ * @typedef {"mkd-plugin:zoom-in" | "mkd-plugin:zoom-out" | "mkd-plugin:zoom-reset" | "mkd-plugin:drag" | "mkd-plugin:position-reset" | "mkd-plugin:draw:square" | "mkd-plugin:export-download" | "mkd-plugin:export" | "mkd-plugin:toggle-wall" | "mkd-plugin:shape-name" | "mkd-plugin:toggle-backsplash" | "mkd-plugin:rotate-left" | "mkd-plugin:rotate-right" | "mkd-plugin:delete-shape" | "mkd-plugin:enable-shape-drag" | "mkd-plugin:shape-size" | "mkd-plugin:toggle-rounded-box" | "mkd-plugin:draw:l" | "mkd-plugin:rotate" | "mkd-plugin:draw:circle"} MKDPluginEvent
  *
  * @typedef {"mkd-plugin:active-shape" | "mkd-plugin:shape-deleted"} MKDPluginDispatchEvent
  *
@@ -319,7 +319,6 @@ jQuery(document).ready(function ($) {
 });
 
 // Shape L
-
 // @ts-ignore
 jQuery(document).ready(function ($) {
     $("#draw-l").on("click", function () {
@@ -348,5 +347,20 @@ jQuery(document).ready(function ($) {
             value,
             error: (e) => console.log(`[MKD]: ${e.message}`),
         });
+    });
+});
+// Shape Circle
+// @ts-ignore
+jQuery(document).ready(function ($) {
+    $("#draw-circle").on("click", function () {
+        try {
+            dispatchCanvasEvent("mkd-plugin:draw:circle", {
+                image: "/dynamicAssets/material-2.jpeg",
+                success: (resp) => console.log(resp),
+                error: (resp) => console.error(resp),
+            });
+        } catch (e) {
+            console.log(e.message);
+        }
     });
 });

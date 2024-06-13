@@ -3,6 +3,7 @@ import EventManager from "./EventManager.js";
 import ShapeManager from "./ShapeManager.js";
 import LShapeManager from "./LShapeManager.js";
 import { BackgroundNodeId } from "./enum/ShapeManagerEnum.js";
+import CircleShapeManager from "./CircleShapeManager.js";
 
 export class KonvaManager {
     /**
@@ -45,6 +46,12 @@ export class KonvaManager {
 
         // L Shape Manager
         this.lShapeManager = new LShapeManager(
+            this.stage,
+            this.layer,
+            this.eventManager
+        );
+
+        this.circleShapeManager = new CircleShapeManager(
             this.stage,
             this.layer,
             this.eventManager
