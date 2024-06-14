@@ -929,6 +929,12 @@ export default class EventManager {
             this.manager.lShapeManager.updateAttributesOverlayPosition(
                 shapeGroup
             );
+        } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape) {
+            position?.x && shapeGroup.x(Number(position.x));
+            position.y && shapeGroup.y(Number(position.y));
+            this.manager.circleShapeManager.updateAttributesOverlayPosition(
+                shapeGroup
+            );
         }
     }
 
