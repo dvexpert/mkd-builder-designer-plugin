@@ -758,7 +758,7 @@ export default class CircleShapeManager {
             boxRect.x - attributeOverlayRect.width / 2
         }px`;
         attributeOverlay.style.top = `${
-            boxRect.y - attributeOverlayRect.height / 2
+            boxRect.y - 50 / 2
         }px`;
     }
 
