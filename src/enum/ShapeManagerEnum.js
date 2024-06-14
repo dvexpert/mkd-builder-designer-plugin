@@ -52,4 +52,5 @@ export const CircleShapeIds = Object.freeze({
     CircleShapeGroup: "circleShapeGroup",
     CircleShapeObject: "CircleShapeObject",
     CircleShapePlaceholderObject: "CircleShapePlaceholderObject",
+    CircleSizeTextLayer: "CircleSizeTextLayer",
 });

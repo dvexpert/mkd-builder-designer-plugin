@@ -89,15 +89,15 @@ jQuery(document).ready(function ($) {
         dispatchCanvasEvent("mkd-plugin:export-download");
         dispatchCanvasEvent("mkd-plugin:export", {
             success: (response) => {
-                const image = response.image
-                const json = JSON.parse(response.json)
+                const image = response.image;
+                const json = JSON.parse(response.json);
 
                 // TODO: Handle Export Data
-                console.log({image, json})
+                console.log({ image, json });
             },
             error: (err) => {
-                console.error('[MKD-Designer]: ' + err.message)
-            }
+                console.error("[MKD-Designer]: " + err.message);
+            },
         });
     });
     $(".wall").on("change", function () {
@@ -179,11 +179,13 @@ jQuery(document).ready(function ($) {
             $("#active-shape-customization-block").fadeIn();
 
             if (response.shapeType === "SquareShape") {
+                toggleEdgeGroupSettings(true);
                 $(".shape-square-corner-label").fadeIn();
                 $(".shape-l-corner-label").fadeOut();
 
                 $("#square-size-container").slideDown();
                 $("#l-shape-size-container").slideUp();
+                $("#circle-size-container").slideUp();
                 const shapeWidth = $(
                     "#active-shape-customization-block #shapeWidth"
                 );
@@ -193,18 +195,49 @@ jQuery(document).ready(function ($) {
                 );
                 shapeHeight.val(response.shapeSize.height);
             } else if (response.shapeType === "LShape") {
+                toggleEdgeGroupSettings(true);
                 $(".shape-square-corner-label").fadeOut();
                 $(".shape-l-corner-label").fadeIn();
+
                 $("#square-size-container").slideUp();
                 $("#l-shape-size-container").slideDown();
+                $("#circle-size-container").slideUp();
                 Object.keys(response.shapeSize).forEach((wall) => {
                     $(
                         `#l-shape-size-container input[data-wall="${wall}"]`
                     )?.val(response.shapeSize[wall]);
                 });
+            } else if (response.shapeType === "CircleShape") {
+                toggleEdgeGroupSettings(false);
+                $(".shape-square-corner-label").fadeOut();
+                $(".shape-l-corner-label").fadeOut();
+
+                $("#square-size-container").slideUp();
+                $("#l-shape-size-container").slideUp();
+                $("#circle-size-container").slideDown();
+                const shapeRadius = $(
+                    "#active-shape-customization-block #circleRadius"
+                );
+                shapeRadius.val(response.shapeSize.radius);
             }
         }
     );
+
+    /**
+     * enable/disable Walls, backsplash corner radius checkbox
+     * @param {boolean} enable
+     */
+    function toggleEdgeGroupSettings(enable) {
+        const wallInputs = $(".wall");
+        wallInputs.each((i, wallInput) => {
+            const container = $(wallInput).parent().parent();
+            if (enable) {
+                $(container).slideDown();
+            } else {
+                $(container).slideUp();
+            }
+        });
+    }
 
     // Define a flag to track whether the blur event listener should be active
     let blurEventListenerActive = true;
@@ -254,7 +287,7 @@ jQuery(document).ready(function ($) {
         }
         dispatchCanvasEvent("mkd-plugin:shape-size", {
             shapeId: document.activeShape,
-            wall: 'a',
+            wall: "a",
             value,
             error: (e) => console.log(`[MKD]: ${e.message}`),
         });
@@ -267,7 +300,7 @@ jQuery(document).ready(function ($) {
         }
         dispatchCanvasEvent("mkd-plugin:shape-size", {
             shapeId: document.activeShape,
-            wall: 'b',
+            wall: "b",
             value,
             error: (e) => console.log(`[MKD]: ${e.message}`),
         });
@@ -362,5 +395,17 @@ jQuery(document).ready(function ($) {
         } catch (e) {
             console.log(e.message);
         }
+    });
+    $("#circleRadius").on("change", function () {
+        const value = $(this).val();
+        if (value <= 0) {
+            alert("Please select a value greater than 0.");
+            return;
+        }
+        dispatchCanvasEvent("mkd-plugin:shape-size", {
+            shapeId: document.activeShape,
+            value,
+            error: (e) => console.log(`[MKD]: ${e.message}`),
+        });
     });
 });

@@ -225,6 +225,15 @@ export default class EventManager {
                     labelNode,
                     request.value
                 );
+            } else if (
+                shapeGroup &&
+                shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape
+            ) {
+                this.manager.circleShapeManager.handleInputValueChange(
+                    shapeGroup,
+                    null,
+                    request.value
+                );
             }
         });
         document.addEventListener("mkd-plugin:toggle-rounded-box", (e) => {
@@ -948,6 +957,14 @@ export default class EventManager {
             );
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.appendShapeCutOut(
+                shapeGroup,
+                payload.image,
+                payload.name,
+                null,
+                payload.propertyId
+            );
+        } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape) {
+            this.manager.circleShapeManager.appendShapeCutOut(
                 shapeGroup,
                 payload.image,
                 payload.name,
