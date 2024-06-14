@@ -830,6 +830,39 @@ export default class CircleShapeManager {
     }
 
     /**
+     *
+     * @param {Konva.Group} shapeGroup
+     * @param {string} propertyId - when appending shapeCutout right after placing the attribute overlay element in dom.
+     */
+    removeShapeCutOut(
+        shapeGroup,
+        propertyId = null
+    ) {
+        const overlay = document.querySelector(`#attributes-overlay-${shapeGroup._id}`);
+        const container = overlay.querySelector("#shape-cutout-group");
+        const cutOutItem = container.querySelector(`#property-${propertyId}`);
+
+        // initialize attribute on shape group
+        let attributesItems = shapeGroup.getAttr("attributesItems");
+        if (!attributesItems || Object.keys(attributesItems).length === 0) {
+            attributesItems = [];
+        }
+
+        // Check if already exists
+        if (attributesItems.length > 0) {
+            const index = attributesItems.findIndex(
+                (item) => item.id === propertyId
+            );
+            if (index !== -1) {
+                attributesItems.splice(index, 1)
+                shapeGroup.setAttr("attributesItems", attributesItems);
+            }
+        }
+
+        cutOutItem?.remove();
+    }
+
+    /**
      * Function to check collision between two circles
      * @typedef {Object} CircleRectType
      * @property {number} x - x-coordinate of the center of the circle.
