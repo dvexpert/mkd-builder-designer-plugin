@@ -264,6 +264,17 @@
                                 />
                             </div>
                         </div>
+                        <div id="circle-size-container" class="tw-mt-3 tw-flex tw-items-center tw-gap-3 tw-flex-wrap" style="display: none;">
+                            <b class="tw-w-full">Radius:</b>
+                            <input
+                                type="number"
+                                id="circleRadius"
+                                data-val="Circle radius"
+                                class="tw-w-full tw-max-w-[80%] tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                value="150"
+                            />
+                            IN
+                        </div>
                         <div class="tw-mt-6">
                             <b>A:</b> <br />
                             <div class="tw-ml-6">
@@ -482,7 +493,7 @@
                                 </button>
                             </div>
                             <div class="tw-relative tw-text-center tw-flex">
-                                <button id="draw-circle" class="tw-mx-auto disabled" aria-label="draw-circle-button">
+                                <button id="draw-circle" class="tw-mx-auto" aria-label="draw-circle-button">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         width="50"
@@ -603,6 +614,12 @@
                         width: window.innerWidth - sidebar.offsetWidth - 10
                     });
                 });
+
+                setTimeout(() => {
+                    // For testing purpose only 
+                    $('#enable-shape-drag').click();
+                    // $('#draw-circle').click();
+                }, 500)
             });
         </script>
     </body>

@@ -23,6 +23,9 @@ interface ShapeSizeType {
     height: string;
     width: string;
 }
+interface CircleShapeSizeType {
+    radius: string | number;
+}
 type LSideLengthsType = {
     [key in LSideT]: number
 }
@@ -60,7 +63,7 @@ interface RequestObjectType {
     againstTheWall?: WallPresence;
     backsplashes?: BacksplashesPresence;
     haveRoundedCorners?: HaveRoundedCornersPresence;
-    shapeSize?: ShapeSizeType | LSideLengthsType;
+    shapeSize?: ShapeSizeType | LSideLengthsType | CircleShapeSizeType;
     shapeType?: ShapeTypes;
     position?: PositionType
 }

@@ -8,7 +8,7 @@ export default {
     preflight: process.env?.VITE_BUILDING_FOR_DEMO === 'true'
   },
   content: [
-    "./index.html",
+    ...(process.env?.VITE_BUILDING_FOR_DEMO === 'true' ? ["./index.html"] : []),
     "./main.js",
     "./src/**/*.{js,ts,jsx,tsx,html}",
   ],

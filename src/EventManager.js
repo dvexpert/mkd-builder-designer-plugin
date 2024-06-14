@@ -2,6 +2,7 @@ import Konva from "konva";
 import { KonvaManager } from "./KonvaManager";
 import {
     BackgroundNodeId,
+    CircleShapeIds,
     LShapeIds,
     ShapeTypes,
     SquareShapeIds,
@@ -225,6 +226,15 @@ export default class EventManager {
                     labelNode,
                     request.value
                 );
+            } else if (
+                shapeGroup &&
+                shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape
+            ) {
+                this.manager.circleShapeManager.handleInputValueChange(
+                    shapeGroup,
+                    null,
+                    request.value
+                );
             }
         });
         document.addEventListener("mkd-plugin:toggle-rounded-box", (e) => {
@@ -265,6 +275,7 @@ export default class EventManager {
         });
 
         this.handleShapeLEvents();
+        this.handleCircleShapeEvents();
         this.handleExportEvents();
     }
 
@@ -312,6 +323,50 @@ export default class EventManager {
         });
     }
 
+    handleCircleShapeEvents() {
+        document.addEventListener("mkd-plugin:draw:circle", (e) => {
+            const request = e?.detail;
+            try {
+                const shapeGroup = this.manager.circleShapeManager.draw(
+                    request?.image,
+                    true,
+                    request.materialId,
+                    null,
+                    request?.prevShapeId,
+                    request?.shapeSize,
+                    {
+                        materialName: request.materialName,
+                        productName: request.productName
+                    }
+                );
+
+                if (shapeGroup && request.placed && request.placed === true) {
+                    this.manager.circleShapeManager.draw(
+                        request?.image,
+                        false,
+                        request.materialId,
+                        shapeGroup
+                    );
+                    this.manager.circleShapeManager.updateHoverActionOverlayPosition(
+                        shapeGroup
+                    );
+                }
+
+                if (typeof request?.success === "function") {
+                    request.success({
+                        message: "Circle shape created",
+                        shapeId: shapeGroup._id
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+                if (typeof request?.error === "function") {
+                    request.error({ message: e.message });
+                }
+            }
+        });
+    }
+
     /**
      *
      * @typedef {"height" | "width"} AttrType
@@ -344,7 +399,7 @@ export default class EventManager {
         this.stage.setAttr("shapeDraggable", enable);
         /** @type {Konva.Group[]} */
         const shapes = this.stage.find(
-            `#${SquareShapeIds.ShapeGroup},#${LShapeIds.LShapeGroup}`
+            `#${SquareShapeIds.ShapeGroup},#${LShapeIds.LShapeGroup},#${CircleShapeIds.CircleShapeGroup}`
         );
         shapes.forEach((shape) => shape.setDraggable(enable));
     }
@@ -874,6 +929,12 @@ export default class EventManager {
             this.manager.lShapeManager.updateAttributesOverlayPosition(
                 shapeGroup
             );
+        } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape) {
+            position?.x && shapeGroup.x(Number(position.x));
+            position.y && shapeGroup.y(Number(position.y));
+            this.manager.circleShapeManager.updateAttributesOverlayPosition(
+                shapeGroup
+            );
         }
     }
 
@@ -909,6 +970,14 @@ export default class EventManager {
                 null,
                 payload.propertyId
             );
+        } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape) {
+            this.manager.circleShapeManager.appendShapeCutOut(
+                shapeGroup,
+                payload.image,
+                payload.name,
+                null,
+                payload.propertyId
+            );
         }
     }
 
@@ -927,6 +996,8 @@ export default class EventManager {
             this.manager.shapeManager.removeShapeCutOut(shapeGroup, propertyId);
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.removeShapeCutOut(shapeGroup, propertyId);
+        } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape) {
+            this.manager.circleShapeManager.removeShapeCutOut(shapeGroup, propertyId);
         }
     }
 }

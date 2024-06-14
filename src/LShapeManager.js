@@ -290,7 +290,6 @@ export default class LShapeManager {
             };
             placeHolderElm.id(LShapeIds.LShapeObject);
             this.actionOverlayNode.style.display = "none";
-            // TODO: Dispatch Shape Select Overlay.
             this.createAttributesOverlay(shapeGroup);
             this.eventManager.dispatchShapeSelect(shapeGroup);
             shapeGroup.setAttr('isPlaced', true);
