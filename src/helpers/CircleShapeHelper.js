@@ -6,13 +6,7 @@ export class CircleShapeHelper {
      * @static
      * @type {CircleSideR}
      */
-    static EdgeGroupSideName = "r";
-    
-    /**
-     * @static
-     * @type {CircleSideR}
-     */
-    static side = CircleShapeHelper.EdgeGroupSideName;
+    static side = 'r';
 
     static edgeGroupGap = 5;
 }

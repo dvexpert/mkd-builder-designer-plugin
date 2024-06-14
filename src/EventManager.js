@@ -2,6 +2,7 @@ import Konva from "konva";
 import { KonvaManager } from "./KonvaManager";
 import {
     BackgroundNodeId,
+    CircleShapeIds,
     LShapeIds,
     ShapeTypes,
     SquareShapeIds,
@@ -339,17 +340,17 @@ export default class EventManager {
                     }
                 );
 
-                // if (shapeGroup && request.placed && request.placed === true) {
-                //     this.manager.lShapeManager.draw(
-                //         request?.image,
-                //         false,
-                //         request.materialId,
-                //         shapeGroup
-                //     );
-                //     this.manager.lShapeManager.updateHoverActionOverlayPosition(
-                //         shapeGroup
-                //     );
-                // }
+                if (shapeGroup && request.placed && request.placed === true) {
+                    this.manager.circleShapeManager.draw(
+                        request?.image,
+                        false,
+                        request.materialId,
+                        shapeGroup
+                    );
+                    this.manager.circleShapeManager.updateHoverActionOverlayPosition(
+                        shapeGroup
+                    );
+                }
 
                 if (typeof request?.success === "function") {
                     request.success({
@@ -398,7 +399,7 @@ export default class EventManager {
         this.stage.setAttr("shapeDraggable", enable);
         /** @type {Konva.Group[]} */
         const shapes = this.stage.find(
-            `#${SquareShapeIds.ShapeGroup},#${LShapeIds.LShapeGroup}`
+            `#${SquareShapeIds.ShapeGroup},#${LShapeIds.LShapeGroup},#${CircleShapeIds.CircleShapeGroup}`
         );
         shapes.forEach((shape) => shape.setDraggable(enable));
     }
@@ -989,6 +990,8 @@ export default class EventManager {
             this.manager.shapeManager.removeShapeCutOut(shapeGroup, propertyId);
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.removeShapeCutOut(shapeGroup, propertyId);
+        } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape) {
+            this.manager.circleShapeManager.removeShapeCutOut(shapeGroup, propertyId);
         }
     }
 }
