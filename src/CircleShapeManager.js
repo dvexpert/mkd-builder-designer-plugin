@@ -278,7 +278,7 @@ export default class CircleShapeManager {
         let shapeGroup;
 
         if (onlyPlaceholder) {
-            const radius = shapeSize?.radius ? Number(shapeSize?.radius) : 50;
+            const radius = shapeSize?.radius ? Number(shapeSize?.radius) : 100;
             shapeGroup = new Konva.Group({
                 x: posX,
                 y: posY,
@@ -298,7 +298,7 @@ export default class CircleShapeManager {
             });
             shapeGroup.setAttr("canvasShapeId", shapeGroup._id);
             const circlePlaceHolderObject = new Konva.Circle({
-                radius: radius * SizeDiff,
+                radius: (radius / 2) * SizeDiff,
                 id: CircleShapeIds.CircleShapePlaceholderObject,
                 fill: "red",
                 opacity: 0.3,
@@ -485,10 +485,9 @@ export default class CircleShapeManager {
 
         const sideLabel = new Konva.Text({
             id: `text_node_${CSH.side}`,
-            text: CSH.side,
+            text: '⌀',
             fill: "#000",
             fontSize: 22,
-            fontStyle: "italic",
             fontVariant: "",
         });
         subGroup.add(sideLabel);
@@ -538,7 +537,7 @@ export default class CircleShapeManager {
             `#${CircleShapeIds.CircleSizeTextLayer}`
         );
         if (createInput === true && !radiusInput) {
-            const shapeSize = groupShapeObject.radius() / SizeDiff;
+            const shapeSize = (groupShapeObject.radius() * 2) / SizeDiff;
 
             radiusInput = new Konva.Text({
                 id: CircleShapeIds.CircleSizeTextLayer,
@@ -668,15 +667,16 @@ export default class CircleShapeManager {
             deleteInput && document.body.removeChild(inputBox);
         }
 
+        const value = Number(inputBoxValue);
         radiusLabelNode.text(inputBoxValue);
         this.setDragging(shapeGroup, true);
-        circlePlaceHolderObject.radius(Number(inputBoxValue) * SizeDiff);
+        circlePlaceHolderObject.radius((value / 2) * SizeDiff);
 
         this.updateHoverActionOverlayPosition(shapeGroup);
         this.updateEdgeGroupsPosition(shapeGroup);
 
         const shapeSize = shapeGroup.getAttr("shapeSize");
-        shapeSize["radius"] = inputBoxValue;
+        shapeSize["radius"] = value;
         shapeGroup.setAttr("shapeSize", shapeSize);
 
         this.eventManager.dispatchSizeUpdate(shapeGroup);

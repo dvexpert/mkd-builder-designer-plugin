@@ -12,7 +12,8 @@ mv build/assets/css/style.css build/designer.css
 
 rm -rf build.zip
 cd build/
-zip -r ../build.zip . -x "assets/*" "image/*"
+DATA=$(date +'%Y_%m_%d_%H_%m_%S')
+zip -r ../build_$DATA.zip . -x "assets/*" "image/*"
 
 
 # Move to Mkd builder local setup
