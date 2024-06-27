@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => {
             assetsDir: "assets",
             minify: "terser",
             lib: {
-                entry: "main.js", // Main entry file
+                entry: "src/main.js", // Main entry file
                 name: "mkdDesignerPlugin",
                 // formats: ["es", "umd"], // Output formats: ES module and UMD
                 formats: ["es"], // Output formats: ES module and UMD
