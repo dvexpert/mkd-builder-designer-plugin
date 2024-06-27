@@ -1,7 +1,7 @@
 #!/bin/bash
 
-package_name=$(grep '"name"' package.json | sed 's/.*"name": "\(.*\)",/\1/')
-package_version=$(grep version package.json | sed 's/.*"version": "\(.*\)".*/\1/')
+package_name=$(npm pkg get name | sed 's/"//g')
+package_version=$(npm pkg get version | sed 's/"//g')
 
 Green='\033[0;32m'
 echo -e "${Green}Building ${package_name} version ${package_version}\n"
@@ -20,7 +20,7 @@ build_file_name="${package_name}_v${package_version}.zip"
 if [ -f $build_file_name ]; then
     echo -e "Removing old build file \"$build_file_name\"\n"
     rm $build_file_name
-    sleep 1s
+    sleep 0.5s
 fi
 rm -rf build.zip
 cd build/
