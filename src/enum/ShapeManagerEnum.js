@@ -1,6 +1,6 @@
 import { LShapeHelper as LSH } from "@/helpers/LShapeHelper";
 
-export const BackgroundNodeId = 'BackgroundRect'
+export const BackgroundNodeId = "BackgroundRect";
 
 export const ShapeActions = Object.freeze({
     Place: "place",
@@ -41,12 +41,38 @@ LShapeIdsObject.LShapeTextLayers = {
 
 export const LShapeIds = Object.freeze(LShapeIdsObject);
 
-
 export const ShapeTypes = Object.freeze({
     SquareShape: "SquareShape",
     LShape: "LShape",
+    UShape: "UShape",
     CircleShape: "CircleShape",
 });
+
+const UShapeIdsObject = {
+    UShapeGroup: "UShapeGroup",
+
+    UShapeObject: "UShapeObject",
+    UShapePlaceholderObject: "UShapePlaceholderObject",
+    UShapeATextLayer: "UShapeATextLayer",
+    UShapeBTextLayer: "UShapeBTextLayer",
+    UShapeCTextLayer: "UShapeCTextLayer",
+    UShapeDTextLayer: "UShapeDTextLayer",
+    UShapeITextLayer: "UShapeITextLayer",
+
+    UShapeTextLayers: {},
+
+    UShapeActionOverlayId: "u-shape-action-overlay",
+};
+
+UShapeIdsObject.UShapeTextLayers = {
+    [LSH.SideA]: UShapeIdsObject.UShapeATextLayer,
+    [LSH.SideB]: UShapeIdsObject.UShapeBTextLayer,
+    [LSH.SideC]: UShapeIdsObject.UShapeCTextLayer,
+    [LSH.SideD]: UShapeIdsObject.UShapeDTextLayer,
+    [LSH.SideI]: UShapeIdsObject.UShapeITextLayer,
+};
+
+export const UShapeIds = Object.freeze(UShapeIdsObject);
 
 export const CircleShapeIds = Object.freeze({
     CircleShapeGroup: "circleShapeGroup",

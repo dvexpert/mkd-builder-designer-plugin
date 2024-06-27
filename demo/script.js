@@ -1,6 +1,6 @@
 /**
  *
- * @typedef {"mkd-plugin:zoom-in" | "mkd-plugin:zoom-out" | "mkd-plugin:zoom-reset" | "mkd-plugin:drag" | "mkd-plugin:position-reset" | "mkd-plugin:draw:square" | "mkd-plugin:export-download" | "mkd-plugin:export" | "mkd-plugin:toggle-wall" | "mkd-plugin:shape-name" | "mkd-plugin:toggle-backsplash" | "mkd-plugin:rotate-left" | "mkd-plugin:rotate-right" | "mkd-plugin:delete-shape" | "mkd-plugin:enable-shape-drag" | "mkd-plugin:shape-size" | "mkd-plugin:toggle-rounded-box" | "mkd-plugin:draw:l" | "mkd-plugin:rotate" | "mkd-plugin:draw:circle"} MKDPluginEvent
+ * @typedef {"mkd-plugin:zoom-in" | "mkd-plugin:zoom-out" | "mkd-plugin:zoom-reset" | "mkd-plugin:drag" | "mkd-plugin:position-reset" | "mkd-plugin:draw:square" | "mkd-plugin:export-download" | "mkd-plugin:export" | "mkd-plugin:toggle-wall" | "mkd-plugin:shape-name" | "mkd-plugin:toggle-backsplash" | "mkd-plugin:rotate-left" | "mkd-plugin:rotate-right" | "mkd-plugin:delete-shape" | "mkd-plugin:enable-shape-drag" | "mkd-plugin:shape-size" | "mkd-plugin:toggle-rounded-box" | "mkd-plugin:draw:l" | "mkd-plugin:rotate" | "mkd-plugin:draw:circle" | "mkd-plugin:draw:u"} MKDPluginEvent
  *
  * @typedef {"mkd-plugin:active-shape" | "mkd-plugin:shape-deleted"} MKDPluginDispatchEvent
  *
@@ -408,4 +408,31 @@ jQuery(document).ready(function ($) {
             error: (e) => console.log(`[MKD]: ${e.message}`),
         });
     });
+});
+// Shape U
+// @ts-ignore
+jQuery(document).ready(function ($) {
+    $("#draw-u").on("click", function () {
+        try {
+            dispatchCanvasEvent("mkd-plugin:draw:u", {
+                image: "/dynamicAssets/material-2.jpeg",
+                success: (resp) => console.log(resp),
+                error: (resp) => console.error(resp),
+            });
+        } catch (e) {
+            console.log(e.message);
+        }
+    });
+    // $("#circleRadius").on("change", function () {
+    //     const value = $(this).val();
+    //     if (value <= 0) {
+    //         alert("Please select a value greater than 0.");
+    //         return;
+    //     }
+    //     dispatchCanvasEvent("mkd-plugin:shape-size", {
+    //         shapeId: document.activeShape,
+    //         value,
+    //         error: (e) => console.log(`[MKD]: ${e.message}`),
+    //     });
+    // });
 });

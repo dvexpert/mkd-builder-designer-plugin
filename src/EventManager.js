@@ -275,6 +275,7 @@ export default class EventManager {
         });
 
         this.handleShapeLEvents();
+        this.handleUShapeEvents();
         this.handleCircleShapeEvents();
         this.handleExportEvents();
     }
@@ -304,6 +305,50 @@ export default class EventManager {
                         shapeGroup
                     );
                     this.manager.lShapeManager.updateHoverActionOverlayPosition(
+                        shapeGroup
+                    );
+                }
+
+                if (typeof request?.success === "function") {
+                    request.success({
+                        message: "Square shape created",
+                        shapeId: shapeGroup._id
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+                if (typeof request?.error === "function") {
+                    request.error({ message: e.message });
+                }
+            }
+        });
+    }
+
+    handleUShapeEvents() {
+        document.addEventListener("mkd-plugin:draw:u", (e) => {
+            const request = e?.detail;
+            try {
+                const shapeGroup = this.manager.uShapeManager.draw(
+                    request?.image,
+                    true,
+                    request.materialId,
+                    null,
+                    request?.prevShapeId,
+                    request?.shapeSize,
+                    {
+                        materialName: request.materialName,
+                        productName: request.productName
+                    }
+                );
+
+                if (shapeGroup && request.placed && request.placed === true) {
+                    this.manager.uShapeManager.draw(
+                        request?.image,
+                        false,
+                        request.materialId,
+                        shapeGroup
+                    );
+                    this.manager.uShapeManager.updateHoverActionOverlayPosition(
                         shapeGroup
                     );
                 }
@@ -816,6 +861,8 @@ export default class EventManager {
             this.manager.shapeManager.rotateShapeGroup(shape, rotation);
         } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.rotateShapeGroup(shape, rotation);
+        } else if (shape.getAttr("shapeType") === ShapeTypes.UShape) {
+            this.manager.uShapeManager.rotateShapeGroup(shape, rotation);
         }
     }
 

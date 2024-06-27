@@ -9,9 +9,11 @@
         <link rel="stylesheet" href="/dist/assets/css/style.css" />
 
         <style>
+            /* Not In Use */
             .disabled {
                 cursor: not-allowed;
             }
+            /* Not In Use */
             .disabled::after {
                 content: "Coming Soon...";
                 position: absolute;
@@ -446,7 +448,7 @@
                         <div
                             class="tw-flex tw-gap-6 tw-items-center [&>div]:tw-min-w-32"
                         >
-                            <button id="draw-square" class="tw-mx-auto" aria-label="draw-square-button">
+                            <button id="draw-square" class="tw-mx-auto" aria-label="draw-square-button" title="Draw Square Shape">
                                 <svg
                                     width="50"
                                     height="50"
@@ -455,63 +457,57 @@
                                     <rect width="50" height="50" fill="gray" />
                                 </svg>
                             </button>
-                            <div class="tw-relative tw-text-center tw-flex">
-                                <button id="draw-l" class="tw-mx-auto" aria-label="draw-l-button">
-                                    <svg
-                                        width="50"
-                                        height="50"
-                                        viewBox="0 0 37 36"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="tw-rotate-90"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            clip-rule="evenodd"
-                                            d="M15.7138 0.272705H0.11377V35.7272H15.7138V35.727L36.9864 35.727V20.127L15.7138 20.127V0.272705Z"
-                                            fill="#797979"
-                                        />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="tw-relative tw-text-center tw-flex">
-                                <button id="draw-u" class="tw-mx-auto disabled" aria-label="draw-u-button">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="50"
-                                        height="50"
-                                        viewBox="0 0 42 36"
-                                        fill="none"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            clip-rule="evenodd"
-                                            d="M0.632568 0.272705H16.2326V20.1273H26.1597V0.272705H41.7597V35.7272H37.5052V35.7273H2.0507V35.7272H0.632568V0.272705Z"
-                                            fill="#797979"
-                                        />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="tw-relative tw-text-center tw-flex">
-                                <button id="draw-circle" class="tw-mx-auto" aria-label="draw-circle-button">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="50"
-                                        height="50"
-                                        viewBox="0 0 35 36"
-                                        fill="none"
-                                    >
-                                        <ellipse
-                                            cx="17.5"
-                                            cy="18"
-                                            rx="17.5"
-                                            ry="18"
-                                            fill="#797979"
-                                        />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="tw-flex tw-justify-center">
+                            <button id="draw-l" class="tw-mx-auto" aria-label="draw-l-button" title="Draw L Shape">
+                                <svg
+                                    width="50"
+                                    height="50"
+                                    viewBox="0 0 37 36"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="tw-rotate-90"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        clip-rule="evenodd"
+                                        d="M15.7138 0.272705H0.11377V35.7272H15.7138V35.727L36.9864 35.727V20.127L15.7138 20.127V0.272705Z"
+                                        fill="#797979"
+                                    />
+                                </svg>
+                            </button>
+                            <button id="draw-u" class="tw-mx-auto" aria-label="draw-u-button" title="Draw U Shape">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="50"
+                                    height="50"
+                                    viewBox="0 0 42 36"
+                                    fill="none"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        clip-rule="evenodd"
+                                        d="M0.632568 0.272705H16.2326V20.1273H26.1597V0.272705H41.7597V35.7272H37.5052V35.7273H2.0507V35.7272H0.632568V0.272705Z"
+                                        fill="#797979"
+                                    />
+                                </svg>
+                            </button>
+                            <button id="draw-circle" class="tw-mx-auto" aria-label="draw-circle-button" title="Draw Circle Shape">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="50"
+                                    height="50"
+                                    viewBox="0 0 35 36"
+                                    fill="none"
+                                >
+                                    <ellipse
+                                        cx="17.5"
+                                        cy="18"
+                                        rx="17.5"
+                                        ry="18"
+                                        fill="#797979"
+                                    />
+                                </svg>
+                            </button>
+                            <div class="tw-flex tw-justify-center tw-ml-12">
                                 <div class="tw-mr-3">
                                     <input
                                         type="checkbox"
@@ -619,6 +615,7 @@
                     // For testing purpose only 
                     $('#enable-shape-drag').click();
                     // $('#draw-circle').click();
+                    $('#draw-u').click();
                 }, 500)
             });
         </script>
