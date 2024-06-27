@@ -9,8 +9,7 @@
         },
     },
     "include": [
-        "main.js",
         "src/**/*",
-        "script.js", // from plugin demo only
+        "demo/script.js", // from plugin demo only
     ]
 }

@@ -8,8 +8,8 @@ export default {
     preflight: process.env?.VITE_BUILDING_FOR_DEMO === 'true'
   },
   content: [
-    ...(process.env?.VITE_BUILDING_FOR_DEMO === 'true' ? ["./index.html"] : []),
-    "./main.js",
+    ...(process.env?.VITE_BUILDING_FOR_DEMO === 'true' ? ["./demo/index.html"] : []),
+    "./src/main.js",
     "./src/**/*.{js,ts,jsx,tsx,html}",
   ],
   theme: {
