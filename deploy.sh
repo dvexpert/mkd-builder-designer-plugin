@@ -1,5 +1,11 @@
 #!/bin/bash
 
+package_name=$(grep '"name"' package.json | sed 's/.*"name": "\(.*\)",/\1/')
+package_version=$(grep version package.json | sed 's/.*"version": "\(.*\)".*/\1/')
+
+Green='\033[0;32m'
+echo -e "${Green}Building ${package_name} version ${package_version}\n"
+
 rm -rf build/*
 
 export VITE_NODE_ENVIRONMENT="production"
@@ -10,11 +16,18 @@ yarn build
 
 mv build/assets/css/style.css build/designer.css
 
+build_file_name="${package_name}_v${package_version}.zip"
+if [ -f $build_file_name ]; then
+    echo -e "Removing old build file \"$build_file_name\"\n"
+    rm $build_file_name
+    sleep 1s
+fi
 rm -rf build.zip
 cd build/
-DATA=$(date +'%Y_%m_%d_%H_%m_%S')
-zip -r ../build_$DATA.zip . -x "assets/*" "image/*"
 
+zip -r "../$build_file_name" . -x "assets/*" "image/*"
+
+echo -e "\n${Green}Build zip created succesfully. \"$build_file_name\"\n"
 
 # Move to Mkd builder local setup
 # rm -rf /home/teq001/projects/mkd/mkd-builder/wp-content/plugins/mkd-builder/public/js/@vendor-*
@@ -23,4 +36,3 @@ zip -r ../build_$DATA.zip . -x "assets/*" "image/*"
 
 # cp -Rf build/*.js /home/teq001/projects/mkd/mkd-builder/wp-content/plugins/mkd-builder/public/js/
 # cp -Rf build/assets/css/style.css /home/teq001/projects/mkd/mkd-builder/wp-content/plugins/mkd-builder/public/css/designer.css
-
