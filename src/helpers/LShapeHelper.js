@@ -145,7 +145,7 @@ export class LShapeHelper {
         const { x: x2, y: y2 } = point2;
         const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 
-        return distance;
+        return Math.ceil(distance);
     }
 
     /**

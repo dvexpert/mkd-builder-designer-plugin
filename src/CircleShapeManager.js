@@ -227,6 +227,9 @@ export default class CircleShapeManager {
         const shapeNode = this.getShapeObject(
             shapeGroup ?? this.currentHoverNode
         );
+
+        const scaleX = this.stage.scaleX();
+        this.actionOverlayNode.style.transform = `scale(${scaleX})`;
         const boxRect = shapeNode.getClientRect();
         const shapePosition = {
             x: boxRect.x + boxRect.width / 2,
@@ -235,8 +238,8 @@ export default class CircleShapeManager {
 
         const overlyRect = this.actionOverlayNode.getBoundingClientRect();
         const overlayNewPosition = {
-            left: shapePosition.x - overlyRect.width / 2,
-            top: shapePosition.y - overlyRect.height / 2,
+            left: shapePosition.x - (overlyRect.width / 2) / scaleX,
+            top: shapePosition.y - (overlyRect.height / 2) / scaleX,
         };
 
         this.actionOverlayNode.style.left = `${overlayNewPosition.left}px`;
