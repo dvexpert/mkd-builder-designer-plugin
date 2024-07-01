@@ -517,30 +517,21 @@ export default class LShapeManager {
         if (!shapeGroup) {
             shapeGroup = shapeNode.findAncestor("Group");
         }
+
+        const scaleX = this.stage.scaleX()
+        this.actionOverlayNode.style.transform = `scale(${scaleX})`
+
         const rotation = shapeGroup.rotation();
         const boxRect = shapeNode.getClientRect();
         let overlayNewPosition = {
-            left: boxRect.x + 30,
+            left: boxRect.x + 30,   
             top: boxRect.y + 30,
         };
 
-        if (rotation === 180) {
+        if (rotation >= 180) {
             overlayNewPosition = {
-                left: boxRect.x + 30,
-                top:
-                    boxRect.y +
-                    shapeNode.height() -
-                    this.actionOverlayNode.clientHeight -
-                    30,
-            };
-        } else if (rotation > 180) {
-            overlayNewPosition = {
-                left: boxRect.x + 30,
-                top:
-                    boxRect.y +
-                    shapeNode.width() -
-                    this.actionOverlayNode.clientHeight -
-                    30,
+                left: boxRect.x + boxRect.width - this.actionOverlayNode.clientWidth - 30,
+                top: boxRect.y + boxRect.height - this.actionOverlayNode.clientHeight - 30
             };
         }
 

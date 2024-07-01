@@ -242,16 +242,19 @@ export default class ShapeManager {
         const shapeNode = this.getShapeObject(
             shapeGroup ?? this.currentHoverNode
         );
+    
         const boxRect = shapeNode.getClientRect();
         const shapePosition = {
             x: boxRect.x + boxRect.width / 2,
             y: boxRect.y + boxRect.height / 2,
         };
-
+        const scaleX = this.stage.scaleX();
+        this.actionOverlayNode.style.transform = `scale(${scaleX})`;
+    
         const overlyRect = this.actionOverlayNode.getBoundingClientRect();
         const overlayNewPosition = {
-            left: shapePosition.x - overlyRect.width / 2,
-            top: shapePosition.y - overlyRect.height / 2,
+            left: shapePosition.x - (overlyRect.width / 2) / scaleX,
+            top: shapePosition.y - (overlyRect.height / 2) / scaleX,
         };
 
         this.actionOverlayNode.style.left = `${overlayNewPosition.left}px`;
