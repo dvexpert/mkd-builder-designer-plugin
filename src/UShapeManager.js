@@ -1,11 +1,7 @@
 import Konva from "konva";
 import { rotateGroup } from "./Helper.js";
 import RotateIcon from "@/assets/image/rotate.svg?raw";
-import {
-    UShapeIds,
-    ShapeActions,
-    ShapeTypes,
-} from "./enum/ShapeManagerEnum.js";
+import { UShapeIds, ShapeActions, ShapeTypes } from "./enum/ShapeManagerEnum.js";
 import AttributeOverlayTemplate from "@/templates/AttributesOverlay/index.html?raw";
 import AttributeShapeCutOutTemplate from "@/templates/AttributesOverlay/ShapeCutOut.html?raw";
 import EventManager from "./EventManager.js";
@@ -21,6 +17,7 @@ export default class UShapeManager {
      * @param {EventManager} eventManager
      */
     constructor(stage, layer, eventManager) {
+        this.demoOnly = Boolean(import.meta.env.VITE_BUILDING_FOR_DEMO === "true");
         this.currentHoverNode;
         this.stage = stage;
         this.layer = layer;
@@ -101,24 +98,12 @@ export default class UShapeManager {
 
             /** @type {AllSideLengthsType} */
             const sidesLength = USH.getSideLength(false, shapeInitialCord);
-            sidesLength.a =
-                (shapeSize && shapeSize[USH.SideA]) ??
-                sidesLength.a / USH.SizeDiff;
-            sidesLength.b =
-                (shapeSize && shapeSize[USH.SideB]) ??
-                sidesLength.b / USH.SizeDiff;
-            sidesLength.c =
-                (shapeSize && shapeSize[USH.SideC]) ??
-                sidesLength.c / USH.SizeDiff;
-            sidesLength.d =
-                (shapeSize && shapeSize[USH.SideD]) ??
-                sidesLength.d / USH.SizeDiff;
-            sidesLength.e =
-                (shapeSize && shapeSize[USH.SideD]) ??
-                sidesLength.e / USH.SizeDiff;
-            sidesLength.f =
-                (shapeSize && shapeSize[USH.SideD]) ??
-                sidesLength.f / USH.SizeDiff;
+            sidesLength.a = (shapeSize && shapeSize[USH.SideA]) ?? sidesLength.a / USH.SizeDiff;
+            sidesLength.b = (shapeSize && shapeSize[USH.SideB]) ?? sidesLength.b / USH.SizeDiff;
+            sidesLength.c = (shapeSize && shapeSize[USH.SideC]) ?? sidesLength.c / USH.SizeDiff;
+            sidesLength.d = (shapeSize && shapeSize[USH.SideD]) ?? sidesLength.d / USH.SizeDiff;
+            sidesLength.e = (shapeSize && shapeSize[USH.SideD]) ?? sidesLength.e / USH.SizeDiff;
+            sidesLength.f = (shapeSize && shapeSize[USH.SideD]) ?? sidesLength.f / USH.SizeDiff;
             // sidesLength.i = (shapeSize && shapeSize[USH.SideI]) ??  90;
 
             shapeGroup = new Konva.Group({
@@ -149,7 +134,7 @@ export default class UShapeManager {
             });
 
             shapeGroup.add(shapeObject);
-            // this.createEdgeGroups(shapeGroup);
+            this.createEdgeGroups(shapeGroup);
             this.layer.add(shapeGroup);
 
             shapeGroup.on("click dragend", (e) => {
@@ -187,8 +172,7 @@ export default class UShapeManager {
                     // );
                 }
 
-                const attributeOverlay =
-                    this.getShapeGroupAttributeOverlay(shapeGroup);
+                const attributeOverlay = this.getShapeGroupAttributeOverlay(shapeGroup);
                 if (e.type === "mouseenter" && attributeOverlay) {
                     /**
                      * on shape group hover active the current group attribute overlay
@@ -248,12 +232,7 @@ export default class UShapeManager {
                 const elm = e.evt?.relatedTarget;
                 const elmId = e.evt?.relatedTarget?.id ?? e.target.id();
 
-                if (
-                    !Boolean(
-                        e.evt?.relatedTarget &&
-                            elm?.closest("#attributes-overlay-group")
-                    )
-                ) {
+                if (!Boolean(e.evt?.relatedTarget && elm?.closest("#attributes-overlay-group"))) {
                     /**
                      * on Mouse leave remove active state of the attributes overlay
                      */
@@ -280,7 +259,7 @@ export default class UShapeManager {
         } else {
             // Replace Placeholder with an image
             shapeGroup = placeholderGroup ?? this.currentHoverNode;
-            if (import.meta.env.VITE_BUILDING_FOR_DEMO === "true") {
+            if (this.demoOnly) {
                 shapeGroup.on("click", () => {
                     this.eventManager.dispatchShapeSelect(shapeGroup);
                 });
@@ -289,9 +268,7 @@ export default class UShapeManager {
 
             // Place image element onto the layer with actual material image
             /** @type {Konva.Rect} */
-            const placeHolderElm = shapeGroup.findOne(
-                `#${UShapeIds.UShapePlaceholderObject}`
-            );
+            const placeHolderElm = shapeGroup.findOne(`#${UShapeIds.UShapePlaceholderObject}`);
             placeHolderElm.fill("");
             placeHolderElm.opacity(1);
 
@@ -335,18 +312,13 @@ export default class UShapeManager {
             userSelect: "none",
         };
         const contextMenuItem_DeleteAction = document.createElement("div");
-        Object.assign(
-            contextMenuItem_DeleteAction.style,
-            contextMenuItemStyles
-        );
+        Object.assign(contextMenuItem_DeleteAction.style, contextMenuItemStyles);
         contextMenuItem_DeleteAction.id = "image-context-item";
         contextMenuItem_DeleteAction.innerText = "Delete";
         contextMenuItem_DeleteAction.addEventListener("click", () => {
             if (this.currentShape) {
                 /** @type {Konva.Group} */
-                const shapeGroup = this.currentShape.findAncestor(
-                    `#${UShapeIds.UShapeGroup}`
-                );
+                const shapeGroup = this.currentShape.findAncestor(`#${UShapeIds.UShapeGroup}`);
                 this.deleteShape(shapeGroup);
             }
         });
@@ -380,10 +352,8 @@ export default class UShapeManager {
             // context show menu
             this.contextMenuNode.style.display = "initial";
 
-            this.contextMenuNode.style.top =
-                this.stage.getPointerPosition().y + 4 + "px";
-            this.contextMenuNode.style.left =
-                this.stage.getPointerPosition().x + 4 + "px";
+            this.contextMenuNode.style.top = this.stage.getPointerPosition().y + 4 + "px";
+            this.contextMenuNode.style.left = this.stage.getPointerPosition().x + 4 + "px";
         });
     }
 
@@ -479,10 +449,7 @@ export default class UShapeManager {
         Object.assign(actionOverlayBtnNodePlace.style, actionOverlayBtnStyle);
         actionOverlayBtnNodePlace.id = "action-overlay-btn";
         actionOverlayBtnNodePlace.innerText = "Place";
-        actionOverlayBtnNodePlace.setAttribute(
-            "data-action",
-            ShapeActions.Place
-        );
+        actionOverlayBtnNodePlace.setAttribute("data-action", ShapeActions.Place);
         this.actionOverlayNode.append(actionOverlayBtnNodePlace);
 
         const actionOverlayBtnNodeRotate = document.createElement("button");
@@ -494,10 +461,7 @@ export default class UShapeManager {
             '<svg style="pointer-events: none;" '
         );
         actionOverlayBtnNodeRotate.innerHTML = `${rotateIcon} Rotate`;
-        actionOverlayBtnNodeRotate.setAttribute(
-            "data-action",
-            ShapeActions.Rotate
-        );
+        actionOverlayBtnNodeRotate.setAttribute("data-action", ShapeActions.Rotate);
         this.actionOverlayNode.append(actionOverlayBtnNodeRotate);
 
         // append menu to the canvas container in dom
@@ -514,8 +478,7 @@ export default class UShapeManager {
             if (action === ShapeActions.Rotate) {
                 this.rotateShapeGroup(this.currentHoverNode, 90);
             } else if (action === ShapeActions.Place) {
-                let materialImage =
-                    this.currentHoverNode.getAttr("materialImage");
+                let materialImage = this.currentHoverNode.getAttr("materialImage");
                 this.draw(materialImage, false);
                 this.updateHoverActionOverlayPosition();
             }
@@ -540,9 +503,7 @@ export default class UShapeManager {
      * @param {Konva.Group} shapeGroup
      */
     updateHoverActionOverlayPosition(shapeGroup = null) {
-        const shapeNode = this.getShapeObject(
-            shapeGroup ?? this.currentHoverNode
-        );
+        const shapeNode = this.getShapeObject(shapeGroup ?? this.currentHoverNode);
         if (!shapeGroup) {
             shapeGroup = shapeNode.findAncestor("Group");
         }
@@ -556,20 +517,12 @@ export default class UShapeManager {
         if (rotation === 180) {
             overlayNewPosition = {
                 left: boxRect.x + 30,
-                top:
-                    boxRect.y +
-                    shapeNode.height() -
-                    this.actionOverlayNode.clientHeight -
-                    30,
+                top: boxRect.y + shapeNode.height() - this.actionOverlayNode.clientHeight - 30,
             };
         } else if (rotation > 180) {
             overlayNewPosition = {
                 left: boxRect.x + 30,
-                top:
-                    boxRect.y +
-                    shapeNode.width() -
-                    this.actionOverlayNode.clientHeight -
-                    30,
+                top: boxRect.y + shapeNode.width() - this.actionOverlayNode.clientHeight - 30,
             };
         }
 
@@ -614,13 +567,13 @@ export default class UShapeManager {
     /**
      *
      * @param {Konva.Group} shapeGroup
+     * @param {boolean} updatePositionOnly
      */
-    createEdgeGroups(shapeGroup) {
+    createEdgeGroups(shapeGroup, updatePositionOnly = false) {
         const groupShapeObject = this.getShapeObject(shapeGroup);
         const subgroupNames = USH.sides;
-        // const subgroupNames = [USH.SideA, USH.SideB, USH.SideC];
         // TODO: for demo only. also remove index param from subgroupNames loop callback params
-        // const subgroupColor = ["yellow", "red", "green", "blue", "magenta"];
+        // const subgroupColor = ["yellow", "red", "green", "blue", "magenta", "#e479f2"];
 
         const points = groupShapeObject.points();
         subgroupNames.forEach((subgroupName, index) => {
@@ -633,70 +586,85 @@ export default class UShapeManager {
             };
             if (isHorizontal) {
                 attributes.height = 100;
-                attributes.width = Number(
-                    USH.getSideLength(subgroupName, points)
-                );
+                attributes.width = Number(USH.getSideLength(subgroupName, points));
             } else {
-                attributes.height = Number(
-                    USH.getSideLength(subgroupName, points)
-                );
+                attributes.height = Number(USH.getSideLength(subgroupName, points));
                 attributes.width = 100;
             }
 
-            if (subgroupName === USH.SideI) {
-                attributes.height = Number(
-                    USH.getSideLength(USH.SideIC, points)
-                );
+            if (subgroupName === USH.SideD) {
+                attributes.width = Number(USH.getPointDistance(4, 5, points));
             }
+            // if (subgroupName === USH.SideI) {
+            //     attributes.height = Number(USH.getSideLength(USH.SideIC, points));
+            // }
 
-            const subGroup = new Konva.Group({
-                name: subgroupName,
-                height: attributes.height,
-                width: attributes.width,
-            });
-            shapeGroup.add(subGroup);
-
-            const sideLabel = new Konva.Text({
-                id: `text_node_${subgroupName}`,
-                text: subgroupName.toUpperCase(),
-                fill: "#000",
-                fontSize: 16,
-                stroke: "#000",
-                strokeWidth: 1.2,
-                fontVariant: "",
-            });
-            subGroup.add(sideLabel);
-
-            if (subgroupName === USH.SideI) {
-                [USH.SideIB, USH.SideIC].forEach((iSubgroupName) => {
-                    const sideLabel = new Konva.Text({
-                        id: `text_node_${iSubgroupName}`,
-                        text: iSubgroupName.toUpperCase(),
-                        fill: "#000",
-                        fontSize: 16,
-                        stroke: "#000",
-                        strokeWidth: 1.2,
-                        fontVariant: "",
-                    });
-                    subGroup.add(sideLabel);
+            if (updatePositionOnly === true) {
+                /** @type {Konva.Group} */
+                const subGroup = shapeGroup.findOne(`.${subgroupName}`);
+                subGroup?.setAttrs({
+                    height: attributes.height,
+                    width: attributes.width,
                 });
+
+                // if (this.demoOnly) {
+                //     /** @type {Konva.Rect} */
+                //     const tempRect = subGroup.findOne(".tempBG");
+                //     tempRect?.setAttrs({
+                //         width: attributes.width,
+                //         height: attributes.height,
+                //     });
+                // }
+            } else {
+                const subGroup = new Konva.Group({
+                    name: subgroupName,
+                    height: attributes.height,
+                    width: attributes.width,
+                });
+                shapeGroup.add(subGroup);
+
+                const sideLabel = new Konva.Text({
+                    id: `text_node_${subgroupName}`,
+                    text: subgroupName.toUpperCase(),
+                    fill: "#000",
+                    fontSize: 16,
+                    stroke: "#000",
+                    strokeWidth: 1.2,
+                    fontVariant: "",
+                });
+                subGroup.add(sideLabel);
+
+                // if (this.demoOnly) {
+                //     // TODO: For development purposes only
+                //     const tempRect = new Konva.Rect({
+                //         name: "tempBG",
+                //         fill: subgroupColor[index],
+                //         opacity: 0.5,
+                //         width: attributes.width,
+                //         height: attributes.height,
+                //         stroke: "black",
+                //     });
+                //     subGroup.add(tempRect);
+                // }
             }
 
-            // To Add Border Radius checkbox by default.
-            // this.addCheckboxGroup(subGroup, subgroupName, shapeGroup);
-
-            // TODO: For development purposes only
-            // const tempRect = new Konva.Rect({
-            //     name: 'tempBG',
-            //     fill: subgroupColor[index],
-            //     opacity: 0.3,
-            //     width: attributes.width,
-            //     height: attributes.height,
-            // });
-            // subGroup.add(tempRect);
+            // if (subgroupName === USH.SideI) {
+            //     [USH.SideIB, USH.SideIC].forEach((iSubgroupName) => {
+            //         const sideLabel = new Konva.Text({
+            //             id: `text_node_${iSubgroupName}`,
+            //             text: iSubgroupName.toUpperCase(),
+            //             fill: "#000",
+            //             fontSize: 16,
+            //             stroke: "#000",
+            //             strokeWidth: 1.2,
+            //             fontVariant: "",
+            //         });
+            //         subGroup.add(sideLabel);
+            //     });
+            // }
         });
 
-        this.updateEdgeGroupsPosition(shapeGroup, true);
+        this.updateEdgeGroupsPosition(shapeGroup, !updatePositionOnly);
     }
 
     /**
@@ -704,11 +672,7 @@ export default class UShapeManager {
      * @param {Konva.Group} shapeGroup
      * @param {boolean} createInputs
      */
-    updateEdgeGroupsPosition(
-        shapeGroup,
-        createInputs = false,
-        updateLabelPositionOnly = false
-    ) {
+    updateEdgeGroupsPosition(shapeGroup, createInputs = false, updateLabelPositionOnly = false) {
         const groupShapeObject = this.getShapeObject(shapeGroup);
         const subgroupNames = USH.sides;
         const points = groupShapeObject.points();
@@ -721,9 +685,7 @@ export default class UShapeManager {
             const isHorizontal = USH.isHorizontal(subgroupName);
             const sidePosition = USH.getSidePoints(subgroupName, points);
 
-            const backsplash = shapeGroup.findOne(
-                `.backsplash_${subgroupName}`
-            );
+            const backsplash = shapeGroup.findOne(`.backsplash_${subgroupName}`);
             // const checkboxGroup = shapeGroup.findOne(
             //     `.checkbox_node_${subgroupName}`
             // );
@@ -737,81 +699,78 @@ export default class UShapeManager {
                 y: subGroup.y(),
             };
 
-            if (isHorizontal) {
-                if (backsplash) {
-                    backsplashOffset =
-                        backsplash.height() + USH.wallBacksplashGap;
-                }
-                if (USH.isFirstInHorizontalOrVertical(subgroupName)) {
-                    const sidePositionS = sidePosition[0];
-                    attributes.x = sidePositionS.x;
-                    attributes.y =
-                        sidePositionS.y - subGroup.height() - spacingOffset;
+            // if (backsplash) {
+            //     backsplashOffset = backsplash.height() + USH.wallBacksplashGap;
+            // }
+            if (subgroupName === USH.SideA) {
+                const sidePositionS = sidePosition[0];
+                attributes.x = sidePositionS.x;
+                attributes.y = sidePositionS.y - subGroup.height() - spacingOffset;
 
-                    sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
-                    let y = subGroup.height() - 30 - backsplashOffset;
-                    sideLabel.y(y);
+                sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
+                let y = subGroup.height() - 30 - backsplashOffset;
+                sideLabel.y(y);
 
-                    // checkboxGroup?.y(y);
-
-                    createInputs && this.createWidthInput(subGroup);
-                } else {
-                    const sidePositionE = sidePosition[1];
-                    attributes.x = sidePositionE.x;
-                    attributes.y = sidePositionE.y + spacingOffset;
-
-                    if (USH.SideI === subgroupName) {
-                        sideLabel.x(subGroup.width() - subGroup.width() * 0.95);
-                    } else {
-                        sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
-                    }
-                    sideLabel.y(15 + backsplashOffset);
-
-                    // checkboxGroup?.x(
-                    //     subGroup.width() - (checkboxRect.width() ?? 0)
-                    // );
-                    // checkboxGroup?.y(15 + backsplashOffset);
-
-                    createInputs && this.createWidthInput(subGroup);
-                }
-            } else {
-                if (backsplash) {
-                    backsplashOffset =
-                        backsplash.width() + USH.wallBacksplashGap;
-                }
-                if (USH.isFirstInHorizontalOrVertical(subgroupName)) {
-                    const sidePositionS = sidePosition[0];
-                    attributes.x = sidePositionS.x + spacingOffset;
-                    attributes.y = sidePositionS.y;
-
-                    const x = 15 + backsplashOffset;
-                    sideLabel.x(x);
-                    sideLabel.y(
-                        subGroup.height() - subGroup.height() * 0.8 + 10
-                    );
-                    // checkboxGroup?.x(x);
-                    createInputs && this.createHeightInput(subGroup);
-                } else {
-                    const sidePositionS = sidePosition[1];
-                    attributes.x =
-                        sidePositionS.x - subGroup.width() - spacingOffset;
-                    attributes.y = sidePositionS.y;
-
-                    const x =
-                        subGroup.width() -
-                        subGroup.width() * 0.5 -
-                        backsplashOffset;
-                    sideLabel.x(x);
-                    sideLabel.y(30);
-
-                    // checkboxGroup?.x(x);
-                    // checkboxGroup?.y(
-                    //     subGroup.height() - (checkboxRect.height() ?? 0)
-                    // );
-
-                    createInputs && this.createHeightInput(subGroup);
-                }
+                // checkboxGroup?.y(y);
             }
+
+            if (subgroupName === USH.SideC || subgroupName === USH.SideE) {
+                const sidePositionE = sidePosition[1];
+                attributes.x = sidePositionE.x;
+                attributes.y = sidePositionE.y + spacingOffset;
+
+                // if (USH.SideI === subgroupName) {
+                //     sideLabel.x(subGroup.width() - subGroup.width() * 0.95);
+                // } else {
+                //     sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
+                // }
+                sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
+                sideLabel.y(15 + backsplashOffset);
+
+                // checkboxGroup?.x(
+                //     subGroup.width() - (checkboxRect.width() ?? 0)
+                // );
+                // checkboxGroup?.y(15 + backsplashOffset);
+            }
+
+            // if (backsplash) {
+            //     backsplashOffset = backsplash.width() + USH.wallBacksplashGap;
+            // }
+            if (subgroupName === USH.SideB) {
+                const sidePositionS = sidePosition[0];
+                attributes.x = sidePositionS.x + spacingOffset;
+                attributes.y = sidePositionS.y;
+
+                const x = 15 + backsplashOffset;
+                sideLabel.x(x);
+                sideLabel.y(subGroup.height() - subGroup.height() * 0.8 + 10);
+                // checkboxGroup?.x(x);
+            }
+            if (subgroupName === USH.SideD) {
+                const sidePositionD = sidePosition[0];
+                attributes.x = sidePositionD.x + spacingOffset;
+                attributes.y = sidePositionD.y;
+
+                const x = subGroup.width() - subGroup.width() * 0.9;
+                sideLabel.x(x);
+                sideLabel.y(30);
+            }
+            if (subgroupName === USH.SideF) {
+                const sidePositionS = sidePosition[1];
+                attributes.x = sidePositionS.x - subGroup.width() - spacingOffset;
+                attributes.y = sidePositionS.y;
+
+                const x = subGroup.width() - subGroup.width() * 0.5 - backsplashOffset;
+                sideLabel.x(x);
+                sideLabel.y(30);
+            }
+
+            // checkboxGroup?.x(x);
+            // checkboxGroup?.y(
+            //     subGroup.height() - (checkboxRect.height() ?? 0)
+            // );
+
+            createInputs && this.createLengthInput(subGroup);
 
             if (updateLabelPositionOnly === false) {
                 subGroup.position({
@@ -826,14 +785,10 @@ export default class UShapeManager {
         corners.forEach((subgroupName, index) => {
             /** @type {Konva.Group} */
             const subGroup = shapeGroup.findOne(`.${subgroupName}`);
-            const backsplash = shapeGroup.findOne(
-                `.backsplash_${subgroupName}`
-            );
+            const backsplash = shapeGroup.findOne(`.backsplash_${subgroupName}`);
 
             /** @type {Konva.Group} */
-            const checkboxGroup = shapeGroup.findOne(
-                `.checkbox_node_${subgroupName}`
-            );
+            const checkboxGroup = shapeGroup.findOne(`.checkbox_node_${subgroupName}`);
             if (!checkboxGroup) {
                 return;
             }
@@ -871,25 +826,22 @@ export default class UShapeManager {
     }
 
     /**
-     * Create Text and Input box for the Width adjustments
+     * Create Text and Input box for the border length adjustments
      * @param {Konva.Group} subGroup - edge sub group
      */
-    createWidthInput(subGroup) {
-        const shapeObject = this.getShapeObject(
-            subGroup.findAncestor(`#${UShapeIds.UShapeGroup}`)
-        );
-        const sideLength = USH.getSideLength(
-            subGroup.name(),
-            shapeObject.points()
-        );
+    createLengthInput(subGroup) {
+        /** @type {Konva.Group} */
+        const shapeGroup = subGroup.findAncestor(`#${UShapeIds.UShapeGroup}`);
+        const shapeObject = this.getShapeObject(shapeGroup);
+        const sideLength = USH.getSideLength(subGroup.name(), shapeObject.points());
 
         /** @type {string | number} */
         let value = sideLength / USH.SizeDiff;
-        if (subGroup.name() === USH.SideI) {
-            value = USH.getInteriorAngleText();
-        }
+        // if (subGroup.name() === USH.SideI) {
+        //     value = USH.getInteriorAngleText();
+        // }
 
-        const widthInput = new Konva.Text({
+        const lengthInput = new Konva.Text({
             id: UShapeIds.UShapeTextLayers[subGroup.name()],
             text: String(value),
             fontSize: 20,
@@ -897,17 +849,17 @@ export default class UShapeManager {
             // width: 80,
             wall: subGroup.name(),
         });
-        subGroup.add(widthInput);
+        subGroup.add(lengthInput);
 
         this.updateInputsPosition(subGroup, false, true);
 
-        if (subGroup.name() === USH.SideI) {
-            // We don't need click event listeners
-            // for interior angle.
-            return;
-        }
+        // if (subGroup.name() === USH.SideI) {
+        //     // We don't need click event listeners
+        //     // for interior angle.
+        //     return;
+        // }
         // create event listener to show text box to change width
-        widthInput.on("click", (e) => {
+        lengthInput.on("click", (e) => {
             let wInput = e.target;
             this.setDragging(subGroup, false);
             // at first lets find position of text node relative to the stage:
@@ -938,114 +890,19 @@ export default class UShapeManager {
                 borderRadius: "4px",
             };
 
-            inputBox.value = widthInput.text();
+            inputBox.value = lengthInput.text();
             Object.assign(inputBox.style, inputBoxStyle);
             inputBox.focus();
             let inputRemoved = false;
             inputBox.addEventListener("keydown", (e) => {
                 if (e.key === "Enter") {
                     inputRemoved = true;
-                    this.handleInputValueChange(
-                        "width",
-                        subGroup,
-                        widthInput,
-                        inputBox
-                    );
+                    this.handleInputValueChange(subGroup, lengthInput, inputBox);
                 }
             });
             inputBox.addEventListener("blur", () => {
                 if (inputRemoved) return;
-                this.handleInputValueChange(
-                    "width",
-                    subGroup,
-                    widthInput,
-                    inputBox
-                );
-            });
-        });
-    }
-
-    /**
-     * Create Text and Input box for the height adjustments
-     * @param {Konva.Group} subGroup - edge sub group
-     */
-    createHeightInput(subGroup) {
-        const shapeObject = this.getShapeObject(
-            subGroup.findAncestor(`#${UShapeIds.UShapeGroup}`)
-        );
-        const sideLength = USH.getSideLength(
-            subGroup.name(),
-            shapeObject.points()
-        );
-        const value = sideLength / USH.SizeDiff;
-
-        const heightInput = new Konva.Text({
-            id: UShapeIds.UShapeTextLayers[subGroup.name()],
-            text: String(value),
-            fontSize: 20,
-            fill: "black",
-            width: 40,
-            wall: subGroup.name(),
-        });
-        subGroup.add(heightInput);
-
-        this.updateInputsPosition(subGroup, true, false);
-
-        // create event listener to show text box to change width
-        heightInput.on("click", (e) => {
-            let wInput = e.target;
-            this.setDragging(subGroup, false);
-            // at first lets find position of text node relative to the stage:
-            const textPosition = wInput.getClientRect();
-
-            // then lets find position of stage container on the page:
-            const stageBox = this.stage.container().getBoundingClientRect();
-
-            // so position of textarea will be the sum of positions above:
-            const areaPosition = {
-                x: stageBox.left + textPosition.x,
-                y: stageBox.top + textPosition.y,
-            };
-
-            // create textarea and style it
-            const inputBox = document.createElement("input");
-            inputBox.type = "number";
-            document.body.appendChild(inputBox);
-            /** @type {CSSStyleDec} */
-            const inputBoxStyle = {
-                position: "absolute",
-                top: areaPosition.y + "px",
-                left: areaPosition.x + "px",
-                width: "60px",
-                border: "1px solid",
-                outline: "0",
-                padding: "1px 8px",
-                borderRadius: "4px",
-            };
-
-            inputBox.value = heightInput.text();
-            Object.assign(inputBox.style, inputBoxStyle);
-            inputBox.focus();
-            let inputRemoved = false;
-            inputBox.addEventListener("keydown", (e) => {
-                if (e.key === "Enter") {
-                    inputRemoved = true;
-                    this.handleInputValueChange(
-                        "height",
-                        subGroup,
-                        heightInput,
-                        inputBox
-                    );
-                }
-            });
-            inputBox.addEventListener("blur", (e) => {
-                if (inputRemoved) return;
-                this.handleInputValueChange(
-                    "height",
-                    subGroup,
-                    heightInput,
-                    inputBox
-                );
+                this.handleInputValueChange(subGroup, lengthInput, inputBox);
             });
         });
     }
@@ -1067,101 +924,85 @@ export default class UShapeManager {
 
         const points = this.getShapeObject(shapeGroup).points();
 
-        if (heightOnly && [USH.SideB, USH.SideD].includes(subGroup.name())) {
+        if (heightOnly && [USH.SideB, USH.SideD, USH.SideF].includes(subGroup.name())) {
             const heightInput = shapeGroup.findOne(
                 `#${UShapeIds.UShapeTextLayers[subGroup.name()]}`
             );
+
+            if (!heightInput) {
+                return;
+            }
 
             let position = {
                 x: 0,
                 y: 0,
             };
-            if (heightInput.getAttr("wall") === USH.SideB) {
-                const textNode = shapeGroup.findOne(
-                    `#text_node_${heightInput.getAttr("wall")}`
-                );
-                if (textNode) {
-                    position = { x: textNode.x(), y: textNode.y() };
-                    position.x = position.x - 3;
-                    position.y = position.y + 50;
-                }
-            } else {
-                const textNode = shapeGroup.findOne(
-                    `#text_node_${heightInput.getAttr("wall")}`
-                );
-                if (textNode) {
-                    position = { x: textNode.x(), y: textNode.y() };
-                    position.y = position.y + 50;
-                }
+            const textNode = shapeGroup.findOne(`#text_node_${heightInput.getAttr("wall")}`);
+            if (textNode) {
+                position = { x: textNode.x(), y: textNode.y() };
+                position.x = position.x - 3;
+                position.y = position.y + 50;
             }
+            // if (heightInput.getAttr("wall") === USH.SideB) {
+            //     const textNode = shapeGroup.findOne(`#text_node_${heightInput.getAttr("wall")}`);
+            //     if (textNode) {
+            //         position = { x: textNode.x(), y: textNode.y() };
+            //         position.x = position.x - 3;
+            //         position.y = position.y + 50;
+            //     }
+            // } else {
+            //     const textNode = shapeGroup.findOne(`#text_node_${heightInput.getAttr("wall")}`);
+            //     if (textNode) {
+            //         position = { x: textNode.x(), y: textNode.y() };
+            //         position.y = position.y + 50;
+            //     }
+            // }
 
             heightInput.position(position);
         }
 
-        if (
-            widthOnly &&
-            [USH.SideA, USH.SideC, USH.SideI].includes(subGroup.name())
-        ) {
+        if (widthOnly && [USH.SideA, USH.SideC, USH.SideE, USH.SideI].includes(subGroup.name())) {
             const widthInput = shapeGroup.findOne(
                 `#${UShapeIds.UShapeTextLayers[subGroup.name()]}`
             );
+            if (!widthInput) {
+                return;
+            }
 
             // Update both width input positions
             let position = {
                 x: 0,
                 y: 0,
             };
-            if (widthInput.getAttr("wall") === USH.SideA) {
-                const textNode = shapeGroup.findOne(
-                    `#text_node_${widthInput.getAttr("wall")}`
-                );
-                if (textNode) {
-                    position = { x: textNode.x(), y: textNode.y() };
-                    position.x = position.x + 50;
-                    position.y = position.y - 3;
-                }
-            } else if (widthInput.getAttr("wall") === USH.SideC) {
-                const textNode = shapeGroup.findOne(
-                    `#text_node_${widthInput.getAttr("wall")}`
-                );
-                if (textNode) {
-                    position = { x: textNode.x(), y: textNode.y() };
-                    position.x = position.x + 50;
-                    position.y = position.y - 3;
-                }
-            } else if (widthInput.getAttr("wall") === USH.SideI) {
-                // Interior angle.
-                const textNode = shapeGroup.findOne(
-                    `#text_node_${widthInput.getAttr("wall")}`
-                );
-                if (textNode) {
-                    position = { x: textNode.x(), y: textNode.y() };
-                    position.x = position.x + 30;
-                    position.y = position.y - 3;
-                }
-
-                const textNodeIB = shapeGroup.findOne(
-                    `#text_node_${USH.SideIB}`
-                );
-                if (textNodeIB) {
-                    const sideLength = Number(
-                        USH.getSideLength(USH.SideIB, points)
-                    );
-                    textNodeIB.x(sideLength / 2);
-                    textNodeIB.y(position.y);
-                }
-
-                const textNodeIC = shapeGroup.findOne(
-                    `#text_node_${USH.SideIC}`
-                );
-                if (textNodeIC) {
-                    const sideLength = Number(
-                        USH.getSideLength(USH.SideIC, points)
-                    );
-                    textNodeIC.x(8);
-                    textNodeIC.y(sideLength / 2);
-                }
+            const textNode = shapeGroup.findOne(`#text_node_${widthInput.getAttr("wall")}`);
+            if (textNode) {
+                position = { x: textNode.x(), y: textNode.y() };
+                position.x = position.x + 50;
+                position.y = position.y - 3;
             }
+            // else if (widthInput.getAttr("wall") === USH.SideI) {
+            //     // Interior angle.
+            //     const textNode = shapeGroup.findOne(`#text_node_${widthInput.getAttr("wall")}`);
+            //     if (textNode) {
+            //         position = { x: textNode.x(), y: textNode.y() };
+            //         position.x = position.x + 30;
+            //         position.y = position.y - 3;
+            //     }
+
+            //     const textNodeIB = shapeGroup.findOne(`#text_node_${USH.SideIB}`);
+            //     if (textNodeIB) {
+            //         const sideLength = Number(USH.getSideLength(USH.SideIB, points));
+            //         textNodeIB.x(sideLength / 2);
+            //         textNodeIB.y(position.y);
+            //     }
+
+            //     const textNodeIC = shapeGroup.findOne(`#text_node_${USH.SideIC}`);
+            //     if (textNodeIC) {
+            //         const sideLength = Number(USH.getSideLength(USH.SideIC, points));
+            //         textNodeIC.x(8);
+            //         textNodeIC.y(sideLength / 2);
+            //     }
+            // }
 
             widthInput.position(position);
         }
@@ -1169,17 +1010,12 @@ export default class UShapeManager {
 
     /**
      *
-     * @param {string} attr - "height" or "width"
      * @param {Konva.Group} subGroup - edge group
      * @param {Konva.Text} labelNode
      * @param {HTMLInputElement | string} inputBox
      */
-    handleInputValueChange = (
-        attr,
-        subGroup,
-        labelNode = null,
-        inputBox = null
-    ) => {
+    handleInputValueChange = (subGroup, labelNode = null, inputBox = null) => {
+        const attr = USH.isHorizontal(subGroup.name()) ? "height" : "width";
         /** @type {Konva.Group} */
         // @ts-ignore
         let shapeGroup = subGroup.findAncestor(`#${UShapeIds.UShapeGroup}`);
@@ -1187,7 +1023,7 @@ export default class UShapeManager {
 
         let inputBoxValue = "";
         if (["string", "number"].includes(typeof inputBox)) {
-            inputBoxValue = inputBox;
+            inputBoxValue = String(inputBox);
         } else {
             inputBoxValue = inputBox?.value;
             document.body.removeChild(inputBox);
@@ -1202,41 +1038,46 @@ export default class UShapeManager {
             b: Number(USH.getSideLength(USH.SideB, points)) / USH.SizeDiff,
             c: Number(USH.getSideLength(USH.SideC, points)) / USH.SizeDiff,
             d: Number(USH.getSideLength(USH.SideD, points)) / USH.SizeDiff,
-            [subGroup.name()]: inputBoxValue,
+            e: Number(USH.getSideLength(USH.SideE, points)) / USH.SizeDiff,
+            f: Number(USH.getSideLength(USH.SideF, points)) / USH.SizeDiff,
+            [subGroup.name()]: Number(inputBoxValue),
         };
 
-        if (sideLengths.a <= sideLengths.c || sideLengths.d <= sideLengths.b) {
-            // Validation to maintain L shape proper form
+        // Validation to maintain U shape proper form
+        if (
+            !(
+                sideLengths.a > sideLengths.c + sideLengths.e &&
+                sideLengths.b > sideLengths.f - sideLengths.d &&
+                sideLengths.c < sideLengths.a - sideLengths.e &&
+                sideLengths.d > sideLengths.f - sideLengths.b &&
+                sideLengths.e < sideLengths.a - sideLengths.c &&
+                sideLengths.f > sideLengths.d
+            )
+        ) {
             return;
         }
 
         // Update label text with new value
         labelNode.text(inputBoxValue);
 
-        const newCoordinates = this.getShapePointsCoordinates(
-            position.x,
-            position.y,
-            sideLengths
-        );
+        const newCoordinates = this.getShapePointsCoordinates(position.x, position.y, sideLengths);
         squarePlaceHolderObject.points(newCoordinates);
 
-        // const edgeGroup = shapeGroup.findOne(`.${subGroup.name()}`);
-        subGroup.setAttr(attr, Number(inputBoxValue) * USH.SizeDiff);
-        // subGroup.findOne(".tempBG").setAttr(attr, Number(inputBoxValue) * USH.SizeDiff); // ! TODO: For development purposes only.
+        this.createEdgeGroups(shapeGroup, true);
 
         // Update Interior Sides subgroup start
         /** @type {Konva.Group} */
-        const iSubGroup = shapeGroup.findOne(`.${USH.SideI}`);
-        const newPoints = squarePlaceHolderObject.points();
-        if (USH.isHorizontal(labelNode.getAttr("wall"))) {
-            const length = Number(USH.getSideLength(USH.SideI, newPoints));
-            iSubGroup.width(length);
-            // iSubGroup.findOne(".tempBG").width(length); // ! TODO: For development purposes only.
-        } else {
-            const length = Number(USH.getSideLength(USH.SideIC, newPoints));
-            iSubGroup.height(length);
-            // iSubGroup.findOne(".tempBG").height(length); // ! TODO: For development purposes only.
-        }
+        // const iSubGroup = shapeGroup.findOne(`.${USH.SideI}`);
+        // const newPoints = squarePlaceHolderObject.points();
+        // if (USH.isHorizontal(labelNode.getAttr("wall"))) {
+        //     const length = Number(USH.getSideLength(USH.SideI, newPoints));
+        //     iSubGroup.width(length);
+        //     // iSubGroup.findOne(".tempBG").width(length); // ! TODO: For development purposes only.
+        // } else {
+        //     const length = Number(USH.getSideLength(USH.SideIC, newPoints));
+        //     iSubGroup.height(length);
+        //     // iSubGroup.findOne(".tempBG").height(length); // ! TODO: For development purposes only.
+        // }
         // Update Interior Sides subgroup end
 
         // Update wall and backsplash size also.
@@ -1303,14 +1144,12 @@ export default class UShapeManager {
 
         const materialName = shapeGroup.getAttr("materialName");
         if (materialName) {
-            attributeOverlay.querySelector("#material-name").innerHTML =
-                materialName;
+            attributeOverlay.querySelector("#material-name").innerHTML = materialName;
         }
 
         const productName = shapeGroup.getAttr("productName");
         if (productName) {
-            attributeOverlay.querySelector("#product-name").innerHTML =
-                productName;
+            attributeOverlay.querySelector("#product-name").innerHTML = productName;
         }
 
         attributeOverlay.addEventListener("mouseenter", (e) => {
@@ -1326,14 +1165,9 @@ export default class UShapeManager {
         this.updateAttributesOverlayPosition(shapeGroup);
 
         // TODO: For demo purpose only
-        if (import.meta.env.VITE_BUILDING_FOR_DEMO === "true") {
+        if (this.demoOnly) {
             Array.from(Array(4)).forEach(() =>
-                this.appendShapeCutOut(
-                    shapeGroup,
-                    undefined,
-                    undefined,
-                    attributeOverlay
-                )
+                this.appendShapeCutOut(shapeGroup, undefined, undefined, attributeOverlay)
             );
         }
     }
@@ -1362,23 +1196,18 @@ export default class UShapeManager {
 
         // Check if already exists
         if (propertyId && attributesItems.length > 0) {
-            const index = attributesItems.findIndex(
-                (item) => item.id === propertyId
-            );
+            const index = attributesItems.findIndex((item) => item.id === propertyId);
             if (index !== -1) {
                 console.warn("Attribute already exists.");
                 return;
             }
         }
 
-        const overlay =
-            attributeOverlay ?? this.getShapeGroupAttributeOverlay(shapeGroup);
+        const overlay = attributeOverlay ?? this.getShapeGroupAttributeOverlay(shapeGroup);
         const container = overlay.querySelector("#shape-cutout-group");
         /** @type {HTMLElement} */
-        const domObject = new DOMParser().parseFromString(
-            AttributeShapeCutOutTemplate,
-            "text/html"
-        ).body.firstChild;
+        const domObject = new DOMParser().parseFromString(AttributeShapeCutOutTemplate, "text/html")
+            .body.firstChild;
         domObject.id = `${domObject.id}-${propertyId}`;
         const image = domObject.querySelector("img");
         const titleElm = domObject.querySelector("span");
@@ -1399,9 +1228,7 @@ export default class UShapeManager {
      * @param {string} propertyId - when appending shapeCutout right after placing the attribute overlay element in dom.
      */
     removeShapeCutOut(shapeGroup, propertyId = null) {
-        const overlay = document.querySelector(
-            `#attributes-overlay-${shapeGroup._id}`
-        );
+        const overlay = document.querySelector(`#attributes-overlay-${shapeGroup._id}`);
         const container = overlay.querySelector("#shape-cutout-group");
         const cutOutItem = container.querySelector(`#property-${propertyId}`);
 
@@ -1413,9 +1240,7 @@ export default class UShapeManager {
 
         // Check if already exists
         if (attributesItems.length > 0) {
-            const index = attributesItems.findIndex(
-                (item) => item.id === propertyId
-            );
+            const index = attributesItems.findIndex((item) => item.id === propertyId);
             if (index !== -1) {
                 attributesItems.splice(index, 1);
                 shapeGroup.setAttr("attributesItems", attributesItems);
@@ -1445,20 +1270,12 @@ export default class UShapeManager {
         if (rotation === 180) {
             overlayNewPosition = {
                 left: boxRect.x + 30,
-                top:
-                    boxRect.y +
-                    ShapeObject.height() -
-                    attributeOverlay.clientHeight -
-                    30,
+                top: boxRect.y + ShapeObject.height() - attributeOverlay.clientHeight - 30,
             };
         } else if (rotation > 180) {
             overlayNewPosition = {
                 left: boxRect.x + 30,
-                top:
-                    boxRect.y +
-                    ShapeObject.width() -
-                    attributeOverlay.clientHeight -
-                    30,
+                top: boxRect.y + ShapeObject.width() - attributeOverlay.clientHeight - 30,
             };
         }
 
@@ -1472,9 +1289,7 @@ export default class UShapeManager {
      * @returns {HTMLDivElement}
      */
     getShapeGroupAttributeOverlay(shapeGroup) {
-        return this.stage
-            .container()
-            .querySelector(`#attributes-overlay-${shapeGroup._id}`);
+        return this.stage.container().querySelector(`#attributes-overlay-${shapeGroup._id}`);
     }
 
     /**
@@ -1516,10 +1331,7 @@ export default class UShapeManager {
 
         wall.position(attributes);
 
-        let againstTheWall = this.initializeCorners(
-            shapeGroup.getAttr("againstTheWall"),
-            false
-        );
+        let againstTheWall = this.initializeCorners(shapeGroup.getAttr("againstTheWall"), false);
         againstTheWall[SubGroup.name()] = true;
         shapeGroup.setAttr("againstTheWall", againstTheWall);
 
@@ -1618,8 +1430,7 @@ export default class UShapeManager {
         const attributes = { x: 0, y: 0 };
         if (USH.isHorizontal(backsplashGroupName)) {
             const wallSizeOffset =
-                SubGroup.findOne(`.wall_${SubGroup.name()}`).height() +
-                USH.wallBacksplashGap;
+                SubGroup.findOne(`.wall_${SubGroup.name()}`).height() + USH.wallBacksplashGap;
             backsplash.height(30);
             backsplash.width(SubGroup.width());
             if (USH.isFirstInHorizontalOrVertical(backsplashGroupName)) {
@@ -1630,13 +1441,11 @@ export default class UShapeManager {
             }
         } else {
             const wallSizeOffset =
-                SubGroup.findOne(`.wall_${SubGroup.name()}`).width() +
-                USH.wallBacksplashGap;
+                SubGroup.findOne(`.wall_${SubGroup.name()}`).width() + USH.wallBacksplashGap;
             backsplash.height(SubGroup.height());
             backsplash.width(30);
             if (!USH.isFirstInHorizontalOrVertical(backsplashGroupName)) {
-                attributes.x =
-                    SubGroup.width() - backsplash.width() - wallSizeOffset;
+                attributes.x = SubGroup.width() - backsplash.width() - wallSizeOffset;
             } else {
                 attributes.x = wallSizeOffset;
             }
@@ -1644,10 +1453,7 @@ export default class UShapeManager {
 
         backsplash.position(attributes);
 
-        const backsplashes = this.initializeCorners(
-            shapeGroup.getAttr("backsplashes"),
-            false
-        );
+        const backsplashes = this.initializeCorners(shapeGroup.getAttr("backsplashes"), false);
         backsplashes[SubGroup.name()] = true;
         shapeGroup.setAttr("backsplashes", backsplashes);
 
@@ -1784,9 +1590,7 @@ export default class UShapeManager {
      * @param {Konva.Group} shapeGroup
      */
     removeCheckboxGroup(subgroupName, shapeGroup) {
-        const checkboxGroup = shapeGroup.findOne(
-            `#checkbox_node_${subgroupName}`
-        );
+        const checkboxGroup = shapeGroup.findOne(`#checkbox_node_${subgroupName}`);
         if (checkboxGroup) {
             // /** @type {Konva.Rect} */
             // const shapeObject = this.getShapeObject(shapeGroup);

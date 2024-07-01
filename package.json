@@ -4,7 +4,7 @@
   "version": "1.0.6",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite build --watch",
     "build": "vite build",
     "preview": "vite preview",
     "start": "node server.cjs",

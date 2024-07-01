@@ -6,6 +6,7 @@ import {
     LShapeIds,
     ShapeTypes,
     SquareShapeIds,
+    UShapeIds,
 } from "./enum/ShapeManagerEnum";
 import { LShapeHelper as LSH } from "./helpers/LShapeHelper";
 import { SquareHelper } from "./helpers/SquareHelper";
@@ -222,6 +223,42 @@ export default class EventManager {
 
                 this.manager.lShapeManager.handleInputValueChange(
                     LSH.isHorizontal(wall) ? "width" : "height",
+                    edgeGroup,
+                    labelNode,
+                    request.value
+                );
+            } else if (
+                shapeGroup &&
+                shapeGroup.getAttr("shapeType") === ShapeTypes.UShape
+            ) {
+                /** @type {import("./helpers/UShapeHelper").UShapeSideO} - wall */
+                const wall = request.wall
+                /**
+                 *
+                 * Extract only sides length property from request object,
+                 * request object has may keys like shapeId and more.
+                 *
+                 * ```json
+                 * { "a" | "b" | "c" | "d" | "e" | "f": 10 }
+                 * ```
+                 * can have single side value.
+                 */
+
+                /** @type {Konva.Group} */
+                const edgeGroup = shapeGroup.findOne(`.${wall}`);
+                /** @type {Konva.Text} */
+                const labelNode = shapeGroup.findOne(
+                    `#${UShapeIds.UShapeTextLayers[wall]}`
+                );
+
+                // if (LSH.SideI === wall) {
+                //     const interiorAngle = LSH.getInteriorAngleText(request.value);
+                //     labelNode.text(interiorAngle);
+
+                //     return;
+                // }
+
+                this.manager.uShapeManager.handleInputValueChange(
                     edgeGroup,
                     labelNode,
                     request.value

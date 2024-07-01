@@ -1,4 +1,5 @@
 import { LShapeHelper as LSH } from "@/helpers/LShapeHelper";
+import { UShapeHelper as USH } from "@/helpers/UShapeHelper";
 
 export const BackgroundNodeId = "BackgroundRect";
 
@@ -57,6 +58,8 @@ const UShapeIdsObject = {
     UShapeBTextLayer: "UShapeBTextLayer",
     UShapeCTextLayer: "UShapeCTextLayer",
     UShapeDTextLayer: "UShapeDTextLayer",
+    UShapeETextLayer: "UShapeETextLayer",
+    UShapeFTextLayer: "UShapeFTextLayer",
     UShapeITextLayer: "UShapeITextLayer",
 
     UShapeTextLayers: {},
@@ -65,11 +68,13 @@ const UShapeIdsObject = {
 };
 
 UShapeIdsObject.UShapeTextLayers = {
-    [LSH.SideA]: UShapeIdsObject.UShapeATextLayer,
-    [LSH.SideB]: UShapeIdsObject.UShapeBTextLayer,
-    [LSH.SideC]: UShapeIdsObject.UShapeCTextLayer,
-    [LSH.SideD]: UShapeIdsObject.UShapeDTextLayer,
-    [LSH.SideI]: UShapeIdsObject.UShapeITextLayer,
+    [USH.SideA]: UShapeIdsObject.UShapeATextLayer,
+    [USH.SideB]: UShapeIdsObject.UShapeBTextLayer,
+    [USH.SideC]: UShapeIdsObject.UShapeCTextLayer,
+    [USH.SideD]: UShapeIdsObject.UShapeDTextLayer,
+    [USH.SideE]: UShapeIdsObject.UShapeETextLayer,
+    [USH.SideF]: UShapeIdsObject.UShapeFTextLayer,
+    // [USH.SideI]: UShapeIdsObject.UShapeITextLayer,
 };
 
 export const UShapeIds = Object.freeze(UShapeIdsObject);

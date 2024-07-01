@@ -266,6 +266,74 @@
                                 />
                             </div>
                         </div>
+                        <div id="u-shape-size-container" class="tw-mt-3 tw-flex tw-flex-col tw-items-center tw-gap-3" style="display: none;">
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-a">A:</label>
+                                <input
+                                    type="number"
+                                    id="size-a"
+                                    data-wall="a"
+                                    data-val="Shape Width"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="150"
+                                />
+                            </div>
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-b">B:</label>
+                                <input
+                                    type="number"
+                                    id="size-b"
+                                    data-wall="b"
+                                    data-val="Shape Width"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="50"
+                                />
+                            </div>
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-c">C:</label>
+                                <input
+                                    type="number"
+                                    id="size-c"
+                                    data-wall="c"
+                                    data-val="Shape Width"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="50"
+                                />
+                            </div>
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-d">D:</label>
+                                <input
+                                    type="number"
+                                    id="size-d"
+                                    data-wall="d"
+                                    data-val="Shape Width"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="100"
+                                />
+                            </div>
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-e">E:</label>
+                                <input
+                                    type="number"
+                                    id="size-e"
+                                    data-wall="e"
+                                    data-val="Shape Width"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="100"
+                                />
+                            </div>
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-f">F:</label>
+                                <input
+                                    type="number"
+                                    id="size-f"
+                                    data-wall="f"
+                                    data-val="Shape Width"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="100"
+                                />
+                            </div>
+                        </div>
                         <div id="circle-size-container" class="tw-mt-3 tw-flex tw-items-center tw-gap-3 tw-flex-wrap" style="display: none;">
                             <b class="tw-w-full">Radius:</b>
                             <input
@@ -615,8 +683,8 @@
                     // For testing purpose only 
                     $('#enable-shape-drag').click();
                     // $('#draw-circle').click();
-                    $('#draw-u').click();
-                }, 500)
+                    $('#draw-u').click(); // TODO: For Development purpose only.
+                }, 100)
             });
         </script>
     </body>

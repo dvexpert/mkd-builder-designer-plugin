@@ -207,6 +207,20 @@ jQuery(document).ready(function ($) {
                         `#l-shape-size-container input[data-wall="${wall}"]`
                     )?.val(response.shapeSize[wall]);
                 });
+            } else if (response.shapeType === "UShape") {
+                toggleEdgeGroupSettings(true);
+                $(".shape-square-corner-label").fadeOut();
+                $(".shape-l-corner-label").fadeIn();
+
+                $("#square-size-container").slideUp();
+                $("#l-shape-size-container").slideUp();
+                $("#circle-size-container").slideUp();
+                $("#u-shape-size-container").slideDown();
+                Object.keys(response.shapeSize).forEach((wall) => {
+                    $(
+                        `#u-shape-size-container input[data-wall="${wall}"]`
+                    )?.val(response.shapeSize[wall]);
+                });
             } else if (response.shapeType === "CircleShape") {
                 toggleEdgeGroupSettings(false);
                 $(".shape-square-corner-label").fadeOut();
@@ -423,16 +437,19 @@ jQuery(document).ready(function ($) {
             console.log(e.message);
         }
     });
-    // $("#circleRadius").on("change", function () {
-    //     const value = $(this).val();
-    //     if (value <= 0) {
-    //         alert("Please select a value greater than 0.");
-    //         return;
-    //     }
-    //     dispatchCanvasEvent("mkd-plugin:shape-size", {
-    //         shapeId: document.activeShape,
-    //         value,
-    //         error: (e) => console.log(`[MKD]: ${e.message}`),
-    //     });
-    // });
+    // U Shape Size Change Inputs
+    $(document).on("change", "#u-shape-size-container input", function () {
+        const wall = $(this).attr("data-wall");
+        const value = $(this).val();
+        if (value <= 0) {
+            alert("Please select a value greater than 0.");
+            return;
+        }
+        dispatchCanvasEvent("mkd-plugin:shape-size", {
+            shapeId: document.activeShape,
+            wall,
+            value,
+            error: (e) => console.log(`[MKD]: ${e.message}`),
+        });
+    });
 });

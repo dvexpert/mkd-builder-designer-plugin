@@ -75,6 +75,9 @@ export class UShapeHelper {
     //  */
     // static SideIB = "ib";
 
+    /**
+     * @type {UShapeSideO[]}
+     */
     static sides = [
         UShapeHelper.SideA,
         UShapeHelper.SideB,
@@ -109,8 +112,7 @@ export class UShapeHelper {
         return Boolean(
             side === UShapeHelper.SideA ||
                 side === UShapeHelper.SideC ||
-                side === UShapeHelper.SideI ||
-                side === UShapeHelper.SideIB
+                side === UShapeHelper.SideE
         );
     }
 
@@ -120,9 +122,7 @@ export class UShapeHelper {
      * @returns {boolean}
      */
     static isFirstInHorizontalOrVertical(side) {
-        return Boolean(
-            side === UShapeHelper.SideA || side === UShapeHelper.SideB
-        );
+        return Boolean(side === UShapeHelper.SideA || side === UShapeHelper.SideB);
     }
 
     /**
@@ -153,7 +153,7 @@ export class UShapeHelper {
         const { x: x2, y: y2 } = point2;
         const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 
-        return distance;
+        return Math.abs(distance);
     }
 
     /**
@@ -200,8 +200,7 @@ export class UShapeHelper {
      * ```
      */
     static getSidePoints(side, points) {
-        const pointGroups =
-            UShapeHelper.convertKonvaLinePointsToPointsGroup(points);
+        const pointGroups = UShapeHelper.convertKonvaLinePointsToPointsGroup(points);
 
         let sidePoints;
         switch (side) {
@@ -212,14 +211,20 @@ export class UShapeHelper {
                 sidePoints = [pointGroups[1], pointGroups[2]];
                 break;
             case this.SideC:
-                sidePoints = [pointGroups[4], pointGroups[5]];
+                sidePoints = [pointGroups[2], pointGroups[3]];
                 break;
             case this.SideD:
                 sidePoints = [pointGroups[5], pointGroups[6]];
                 break;
-            case this.SideI:
-                sidePoints = [pointGroups[2], pointGroups[3]];
+            case this.SideE:
+                sidePoints = [pointGroups[6], pointGroups[7]];
                 break;
+            case this.SideF:
+                sidePoints = [pointGroups[7], pointGroups[8]];
+                break;
+            // case this.SideI:
+            //     sidePoints = [pointGroups[2], pointGroups[3]];
+            //     break;
         }
 
         return sidePoints;
@@ -235,8 +240,7 @@ export class UShapeHelper {
      * @returns {Partial<AllSideLengthsType> | number}
      */
     static getSideLength(side, points) {
-        const pointGroups =
-            UShapeHelper.convertKonvaLinePointsToPointsGroup(points);
+        const pointGroups = UShapeHelper.convertKonvaLinePointsToPointsGroup(points);
 
         if (side === false) {
             // prettier-ignore
@@ -286,6 +290,29 @@ export class UShapeHelper {
         }
 
         return length;
+    }
+
+    /**
+     *
+     * Get length between two points.
+     *
+     * @param {number} point1 - starting from 0 from top left corner
+     * @param {number} point2 - starting from 0 from top left corner
+     * @param {number[]} points - Konva.Line.points
+     *
+     * @returns {number}
+     */
+    static getPointDistance(point1, point2, points) {
+        const pointGroups = UShapeHelper.convertKonvaLinePointsToPointsGroup(points);
+
+        if (point1 > 8 || point1 < 1) {
+            throw new Error("Invalid argument exception: parameter point1 value is out of bound");
+        }
+        if (point2 > 8 || point2 < 1) {
+            throw new Error("Invalid argument exception: parameter point2 value is out of bound");
+        }
+
+        return this.calculateDistance(pointGroups[point1], pointGroups[point2]);
     }
 
     /**
