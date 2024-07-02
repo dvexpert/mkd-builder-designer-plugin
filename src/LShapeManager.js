@@ -529,11 +529,24 @@ export default class LShapeManager {
             top: boxRect.y + 30,
         };
 
-        if (rotation >= 180) {
+        if (rotation >= 90 && rotation < 180) {
+            overlayNewPosition.left = boxRect.x
+        } else if (rotation >= 180 && rotation < 270) {
             overlayNewPosition = {
                 left: boxRect.x + boxRect.width - this.actionOverlayNode.clientWidth - 30,
                 top: boxRect.y + boxRect.height - this.actionOverlayNode.clientHeight - 30
             };
+        } else if (rotation >= 270) {
+            if (scaleX < 0.60) {
+                overlayNewPosition.left = Math.min(boxRect.x, shapeNode.getAbsolutePosition().x)
+            } else {
+                if (scaleX > 1.6) {
+                    overlayNewPosition.left = Math.max(boxRect.x, shapeNode.getAbsolutePosition().x) + (this.actionOverlayNode.clientWidth)
+                } else {
+                    overlayNewPosition.left = Math.max(boxRect.x, shapeNode.getAbsolutePosition().x)
+                }
+            }
+            overlayNewPosition.top = boxRect.y + boxRect.height - this.actionOverlayNode.clientHeight - 30
         }
 
         this.actionOverlayNode.style.left = `${overlayNewPosition.left}px`;
