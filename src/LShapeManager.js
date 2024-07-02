@@ -1335,13 +1335,18 @@ export default class LShapeManager {
         ).body.firstChild;
         domObject.id = `${domObject.id}-${propertyId}`;
         const image = domObject.querySelector("img");
+
         const titleElm = domObject.querySelector("span");
-        
         if(url != '') {
             image.src = url;
             image.alt = url.split("/").reverse()[0];
+            domObject.classList.remove("image-hidden");
+           
         } else {
             image.style.display = 'none';
+            domObject.classList.add("image-hidden");
+            const parentDiv = image.closest('div.image-hidden');
+            parentDiv.style.border = '1px solid #fff'; 
         }
 
         titleElm.innerHTML = title;
