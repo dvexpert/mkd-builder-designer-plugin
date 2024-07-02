@@ -127,7 +127,7 @@ export default class UShapeManager {
             /** @type {Konva.Line} */
             shapeObject = new Konva.Line({
                 id: UShapeIds.UShapePlaceholderObject,
-                points: shapeInitialCord,
+                points: this.getShapePointsCoordinates(undefined, undefined, sidesLength),
                 closed: true, // Close the shape to form an L
                 fill: "red",
                 opacity: 0.3,
@@ -373,21 +373,22 @@ export default class UShapeManager {
         y = 100,
         sidesLength = { a: 150, b: 100, c: 50, d: 40, e: 50, f: 90 }
     ) {
-        sidesLength.a *= USH.SizeDiff;
-        sidesLength.b *= USH.SizeDiff;
-        sidesLength.c *= USH.SizeDiff;
-        sidesLength.d *= USH.SizeDiff;
-        sidesLength.e *= USH.SizeDiff;
-        sidesLength.f *= USH.SizeDiff;
+        const shapeSidesLength = JSON.parse(JSON.stringify(sidesLength))
+        shapeSidesLength.a *= USH.SizeDiff;
+        shapeSidesLength.b *= USH.SizeDiff;
+        shapeSidesLength.c *= USH.SizeDiff;
+        shapeSidesLength.d *= USH.SizeDiff;
+        shapeSidesLength.e *= USH.SizeDiff;
+        shapeSidesLength.f *= USH.SizeDiff;
 
         // Validate the dimensions
         if (
-            sidesLength.a <= 0 ||
-            sidesLength.b <= 0 ||
-            sidesLength.c <= 0 ||
-            sidesLength.d <= 0 ||
-            sidesLength.e <= 0 ||
-            sidesLength.f <= 0
+            shapeSidesLength.a <= 0 ||
+            shapeSidesLength.b <= 0 ||
+            shapeSidesLength.c <= 0 ||
+            shapeSidesLength.d <= 0 ||
+            shapeSidesLength.e <= 0 ||
+            shapeSidesLength.f <= 0
         ) {
             throw new Error("All dimensions must be positive numbers.");
         }
@@ -397,19 +398,19 @@ export default class UShapeManager {
          /* x1, y1 */
             x, y,
          /* x2, y2 */
-            x + sidesLength.a, y,
+            x + shapeSidesLength.a, y,
          /* x3, y3 */
-            x + sidesLength.a, y + sidesLength.b,
+            x + shapeSidesLength.a, y + shapeSidesLength.b,
          /* x4, y4 */
-            (x + sidesLength.a) - sidesLength.c, y + sidesLength.b,
+            (x + shapeSidesLength.a) - shapeSidesLength.c, y + shapeSidesLength.b,
          /* x5, y5 */
-            (x + sidesLength.a) - sidesLength.c, (y + sidesLength.f) - sidesLength.d,
+            (x + shapeSidesLength.a) - shapeSidesLength.c, (y + shapeSidesLength.f) - shapeSidesLength.d,
          /* x6, y6 */
-            x + sidesLength.e, (y + sidesLength.f) - sidesLength.d,
+            x + shapeSidesLength.e, (y + shapeSidesLength.f) - shapeSidesLength.d,
          /* x7, y7 */
-            x + sidesLength.e, y + sidesLength.f,
+            x + shapeSidesLength.e, y + shapeSidesLength.f,
          /* x8, y8 */
-            x, y + sidesLength.f,
+            x, y + shapeSidesLength.f,
          /* x9, y9 */
             x, y,
         ];
