@@ -1337,7 +1337,7 @@ export default class LShapeManager {
         const image = domObject.querySelector("img");
 
         const titleElm = domObject.querySelector("span");
-        if(url != '') {
+        if(url) {
             image.src = url;
             image.alt = url.split("/").reverse()[0];
             domObject.classList.remove("image-hidden");
