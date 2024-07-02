@@ -661,6 +661,8 @@ export default class EventManager {
             this.manager.shapeManager.addWall(edgeGroup, shape);
         } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.addWall(edgeGroup, shape);
+        } else if (shape.getAttr("shapeType") === ShapeTypes.UShape) {
+            this.manager.uShapeManager.addWall(edgeGroup, shape);
         }
     }
 
@@ -677,6 +679,8 @@ export default class EventManager {
             this.manager.shapeManager.removeWall(shape, wall);
         } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.removeWall(edgeGroup, shape, wall);
+        } else if (shape.getAttr("shapeType") === ShapeTypes.UShape) {
+            this.manager.uShapeManager.removeWall(edgeGroup, shape, wall);
         }
     }
 
@@ -693,6 +697,8 @@ export default class EventManager {
             this.manager.shapeManager.addBacksplash(backsplashGroup, shape);
         } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.addBacksplash(backsplashGroup, shape);
+        } else if (shape.getAttr("shapeType") === ShapeTypes.UShape) {
+            this.manager.uShapeManager.addBacksplash(backsplashGroup, shape);
         }
     }
 
@@ -713,6 +719,12 @@ export default class EventManager {
             );
         } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.removeBacksplash(
+                backsplashGroup,
+                shape,
+                wall
+            );
+        } else if (shape.getAttr("shapeType") === ShapeTypes.UShape) {
+            this.manager.uShapeManager.removeBacksplash(
                 backsplashGroup,
                 shape,
                 wall
@@ -932,6 +944,12 @@ export default class EventManager {
                     shape,
                     defaultVal
                 );
+            } else if (shape.getAttr("shapeType") === ShapeTypes.UShape) {
+                this.manager.uShapeManager.addCheckboxGroup(
+                    wall,
+                    shape,
+                    defaultVal
+                );
             }
         } else {
             if (!shape.findOne(`#checkbox_node_${wall}`)) {
@@ -941,6 +959,8 @@ export default class EventManager {
                 this.manager.shapeManager.removeCheckboxGroup(wall, shape);
             } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
                 this.manager.lShapeManager.removeCheckboxGroup(wall, shape);
+            } else if (shape.getAttr("shapeType") === ShapeTypes.UShape) {
+                this.manager.uShapeManager.removeCheckboxGroup(wall, shape);
             }
         }
     }
@@ -1013,6 +1033,12 @@ export default class EventManager {
             this.manager.lShapeManager.updateAttributesOverlayPosition(
                 shapeGroup
             );
+        } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.UShape) {
+            position?.x && shapeGroup.x(Number(position.x));
+            position.y && shapeGroup.y(Number(position.y));
+            this.manager.uShapeManager.updateAttributesOverlayPosition(
+                shapeGroup
+            );
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape) {
             position?.x && shapeGroup.x(Number(position.x));
             position.y && shapeGroup.y(Number(position.y));
@@ -1054,6 +1080,14 @@ export default class EventManager {
                 null,
                 payload.propertyId
             );
+        } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.UShape) {
+            this.manager.uShapeManager.appendShapeCutOut(
+                shapeGroup,
+                payload.image,
+                payload.name,
+                null,
+                payload.propertyId
+            );
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape) {
             this.manager.circleShapeManager.appendShapeCutOut(
                 shapeGroup,
@@ -1080,6 +1114,8 @@ export default class EventManager {
             this.manager.shapeManager.removeShapeCutOut(shapeGroup, propertyId);
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.LShape) {
             this.manager.lShapeManager.removeShapeCutOut(shapeGroup, propertyId);
+        } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.UShape) {
+            this.manager.uShapeManager.removeShapeCutOut(shapeGroup, propertyId);
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape) {
             this.manager.circleShapeManager.removeShapeCutOut(shapeGroup, propertyId);
         }

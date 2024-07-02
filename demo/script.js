@@ -177,7 +177,6 @@ jQuery(document).ready(function ($) {
                 $(".can-be-rounded")?.prop("checked", false);
             }
             $("#active-shape-customization-block").fadeIn();
-
             if (response.shapeType === "SquareShape") {
                 toggleEdgeGroupSettings(true);
                 $(".shape-square-corner-label").fadeIn();
@@ -186,6 +185,9 @@ jQuery(document).ready(function ($) {
                 $("#square-size-container").slideDown();
                 $("#l-shape-size-container").slideUp();
                 $("#circle-size-container").slideUp();
+                ! $("#addBacksplace-common").is(':visible') && $("#addBacksplace-common").slideDown();
+                $(".addBacksplace-ushape").is(':visible') && $(".addBacksplace-ushape").slideUp();
+
                 const shapeWidth = $(
                     "#active-shape-customization-block #shapeWidth"
                 );
@@ -196,6 +198,8 @@ jQuery(document).ready(function ($) {
                 shapeHeight.val(response.shapeSize.height);
             } else if (response.shapeType === "LShape") {
                 toggleEdgeGroupSettings(true);
+                ! $("#addBacksplace-common").is(':visible') && $("#addBacksplace-common").slideDown();
+                $(".addBacksplace-ushape").is(':visible') && $(".addBacksplace-ushape").slideUp();
                 $(".shape-square-corner-label").fadeOut();
                 $(".shape-l-corner-label").fadeIn();
 
@@ -216,6 +220,8 @@ jQuery(document).ready(function ($) {
                 $("#l-shape-size-container").slideUp();
                 $("#circle-size-container").slideUp();
                 $("#u-shape-size-container").slideDown();
+                $("#addBacksplace-common").is(':visible') && $("#addBacksplace-common").slideUp();
+                ! $(".addBacksplace-ushape").is(':visible') && $(".addBacksplace-ushape").slideDown();
                 Object.keys(response.shapeSize).forEach((wall) => {
                     $(
                         `#u-shape-size-container input[data-wall="${wall}"]`
@@ -229,6 +235,8 @@ jQuery(document).ready(function ($) {
                 $("#square-size-container").slideUp();
                 $("#l-shape-size-container").slideUp();
                 $("#circle-size-container").slideDown();
+                ! $("#addBacksplace-common").is(':visible') && $("#addBacksplace-common").slideDown();
+                $(".addBacksplace-ushape").is(':visible') && $(".addBacksplace-ushape").slideUp();
                 const shapeRadius = $(
                     "#active-shape-customization-block #circleRadius"
                 );
@@ -245,6 +253,9 @@ jQuery(document).ready(function ($) {
         const wallInputs = $(".wall");
         wallInputs.each((i, wallInput) => {
             const container = $(wallInput).parent().parent();
+            if (container.id !== 'addBacksplace-common' || ! container.hasClass('addBacksplace-ushape')) {
+                return;
+            }
             if (enable) {
                 $(container).slideDown();
             } else {

@@ -93,6 +93,7 @@ export class UShapeHelper {
         UShapeHelper.SideC,
         UShapeHelper.SideD,
         UShapeHelper.SideE,
+        UShapeHelper.SideF
     ];
 
     static wallBacksplashGap = 8;

@@ -687,12 +687,6 @@ export default class UShapeManager {
             const sidePosition = USH.getSidePoints(subgroupName, points);
 
             const backsplash = shapeGroup.findOne(`.backsplash_${subgroupName}`);
-            // const checkboxGroup = shapeGroup.findOne(
-            //     `.checkbox_node_${subgroupName}`
-            // );
-            // const checkboxRect = checkboxGroup
-            //     ? checkboxGroup.findOne("Rect")
-            //     : null;
             let backsplashOffset = 0;
 
             const attributes = {
@@ -700,9 +694,9 @@ export default class UShapeManager {
                 y: subGroup.y(),
             };
 
-            // if (backsplash) {
-            //     backsplashOffset = backsplash.height() + USH.wallBacksplashGap;
-            // }
+            if (backsplash) {
+                backsplashOffset = backsplash.getAttr(isHorizontal ? 'height' :'width') + USH.wallBacksplashGap;
+            }
             if (subgroupName === USH.SideA) {
                 const sidePositionS = sidePosition[0];
                 attributes.x = sidePositionS.x;
@@ -711,8 +705,6 @@ export default class UShapeManager {
                 sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
                 let y = subGroup.height() - 30 - backsplashOffset;
                 sideLabel.y(y);
-
-                // checkboxGroup?.y(y);
             }
 
             if (subgroupName === USH.SideC || subgroupName === USH.SideE) {
@@ -720,23 +712,10 @@ export default class UShapeManager {
                 attributes.x = sidePositionE.x;
                 attributes.y = sidePositionE.y + spacingOffset;
 
-                // if (USH.SideI === subgroupName) {
-                //     sideLabel.x(subGroup.width() - subGroup.width() * 0.95);
-                // } else {
-                //     sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
-                // }
                 sideLabel.x(subGroup.width() - subGroup.width() * 0.8);
                 sideLabel.y(15 + backsplashOffset);
-
-                // checkboxGroup?.x(
-                //     subGroup.width() - (checkboxRect.width() ?? 0)
-                // );
-                // checkboxGroup?.y(15 + backsplashOffset);
             }
 
-            // if (backsplash) {
-            //     backsplashOffset = backsplash.width() + USH.wallBacksplashGap;
-            // }
             if (subgroupName === USH.SideB) {
                 const sidePositionS = sidePosition[0];
                 attributes.x = sidePositionS.x + spacingOffset;
@@ -745,7 +724,6 @@ export default class UShapeManager {
                 const x = 15 + backsplashOffset;
                 sideLabel.x(x);
                 sideLabel.y(subGroup.height() - subGroup.height() * 0.8 + 10);
-                // checkboxGroup?.x(x);
             }
             if (subgroupName === USH.SideD) {
                 const sidePositionD = sidePosition[0];
@@ -765,11 +743,6 @@ export default class UShapeManager {
                 sideLabel.x(x);
                 sideLabel.y(30);
             }
-
-            // checkboxGroup?.x(x);
-            // checkboxGroup?.y(
-            //     subGroup.height() - (checkboxRect.height() ?? 0)
-            // );
 
             createInputs && this.createLengthInput(subGroup);
 
@@ -808,17 +781,22 @@ export default class UShapeManager {
                 position.y = 0;
             } else if (USH.SideC === subgroupName) {
                 /** @type {Konva.Group} */
-                const subGroup = shapeGroup.findOne(`.${USH.SideB}`);
-                position.x = -checkboxRect.width();
-                position.y = subGroup.height() + checkboxRect.height();
-            } else if (USH.SideD === subgroupName) {
-                /** @type {Konva.Group} */
                 const subGroup = shapeGroup.findOne(`.${USH.SideC}`);
                 position.x = subGroup.width() - checkboxRect.width();
                 position.y = 10;
-            } else if (USH.SideE === subgroupName) {
-                position.x = -(checkboxRect.width() + 10);
+            } else if (USH.SideD === subgroupName) {
+                position.x = - (checkboxRect.width() + 10);
                 position.y = -checkboxRect.height();
+            } else if (USH.SideE === subgroupName) {
+                /** @type {Konva.Group} */
+                const subGroup = shapeGroup.findOne(`.${USH.SideE}`);
+                position.x = subGroup.width() - checkboxRect.width();
+                position.y = 10;
+            } else if (USH.SideF === subgroupName) {
+                /** @type {Konva.Group} */
+                const subGroup = shapeGroup.findOne(`.${USH.SideF}`);
+                position.x = subGroup.width() - checkboxRect.width() - 10;
+                position.y = subGroup.height() - checkboxRect.height();
             }
 
             checkboxGroup.x(position.x);
@@ -1494,9 +1472,7 @@ export default class UShapeManager {
         /** @type {Konva.Group} */
         let subGroupNode = shapeGroup.findOne(`.${subgroupName}`);
 
-        if ([USH.SideB, USH.SideC].includes(subgroupName)) {
-            subGroupNode = shapeGroup.findOne(`.${USH.SideB}`);
-        } else if ([USH.SideD, USH.SideE].includes(subgroupName)) {
+        if ([USH.SideC, USH.SideD].includes(subgroupName)) {
             subGroupNode = shapeGroup.findOne(`.${USH.SideC}`);
         }
 
