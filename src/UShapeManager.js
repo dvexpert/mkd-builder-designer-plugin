@@ -1322,8 +1322,9 @@ export default class UShapeManager {
         const groupMappings = {
             [USH.SideA]: [USH.SideA, USH.SideB],
             [USH.SideB]: [USH.SideB, USH.SideC],
-            [USH.SideC]: [USH.SideD, USH.SideE],
-            [USH.SideD]: [USH.SideA, USH.SideE],
+            [USH.SideC]: [USH.SideC, USH.SideD],
+            [USH.SideE]: [USH.SideE, USH.SideF],
+            [USH.SideF]: [USH.SideA, USH.SideF],
         };
 
         const groupName = SubGroup.name();
@@ -1544,11 +1545,12 @@ export default class UShapeManager {
          * "A" and "B" must be disabled.
          */
         const groupMappings = {
-            [USH.SideA]: [USH.SideA, USH.SideD],
+            [USH.SideA]: [USH.SideA, USH.SideF],
             [USH.SideB]: [USH.SideA, USH.SideB],
-            [USH.SideC]: [USH.SideB],
+            [USH.SideC]: [USH.SideB, USH.SideC],
             [USH.SideD]: [USH.SideC],
-            [USH.SideE]: [USH.SideD, USH.SideC],
+            [USH.SideE]: [USH.SideE],
+            [USH.SideF]: [USH.SideE, USH.SideF],
         };
 
         const groupsToRemove = groupMappings[subgroupName] || [];
