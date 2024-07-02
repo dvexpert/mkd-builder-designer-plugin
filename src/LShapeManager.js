@@ -122,7 +122,7 @@ export default class LShapeManager {
             });
             shapeGroup.setAttr('canvasShapeId', shapeGroup._id);
 
-            const newPoints = this.getShapePointsCoordinates(undefined, undefined, sidesLength);
+            const newPoints = this.getShapePointsCoordinates(posX, posY, sidesLength);
             // Create the L-shape using a line polygon
             /** @type {Konva.Line} */
             shapeObject = new Konva.Line({
@@ -388,7 +388,7 @@ export default class LShapeManager {
         y = 100,
         sidesLength = { a: 150, b: 50, c: 50, d: 100 }
     ) {
-        let tempSidesLength = sidesLength && JSON.parse(JSON.stringify(sidesLength));
+        let tempSidesLength = sidesLength && { ...sidesLength };
         tempSidesLength.a *= LSH.SizeDiff;
         tempSidesLength.b *= LSH.SizeDiff;
         tempSidesLength.c *= LSH.SizeDiff;
@@ -1353,12 +1353,9 @@ export default class LShapeManager {
         if(url) {
             image.src = url;
             image.alt = url.split("/").reverse()[0];
-            domObject.classList.remove("image-hidden");
-           
         } else {
             image.style.display = 'none';
-            domObject.classList.add("image-hidden");
-            const parentDiv = image.closest('div.image-hidden');
+            const parentDiv = image.closest('div');
             parentDiv.style.border = '1px solid #fff'; 
         }
 

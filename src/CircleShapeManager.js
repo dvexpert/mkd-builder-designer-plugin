@@ -824,12 +824,9 @@ export default class CircleShapeManager {
         if(url != '') {
             image.src = url;
             image.alt = url.split("/").reverse()[0];
-            domObject.classList.remove("image-hidden");
-           
         } else {
             image.style.display = 'none';
-            domObject.classList.add("image-hidden");
-            const parentDiv = image.closest('div.image-hidden');
+            const parentDiv = image.closest('div');
             parentDiv.style.border = '1px solid #fff'; 
         }
 
