@@ -525,16 +525,17 @@ export default class LShapeManager {
         const rotation = shapeGroup.rotation();
         const boxRect = shapeNode.getClientRect();
         let overlayNewPosition = {
-            left: boxRect.x + 30,   
-            top: boxRect.y + 30,
+            left: boxRect.x + (scaleX > 1.15 ? 30 : 20),
+            top: boxRect.y + (scaleX > 1.15 ? 30 : 20),
         };
 
         if (rotation >= 90 && rotation < 180) {
-            overlayNewPosition.left = boxRect.x
+            overlayNewPosition.left = boxRect.x + (scaleX > 1.15 ? 30 : 20)
+            overlayNewPosition.top = boxRect.y + (scaleX > 1.15 ? 30 : 20)
         } else if (rotation >= 180 && rotation < 270) {
             overlayNewPosition = {
-                left: boxRect.x + boxRect.width - this.actionOverlayNode.clientWidth - 30,
-                top: boxRect.y + boxRect.height - this.actionOverlayNode.clientHeight - 30
+                left: boxRect.x + boxRect.width - this.actionOverlayNode.clientWidth - (scaleX > 1.15 ? 30 : 20),
+                top: boxRect.y + boxRect.height - this.actionOverlayNode.clientHeight - (scaleX > 1.15 ? 30 : 20)
             };
         } else if (rotation >= 270) {
             if (scaleX < 0.60) {
@@ -543,7 +544,7 @@ export default class LShapeManager {
                 if (scaleX > 1.6) {
                     overlayNewPosition.left = Math.max(boxRect.x, shapeNode.getAbsolutePosition().x) + (this.actionOverlayNode.clientWidth)
                 } else {
-                    overlayNewPosition.left = Math.max(boxRect.x, shapeNode.getAbsolutePosition().x)
+                    overlayNewPosition.left = Math.max(boxRect.x, shapeNode.getAbsolutePosition().x) + (scaleX > 1.15 ? 30 : 20)
                 }
             }
             overlayNewPosition.top = boxRect.y + boxRect.height - this.actionOverlayNode.clientHeight - 30
