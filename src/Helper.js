@@ -4,7 +4,9 @@ import Konva from "konva";
  * @param {number} angle
  */
 export function degToRad(angle) {
-    return (angle * Math.PI) / 180;
+    const shapeAngle = Number(angle)
+
+    return (shapeAngle * Math.PI) / 180;
 }
 
 /**
