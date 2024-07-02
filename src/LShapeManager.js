@@ -122,7 +122,7 @@ export default class LShapeManager {
             });
             shapeGroup.setAttr('canvasShapeId', shapeGroup._id);
 
-            const newPoints = this.getShapePointsCoordinates(posX, posY, sidesLength);
+            const newPoints = this.getShapePointsCoordinates(undefined, undefined, sidesLength);
             // Create the L-shape using a line polygon
             /** @type {Konva.Line} */
             shapeObject = new Konva.Line({
@@ -388,7 +388,7 @@ export default class LShapeManager {
         y = 100,
         sidesLength = { a: 150, b: 50, c: 50, d: 100 }
     ) {
-        let tempSidesLength = sidesLength && { ...sidesLength };
+        let tempSidesLength = sidesLength && JSON.parse(JSON.stringify(sidesLength));
         tempSidesLength.a *= LSH.SizeDiff;
         tempSidesLength.b *= LSH.SizeDiff;
         tempSidesLength.c *= LSH.SizeDiff;
