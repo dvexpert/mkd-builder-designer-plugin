@@ -193,13 +193,7 @@ export default class UShapeManager {
                  * rotate will be performed from outside the canvas via events
                  */
 
-                if (
-                    // [
-                    //     SquareShapeIds.ShapeHeightTextLayer,
-                    //     SquareShapeIds.ShapeWidthTextLayer,
-                    // ].includes(hoverNode.id()) ||
-                    !shapeGroup.findOne(`#${UShapeIds.UShapePlaceholderObject}`)
-                ) {
+                if (!shapeGroup.findOne(`#${UShapeIds.UShapePlaceholderObject}`)) {
                     shapeGroup.setAttr("show_action_overlay", false);
                     return;
                 }
@@ -597,9 +591,6 @@ export default class UShapeManager {
             if (subgroupName === USH.SideD) {
                 attributes.width = Number(USH.getPointDistance(4, 5, points));
             }
-            // if (subgroupName === USH.SideI) {
-            //     attributes.height = Number(USH.getSideLength(USH.SideIC, points));
-            // }
 
             if (updatePositionOnly === true) {
                 /** @type {Konva.Group} */
@@ -622,9 +613,15 @@ export default class UShapeManager {
                 let subGroup;
                 /** @type {Konva.Group} */
                 const innerSubGroup = shapeGroup.findOne(`.${USH.SideD}`);
-                if (!USH.isInteriorAngle(subgroupName) || (USH.isInteriorAngle(subgroupName) && !innerSubGroup)) {
+                if (
+                    !USH.isInteriorAngle(subgroupName) ||
+                    (USH.isInteriorAngle(subgroupName) && !innerSubGroup)
+                ) {
                     subGroup = new Konva.Group({
-                        name: USH.isInteriorAngle(subgroupName) || subgroupName === USH.SideD ? USH.SideD : subgroupName,
+                        name:
+                            USH.isInteriorAngle(subgroupName) || subgroupName === USH.SideD
+                                ? USH.SideD
+                                : subgroupName,
                         height: attributes.height,
                         width: attributes.width,
                     });
@@ -639,9 +636,9 @@ export default class UShapeManager {
                     fill: "#000",
                     fontSize: 16,
                     stroke: "#000",
-                    strokeWidth: USH.isInteriorAngle(subgroupName)  ? 0.7 : 1.2,
+                    strokeWidth: USH.isInteriorAngle(subgroupName) ? 0.7 : 1.2,
                     fontVariant: "",
-                    fontFamily: "monospace"
+                    fontFamily: "monospace",
                 });
                 subGroup.add(sideLabel);
 
@@ -680,7 +677,6 @@ export default class UShapeManager {
             if (USH.isInteriorAngle(subgroupName)) {
                 /** @type {Konva.Group} */
                 subGroup = shapeGroup.findOne(`.${USH.SideD}`);
-
             }
             const sideLabel = shapeGroup.findOne(`#text_node_${subgroupName}`);
             const isHorizontal = USH.isHorizontal(subgroupName);
@@ -935,27 +931,23 @@ export default class UShapeManager {
 
             if (subGroup.name() === USH.SideD) {
                 // This is interior subgroup so also update position of interior angles also.
-                const i1Input = shapeGroup.findOne(
-                    `#${UShapeIds.UShapeTextLayers[USH.SideI1]}`
-                );
+                const i1Input = shapeGroup.findOne(`#${UShapeIds.UShapeTextLayers[USH.SideI1]}`);
                 let positionI1 = {
                     x: 0,
                     y: 0,
                 };
                 const textNodeI1 = shapeGroup.findOne(`#text_node_${USH.SideI1}`);
-                console.log(textNodeI1)
+                console.log(textNodeI1);
                 if (textNodeI1) {
                     positionI1 = { x: textNodeI1.x(), y: textNodeI1.y() };
-                    positionI1.x = positionI1.x - (i1Input?.width() / 1.75);
+                    positionI1.x = positionI1.x - i1Input?.width() / 1.75;
                     positionI1.y = positionI1.y + 30;
                 }
                 i1Input?.position(positionI1);
 
                 // For Side I2
-                const i2Input = shapeGroup.findOne(
-                    `#${UShapeIds.UShapeTextLayers[USH.SideI2]}`
-                );
-    
+                const i2Input = shapeGroup.findOne(`#${UShapeIds.UShapeTextLayers[USH.SideI2]}`);
+
                 let positionI2 = {
                     x: 0,
                     y: 0,
@@ -1050,21 +1042,6 @@ export default class UShapeManager {
         squarePlaceHolderObject.points(newCoordinates);
 
         this.createEdgeGroups(shapeGroup, true);
-
-        // Update Interior Sides subgroup start
-        /** @type {Konva.Group} */
-        // const iSubGroup = shapeGroup.findOne(`.${USH.SideI}`);
-        // const newPoints = squarePlaceHolderObject.points();
-        // if (USH.isHorizontal(labelNode.getAttr("wall"))) {
-        //     const length = Number(USH.getSideLength(USH.SideI, newPoints));
-        //     iSubGroup.width(length);
-        //     // iSubGroup.findOne(".tempBG").width(length); // ! TODO: For development purposes only.
-        // } else {
-        //     const length = Number(USH.getSideLength(USH.SideIC, newPoints));
-        //     iSubGroup.height(length);
-        //     // iSubGroup.findOne(".tempBG").height(length); // ! TODO: For development purposes only.
-        // }
-        // Update Interior Sides subgroup end
 
         // Update wall and backsplash size also.
         const wall = subGroup.findOne((node) => {
@@ -1513,7 +1490,6 @@ export default class UShapeManager {
             const isVisible = !checkMarkLine.visible();
             checkMarkLine.visible(isVisible);
             // /** @type {Konva.Rect} */
-            // const shapeObject = this.getShapeObject(shapeGroup);
 
             const roundedCorners = this.initializeCorners(
                 shapeGroup.getAttr("roundedCorners"),
@@ -1521,13 +1497,6 @@ export default class UShapeManager {
             );
             roundedCorners[subgroupName] = isVisible;
             shapeGroup.setAttr("roundedCorners", roundedCorners);
-
-            // shapeObject.cornerRadius([
-            //     roundedCorners[USH.SideA] ? 15 : 0,
-            //     roundedCorners[USH.SideB] ? 15 : 0,
-            //     roundedCorners[USH.SideC] ? 15 : 0,
-            //     roundedCorners[USH.SideD] ? 15 : 0,
-            // ]);
         });
         if (defaultVal === true) {
             checkboxGroup.fire("click");
@@ -1578,9 +1547,6 @@ export default class UShapeManager {
     removeCheckboxGroup(subgroupName, shapeGroup) {
         const checkboxGroup = shapeGroup.findOne(`#checkbox_node_${subgroupName}`);
         if (checkboxGroup) {
-            // /** @type {Konva.Rect} */
-            // const shapeObject = this.getShapeObject(shapeGroup);
-
             const haveRoundedCorners = this.initializeCorners(
                 shapeGroup.getAttr("haveRoundedCorners"),
                 false
@@ -1594,13 +1560,6 @@ export default class UShapeManager {
             );
             roundedCorners[subgroupName] = false;
             shapeGroup.setAttr("roundedCorners", roundedCorners);
-
-            // shapeObject.cornerRadius([
-            //     roundedCorners[SH.SideA] ? 15 : 0,
-            //     roundedCorners[SH.SideB] ? 15 : 0,
-            //     roundedCorners[SH.SideC] ? 15 : 0,
-            //     roundedCorners[SH.SideD] ? 15 : 0,
-            // ]);
             checkboxGroup.destroy();
         }
         this.eventManager.dispatchShapeSelect(shapeGroup);

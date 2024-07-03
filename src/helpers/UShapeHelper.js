@@ -216,9 +216,6 @@ export class UShapeHelper {
             case this.SideF:
                 sidePoints = [pointGroups[7], pointGroups[8]];
                 break;
-            // case this.SideI:
-            //     sidePoints = [pointGroups[2], pointGroups[3]];
-            //     break;
         }
 
         return sidePoints;
@@ -246,7 +243,6 @@ export class UShapeHelper {
                 [this.SideD]: this.calculateDistance(pointGroups[5], pointGroups[6]),
                 [this.SideE]: this.calculateDistance(pointGroups[6], pointGroups[7]),
                 [this.SideF]: this.calculateDistance(pointGroups[7], pointGroups[8]),
-                // [this.SideI]: this.calculateDistance(pointGroups[2], pointGroups[3])
             };
 
             return allSideLengths;
