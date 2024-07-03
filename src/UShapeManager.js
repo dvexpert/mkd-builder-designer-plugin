@@ -102,8 +102,8 @@ export default class UShapeManager {
             sidesLength.b = (shapeSize && shapeSize[USH.SideB]) ?? sidesLength.b / USH.SizeDiff;
             sidesLength.c = (shapeSize && shapeSize[USH.SideC]) ?? sidesLength.c / USH.SizeDiff;
             sidesLength.d = (shapeSize && shapeSize[USH.SideD]) ?? sidesLength.d / USH.SizeDiff;
-            sidesLength.e = (shapeSize && shapeSize[USH.SideD]) ?? sidesLength.e / USH.SizeDiff;
-            sidesLength.f = (shapeSize && shapeSize[USH.SideD]) ?? sidesLength.f / USH.SizeDiff;
+            sidesLength.e = (shapeSize && shapeSize[USH.SideE]) ?? sidesLength.e / USH.SizeDiff;
+            sidesLength.f = (shapeSize && shapeSize[USH.SideF]) ?? sidesLength.f / USH.SizeDiff;
             // sidesLength.i = (shapeSize && shapeSize[USH.SideI]) ??  90;
 
             shapeGroup = new Konva.Group({

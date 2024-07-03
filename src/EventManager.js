@@ -481,7 +481,7 @@ export default class EventManager {
         this.stage.setAttr("shapeDraggable", enable);
         /** @type {Konva.Group[]} */
         const shapes = this.stage.find(
-            `#${SquareShapeIds.ShapeGroup},#${LShapeIds.LShapeGroup},#${CircleShapeIds.CircleShapeGroup}`
+            `#${SquareShapeIds.ShapeGroup},#${LShapeIds.LShapeGroup},#${CircleShapeIds.CircleShapeGroup},#${UShapeIds.UShapeGroup}`
         );
         shapes.forEach((shape) => shape.setDraggable(enable));
     }
