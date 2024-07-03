@@ -738,7 +738,7 @@ export default class EventManager {
     getExportImageDataURL() {
         const offset = 20;
         const groupNodes = this.stage.find(
-            `#${SquareShapeIds.ShapeGroup}, #${LShapeIds.LShapeGroup}`
+            `#${SquareShapeIds.ShapeGroup}, #${LShapeIds.LShapeGroup}, #${CircleShapeIds.CircleShapeGroup}, #${UShapeIds.UShapeGroup}`
         );
 
         // Get the current scale of the stage
