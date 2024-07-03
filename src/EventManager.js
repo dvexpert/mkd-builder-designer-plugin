@@ -19,7 +19,7 @@ export default class EventManager {
     constructor(stage, manager) {
         this.stage = stage;
         this.manager = manager;
-        this.scaleBy = 1.1;
+        this.scaleBy = 0.05;
 
         document.addEventListener("mkd-plugin:zoom-in", () => {
             this.zoomIn();
@@ -564,8 +564,8 @@ export default class EventManager {
 
     zoomIn() {
         const oldScale = this.stage.scaleX();
-        if (oldScale <= 2) {
-            const newScale = Number((oldScale * this.scaleBy).toFixed(2));
+        if (oldScale <= 1.20) {
+            const newScale = Number((oldScale + this.scaleBy).toFixed(2));
             const newPos = this.getStageCenterNewPos(oldScale, newScale);
 
             this.stage.scale({
@@ -579,8 +579,8 @@ export default class EventManager {
     }
     zoomOut() {
         const oldScale = this.stage.scaleX();
-        if (oldScale < 0.5) return;
-        const newScale = Number((oldScale / this.scaleBy).toFixed(2));
+        if (oldScale < 0.80) return;
+        const newScale = Number((oldScale - this.scaleBy).toFixed(2));
         const newPos = this.getStageCenterNewPos(oldScale, newScale);
 
         this.stage.scale({
