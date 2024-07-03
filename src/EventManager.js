@@ -9,7 +9,7 @@ import {
     UShapeIds,
 } from "./enum/ShapeManagerEnum";
 import { LShapeHelper as LSH } from "./helpers/LShapeHelper";
-import { SquareHelper } from "./helpers/SquareHelper";
+import { SquareHelper as SH } from "./helpers/SquareHelper";
 import { UShapeHelper as USH } from "./helpers/UShapeHelper";
 
 export default class EventManager {
@@ -183,7 +183,7 @@ export default class EventManager {
                 shapeGroup.getAttr("shapeType") === ShapeTypes.SquareShape
             ) {
                 const payload = {};
-                payload.attr = SquareHelper.isHorizontal(request.wall) ? "width" : "height";
+                payload.attr = SH.isHorizontal(request.wall) ? "width" : "height";
 
                 this.manager.shapeManager.handleInputValueChange(
                     payload.attr,
