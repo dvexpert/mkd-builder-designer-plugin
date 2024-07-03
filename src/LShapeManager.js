@@ -82,7 +82,6 @@ export default class LShapeManager {
         if (!materialImage) {
             throw new Error("Material Image is required.");
         }
-
         const stagePos = this.stage.position();
         const scale = this.stage.scaleX(); // Assuming uniform scaling (scaleX = scaleY)
 
@@ -100,11 +99,11 @@ export default class LShapeManager {
             const shapeInitialCord = this.getShapePointsCoordinates();
             /** @type {AllSideLengthsType} */
             const sidesLength = LSH.getSideLength(false, shapeInitialCord);
-            sidesLength.a = (shapeSize && shapeSize[LSH.SideA]) ?? sidesLength.a / LSH.SizeDiff;
-            sidesLength.b = (shapeSize && shapeSize[LSH.SideB]) ?? sidesLength.b / LSH.SizeDiff;
-            sidesLength.c = (shapeSize && shapeSize[LSH.SideC]) ?? sidesLength.c / LSH.SizeDiff;
-            sidesLength.d = (shapeSize && shapeSize[LSH.SideD]) ?? sidesLength.d / LSH.SizeDiff;
-            sidesLength.i = (shapeSize && shapeSize[LSH.SideI]) ??  90;
+            sidesLength.a = Math.trunc((shapeSize && shapeSize[LSH.SideA]) ?? sidesLength.a / LSH.SizeDiff);
+            sidesLength.b = Math.trunc((shapeSize && shapeSize[LSH.SideB]) ?? sidesLength.b / LSH.SizeDiff);
+            sidesLength.c = Math.trunc((shapeSize && shapeSize[LSH.SideC]) ?? sidesLength.c / LSH.SizeDiff);
+            sidesLength.d = Math.trunc((shapeSize && shapeSize[LSH.SideD]) ?? sidesLength.d / LSH.SizeDiff);
+            sidesLength.i = Math.trunc((shapeSize && shapeSize[LSH.SideI]) ??  90);
 
             shapeGroup = new Konva.Group({
                 x: posX,
@@ -123,11 +122,12 @@ export default class LShapeManager {
             });
             shapeGroup.setAttr('canvasShapeId', shapeGroup._id);
 
+            const newPoints = this.getShapePointsCoordinates(undefined, undefined, sidesLength);
             // Create the L-shape using a line polygon
             /** @type {Konva.Line} */
             shapeObject = new Konva.Line({
                 id: LShapeIds.LShapePlaceholderObject,
-                points: shapeInitialCord,
+                points: newPoints,
                 closed: true, // Close the shape to form an L
                 fill: "red",
                 opacity: 0.3,
@@ -388,17 +388,18 @@ export default class LShapeManager {
         y = 100,
         sidesLength = { a: 150, b: 50, c: 50, d: 100 }
     ) {
-        sidesLength.a *= LSH.SizeDiff;
-        sidesLength.b *= LSH.SizeDiff;
-        sidesLength.c *= LSH.SizeDiff;
-        sidesLength.d *= LSH.SizeDiff;
+        let tempSidesLength = sidesLength && JSON.parse(JSON.stringify(sidesLength));
+        tempSidesLength.a *= LSH.SizeDiff;
+        tempSidesLength.b *= LSH.SizeDiff;
+        tempSidesLength.c *= LSH.SizeDiff;
+        tempSidesLength.d *= LSH.SizeDiff;
 
         // Validate the dimensions
         if (
-            sidesLength.a <= 0 ||
-            sidesLength.b <= 0 ||
-            sidesLength.c <= 0 ||
-            sidesLength.d <= 0
+            tempSidesLength.a <= 0 ||
+            tempSidesLength.b <= 0 ||
+            tempSidesLength.c <= 0 ||
+            tempSidesLength.d <= 0
         ) {
             throw new Error("All dimensions must be positive numbers.");
         }
@@ -406,11 +407,11 @@ export default class LShapeManager {
         // prettier-ignore
         return [
             x, y,
-            x + sidesLength.a, y,
-            x + sidesLength.a, y + sidesLength.b,
-            x + sidesLength.c, y + sidesLength.b,
-            x + sidesLength.c, y + sidesLength.d,
-            x, y + sidesLength.d,
+            x + tempSidesLength.a, y,
+            x + tempSidesLength.a, y + tempSidesLength.b,
+            x + tempSidesLength.c, y + tempSidesLength.b,
+            x + tempSidesLength.c, y + tempSidesLength.d,
+            x, y + tempSidesLength.d,
             x, y,
         ];
     }
@@ -517,31 +518,36 @@ export default class LShapeManager {
         if (!shapeGroup) {
             shapeGroup = shapeNode.findAncestor("Group");
         }
+
+        const scaleX = this.stage.scaleX()
+        this.actionOverlayNode.style.transform = `scale(${scaleX})`
+
         const rotation = shapeGroup.rotation();
         const boxRect = shapeNode.getClientRect();
         let overlayNewPosition = {
-            left: boxRect.x + 30,
-            top: boxRect.y + 30,
+            left: boxRect.x + (scaleX > 1.15 ? 30 : 20),
+            top: boxRect.y + (scaleX > 1.15 ? 30 : 20),
         };
 
-        if (rotation === 180) {
+        if (rotation >= 90 && rotation < 180) {
+            overlayNewPosition.left = boxRect.x + (scaleX > 1.15 ? 30 : 20)
+            overlayNewPosition.top = boxRect.y + (scaleX > 1.15 ? 30 : 20)
+        } else if (rotation >= 180 && rotation < 270) {
             overlayNewPosition = {
-                left: boxRect.x + 30,
-                top:
-                    boxRect.y +
-                    shapeNode.height() -
-                    this.actionOverlayNode.clientHeight -
-                    30,
+                left: boxRect.x + boxRect.width - this.actionOverlayNode.clientWidth - (scaleX > 1.15 ? 30 : 20),
+                top: boxRect.y + boxRect.height - this.actionOverlayNode.clientHeight - (scaleX > 1.15 ? 30 : 20)
             };
-        } else if (rotation > 180) {
-            overlayNewPosition = {
-                left: boxRect.x + 30,
-                top:
-                    boxRect.y +
-                    shapeNode.width() -
-                    this.actionOverlayNode.clientHeight -
-                    30,
-            };
+        } else if (rotation >= 270) {
+            if (scaleX < 0.60) {
+                overlayNewPosition.left = Math.min(boxRect.x, shapeNode.getAbsolutePosition().x)
+            } else {
+                if (scaleX > 1.6) {
+                    overlayNewPosition.left = Math.max(boxRect.x, shapeNode.getAbsolutePosition().x) + (this.actionOverlayNode.clientWidth)
+                } else {
+                    overlayNewPosition.left = Math.max(boxRect.x, shapeNode.getAbsolutePosition().x) + (scaleX > 1.15 ? 30 : 20)
+                }
+            }
+            overlayNewPosition.top = boxRect.y + boxRect.height - this.actionOverlayNode.clientHeight - 30
         }
 
         this.actionOverlayNode.style.left = `${overlayNewPosition.left}px`;
@@ -1343,15 +1349,22 @@ export default class LShapeManager {
         ).body.firstChild;
         domObject.id = `${domObject.id}-${propertyId}`;
         const image = domObject.querySelector("img");
+
         const titleElm = domObject.querySelector("span");
-        image.src = url;
-        image.alt = url.split("/").reverse()[0];
+        if(url) {
+            image.src = url;
+            image.alt = url.split("/").reverse()[0];
+        } else {
+            image.style.display = 'none';
+            const parentDiv = image.closest('div');
+            parentDiv.style.border = '1px solid #fff'; 
+        }
 
         titleElm.innerHTML = title;
 
         container.appendChild(domObject);
 
-        attributesItems.push({ id: propertyId, image: url, name: title });
+        attributesItems.push({ id: propertyId, image: url ?? null, name: title });
         shapeGroup.setAttr("attributesItems", attributesItems);
     }
 
