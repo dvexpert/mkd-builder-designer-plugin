@@ -824,7 +824,12 @@ export default class UShapeManager {
         /** @type {string | number} */
         let value = sideLength / USH.SizeDiff;
         if (USH.isInteriorAngle(side)) {
-            value = USH.getInteriorAngleText();
+            const shapeSize = shapeGroup.getAttr("shapeSize");
+            let angle = undefined
+            if (shapeSize && Object.keys(shapeSize).includes(side)) {
+                angle = shapeSize[side];
+            }
+            value = USH.getInteriorAngleText(angle);
         }
 
         const subgroupName = USH.isInteriorAngle(side) ? side : subGroup.name();

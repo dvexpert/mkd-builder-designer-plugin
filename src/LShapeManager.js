@@ -855,7 +855,13 @@ export default class LShapeManager {
         /** @type {string | number} */
         let value = sideLength / LSH.SizeDiff;
         if (subGroup.name() === LSH.SideI) {
-            value = LSH.getInteriorAngleText()
+            const shapeGroup = subGroup.findAncestor(`#${LShapeIds.LShapeGroup}`)
+            const shapeSize = shapeGroup.getAttr("shapeSize");
+            let angle = undefined
+            if (shapeSize && Object.keys(shapeSize).includes(LSH.SideI)) {
+                angle = shapeSize[LSH.SideI];
+            }
+            value = LSH.getInteriorAngleText(angle)
         }
 
 

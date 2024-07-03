@@ -218,6 +218,9 @@ export default class EventManager {
                 if (LSH.SideI === wall) {
                     const interiorAngle = LSH.getInteriorAngleText(request.value);
                     labelNode.text(interiorAngle);
+                    const shapeSize = shapeGroup.getAttr("shapeSize");
+                    shapeSize[LSH.SideI] = request.value;
+                    shapeGroup.setAttr("shapeSize", shapeSize);
 
                     return;
                 }
@@ -255,6 +258,9 @@ export default class EventManager {
                 if (USH.isInteriorAngle(wall)) {
                     const interiorAngle = USH.getInteriorAngleText(request.value);
                     labelNode.text(interiorAngle);
+                    const shapeSize = shapeGroup.getAttr("shapeSize");
+                    shapeSize[wall] = request.value;
+                    shapeGroup.setAttr("shapeSize", shapeSize);
 
                     return;
                 }
