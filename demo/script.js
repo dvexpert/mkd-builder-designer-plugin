@@ -1,6 +1,6 @@
 /**
  *
- * @typedef {"mkd-plugin:zoom-in" | "mkd-plugin:zoom-out" | "mkd-plugin:zoom-reset" | "mkd-plugin:drag" | "mkd-plugin:position-reset" | "mkd-plugin:draw:square" | "mkd-plugin:export-download" | "mkd-plugin:export" | "mkd-plugin:toggle-wall" | "mkd-plugin:shape-name" | "mkd-plugin:toggle-backsplash" | "mkd-plugin:rotate-left" | "mkd-plugin:rotate-right" | "mkd-plugin:delete-shape" | "mkd-plugin:enable-shape-drag" | "mkd-plugin:shape-size" | "mkd-plugin:toggle-rounded-box" | "mkd-plugin:draw:l" | "mkd-plugin:rotate" | "mkd-plugin:draw:circle"} MKDPluginEvent
+ * @typedef {"mkd-plugin:zoom-in" | "mkd-plugin:zoom-out" | "mkd-plugin:zoom-reset" | "mkd-plugin:drag" | "mkd-plugin:position-reset" | "mkd-plugin:draw:square" | "mkd-plugin:export-download" | "mkd-plugin:export" | "mkd-plugin:toggle-wall" | "mkd-plugin:shape-name" | "mkd-plugin:toggle-backsplash" | "mkd-plugin:rotate-left" | "mkd-plugin:rotate-right" | "mkd-plugin:delete-shape" | "mkd-plugin:enable-shape-drag" | "mkd-plugin:shape-size" | "mkd-plugin:toggle-rounded-box" | "mkd-plugin:draw:l" | "mkd-plugin:rotate" | "mkd-plugin:draw:circle" | "mkd-plugin:draw:u"} MKDPluginEvent
  *
  * @typedef {"mkd-plugin:active-shape" | "mkd-plugin:shape-deleted"} MKDPluginDispatchEvent
  *
@@ -177,7 +177,6 @@ jQuery(document).ready(function ($) {
                 $(".can-be-rounded")?.prop("checked", false);
             }
             $("#active-shape-customization-block").fadeIn();
-
             if (response.shapeType === "SquareShape") {
                 toggleEdgeGroupSettings(true);
                 $(".shape-square-corner-label").fadeIn();
@@ -186,6 +185,9 @@ jQuery(document).ready(function ($) {
                 $("#square-size-container").slideDown();
                 $("#l-shape-size-container").slideUp();
                 $("#circle-size-container").slideUp();
+                ! $("#addBacksplace-common").is(':visible') && $("#addBacksplace-common").slideDown();
+                $(".addBacksplace-ushape").is(':visible') && $(".addBacksplace-ushape").slideUp();
+
                 const shapeWidth = $(
                     "#active-shape-customization-block #shapeWidth"
                 );
@@ -196,6 +198,8 @@ jQuery(document).ready(function ($) {
                 shapeHeight.val(response.shapeSize.height);
             } else if (response.shapeType === "LShape") {
                 toggleEdgeGroupSettings(true);
+                ! $("#addBacksplace-common").is(':visible') && $("#addBacksplace-common").slideDown();
+                $(".addBacksplace-ushape").is(':visible') && $(".addBacksplace-ushape").slideUp();
                 $(".shape-square-corner-label").fadeOut();
                 $(".shape-l-corner-label").fadeIn();
 
@@ -207,6 +211,22 @@ jQuery(document).ready(function ($) {
                         `#l-shape-size-container input[data-wall="${wall}"]`
                     )?.val(response.shapeSize[wall]);
                 });
+            } else if (response.shapeType === "UShape") {
+                toggleEdgeGroupSettings(true);
+                $(".shape-square-corner-label").fadeOut();
+                $(".shape-l-corner-label").fadeIn();
+
+                $("#square-size-container").slideUp();
+                $("#l-shape-size-container").slideUp();
+                $("#circle-size-container").slideUp();
+                $("#u-shape-size-container").slideDown();
+                $("#addBacksplace-common").is(':visible') && $("#addBacksplace-common").slideUp();
+                ! $(".addBacksplace-ushape").is(':visible') && $(".addBacksplace-ushape").slideDown();
+                Object.keys(response.shapeSize).forEach((wall) => {
+                    $(
+                        `#u-shape-size-container input[data-wall="${wall}"]`
+                    )?.val(response.shapeSize[wall]);
+                });
             } else if (response.shapeType === "CircleShape") {
                 toggleEdgeGroupSettings(false);
                 $(".shape-square-corner-label").fadeOut();
@@ -215,6 +235,8 @@ jQuery(document).ready(function ($) {
                 $("#square-size-container").slideUp();
                 $("#l-shape-size-container").slideUp();
                 $("#circle-size-container").slideDown();
+                ! $("#addBacksplace-common").is(':visible') && $("#addBacksplace-common").slideDown();
+                $(".addBacksplace-ushape").is(':visible') && $(".addBacksplace-ushape").slideUp();
                 const shapeRadius = $(
                     "#active-shape-customization-block #circleRadius"
                 );
@@ -231,6 +253,9 @@ jQuery(document).ready(function ($) {
         const wallInputs = $(".wall");
         wallInputs.each((i, wallInput) => {
             const container = $(wallInput).parent().parent();
+            if (container.id !== 'addBacksplace-common' || ! container.hasClass('addBacksplace-ushape')) {
+                return;
+            }
             if (enable) {
                 $(container).slideDown();
             } else {
@@ -404,6 +429,36 @@ jQuery(document).ready(function ($) {
         }
         dispatchCanvasEvent("mkd-plugin:shape-size", {
             shapeId: document.activeShape,
+            value,
+            error: (e) => console.log(`[MKD]: ${e.message}`),
+        });
+    });
+});
+// Shape U
+// @ts-ignore
+jQuery(document).ready(function ($) {
+    $("#draw-u").on("click", function () {
+        try {
+            dispatchCanvasEvent("mkd-plugin:draw:u", {
+                image: "/dynamicAssets/material-2.jpeg",
+                success: (resp) => console.log(resp),
+                error: (resp) => console.error(resp),
+            });
+        } catch (e) {
+            console.log(e.message);
+        }
+    });
+    // U Shape Size Change Inputs
+    $(document).on("change", "#u-shape-size-container input", function () {
+        const wall = $(this).attr("data-wall");
+        const value = $(this).val();
+        if (value <= 0) {
+            alert("Please select a value greater than 0.");
+            return;
+        }
+        dispatchCanvasEvent("mkd-plugin:shape-size", {
+            shapeId: document.activeShape,
+            wall,
             value,
             error: (e) => console.log(`[MKD]: ${e.message}`),
         });
