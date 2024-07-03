@@ -9,9 +9,11 @@
         <link rel="stylesheet" href="/dist/assets/css/style.css" />
 
         <style>
+            /* Not In Use */
             .disabled {
                 cursor: not-allowed;
             }
+            /* Not In Use */
             .disabled::after {
                 content: "Coming Soon...";
                 position: absolute;
@@ -35,6 +37,10 @@
             ::-webkit-scrollbar-thumb {
                 background: #888;
                 border-radius: 12px;
+            }
+            svg {
+                max-width: 60px;
+                max-height: 60px;
             }
         </style>
     </head>
@@ -264,6 +270,96 @@
                                 />
                             </div>
                         </div>
+                        <div id="u-shape-size-container" class="tw-mt-3 tw-flex tw-flex-col tw-items-center tw-gap-3" style="display: none;">
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-a">A:</label>
+                                <input
+                                    type="number"
+                                    id="size-a"
+                                    data-wall="a"
+                                    data-val="Shape Width"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="150"
+                                />
+                            </div>
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-b">B:</label>
+                                <input
+                                    type="number"
+                                    id="size-b"
+                                    data-wall="b"
+                                    data-val="Shape Width"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="50"
+                                />
+                            </div>
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-c">C:</label>
+                                <input
+                                    type="number"
+                                    id="size-c"
+                                    data-wall="c"
+                                    data-val="Shape Width"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="50"
+                                />
+                            </div>
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-d">D:</label>
+                                <input
+                                    type="number"
+                                    id="size-d"
+                                    data-wall="d"
+                                    data-val="Shape Width"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="100"
+                                />
+                            </div>
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-e">E:</label>
+                                <input
+                                    type="number"
+                                    id="size-e"
+                                    data-wall="e"
+                                    data-val="Shape Width"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="100"
+                                />
+                            </div>
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-f">F:</label>
+                                <input
+                                    type="number"
+                                    id="size-f"
+                                    data-wall="f"
+                                    data-val="Shape Width"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="100"
+                                />
+                            </div>
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-i1">I1:</label>
+                                <input
+                                    type="number"
+                                    id="size-i1"
+                                    data-wall="i1"
+                                    data-val="Shape Interior angle 1"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="90"
+                                />
+                            </div>
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <label for="size-i2">I2:</label>
+                                <input
+                                    type="number"
+                                    id="size-i2"
+                                    data-wall="i2"
+                                    data-val="Shape Interior angle 2"
+                                    class="tw-mt-2 tw-w-full tw-px-2 tw-font-medium tw-border tw-border-black tw-rounded"
+                                    value="90"
+                                />
+                            </div>
+                        </div>
                         <div id="circle-size-container" class="tw-mt-3 tw-flex tw-items-center tw-gap-3 tw-flex-wrap" style="display: none;">
                             <b class="tw-w-full">Radius:</b>
                             <input
@@ -382,7 +478,7 @@
                                 >Corner B-I Can be Rounded?</label>
                             </div>
                         </div>
-                        <div class="tw-mt-6">
+                        <div class="tw-mt-6" id="addBacksplace-common">
                             <b>D:</b> <br />
                             <div class="tw-ml-6">
                                 <input
@@ -432,6 +528,86 @@
                                 >
                             </div>
                         </div>
+                        <div class="tw-mt-6 addBacksplace-ushape">
+                            <b>E:</b> <br />
+                            <div class="tw-ml-6">
+                                <input
+                                    type="checkbox"
+                                    class="wall"
+                                    id="wall-e"
+                                    data-wall="e"
+                                />
+                                <label for="wall-e" class="tw-ml-2"
+                                    >Against the wall</label
+                                >
+                                <br />
+                                <input
+                                    type="checkbox"
+                                    class="backsplash"
+                                    id="backsplash-e"
+                                    data-wall="e"
+                                />
+                                <label for="backsplash-e" class="tw-ml-2"
+                                    >Backsplash</label
+                                >
+                                <br />
+                                <input
+                                    type="checkbox"
+                                    class="can-be-rounded"
+                                    id="u-can-be-rounded-d"
+                                    data-wall="d"
+                                />
+                                <label
+                                    for="u-can-be-rounded-d"
+                                    class="tw-ml-2"
+                                >Corner I-C Can be Rounded?</label>
+                            </div>
+                        </div>
+                        <div class="tw-mt-6 addBacksplace-ushape">
+                            <b>F:</b> <br />
+                            <div class="tw-ml-6">
+                                <input
+                                    type="checkbox"
+                                    class="wall"
+                                    id="wall-f"
+                                    data-wall="f"
+                                />
+                                <label for="wall-f" class="tw-ml-2"
+                                    >Against the wall</label
+                                >
+                                <br />
+                                <input
+                                    type="checkbox"
+                                    class="backsplash"
+                                    id="backsplash-f"
+                                    data-wall="f"
+                                />
+                                <label for="backsplash-f" class="tw-ml-2"
+                                    >Backsplash</label
+                                >
+                                <br />
+                                <input
+                                    type="checkbox"
+                                    class="can-be-rounded"
+                                    id="u-can-be-rounded-e"
+                                    data-wall="e"
+                                />
+                                <label
+                                    for="u-can-be-rounded-e"
+                                    class="tw-ml-2"
+                                >Corner I-C Can be Rounded?</label>
+                                
+                                <br /> <br />
+                                <input
+                                    type="checkbox"
+                                    class="can-be-rounded"
+                                    id="u-can-be-rounded-f"
+                                    data-wall="f"
+                                />
+                                <label for="u-can-be-rounded-f" class="tw-ml-2"
+                                    >Corner C-D Can be Rounded?</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -446,7 +622,7 @@
                         <div
                             class="tw-flex tw-gap-6 tw-items-center [&>div]:tw-min-w-32"
                         >
-                            <button id="draw-square" class="tw-mx-auto" aria-label="draw-square-button">
+                            <button id="draw-square" class="tw-mx-auto" aria-label="draw-square-button" title="Draw Square Shape">
                                 <svg
                                     width="50"
                                     height="50"
@@ -455,63 +631,57 @@
                                     <rect width="50" height="50" fill="gray" />
                                 </svg>
                             </button>
-                            <div class="tw-relative tw-text-center tw-flex">
-                                <button id="draw-l" class="tw-mx-auto" aria-label="draw-l-button">
-                                    <svg
-                                        width="50"
-                                        height="50"
-                                        viewBox="0 0 37 36"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="tw-rotate-90"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            clip-rule="evenodd"
-                                            d="M15.7138 0.272705H0.11377V35.7272H15.7138V35.727L36.9864 35.727V20.127L15.7138 20.127V0.272705Z"
-                                            fill="#797979"
-                                        />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="tw-relative tw-text-center tw-flex">
-                                <button id="draw-u" class="tw-mx-auto disabled" aria-label="draw-u-button">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="50"
-                                        height="50"
-                                        viewBox="0 0 42 36"
-                                        fill="none"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            clip-rule="evenodd"
-                                            d="M0.632568 0.272705H16.2326V20.1273H26.1597V0.272705H41.7597V35.7272H37.5052V35.7273H2.0507V35.7272H0.632568V0.272705Z"
-                                            fill="#797979"
-                                        />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="tw-relative tw-text-center tw-flex">
-                                <button id="draw-circle" class="tw-mx-auto" aria-label="draw-circle-button">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="50"
-                                        height="50"
-                                        viewBox="0 0 35 36"
-                                        fill="none"
-                                    >
-                                        <ellipse
-                                            cx="17.5"
-                                            cy="18"
-                                            rx="17.5"
-                                            ry="18"
-                                            fill="#797979"
-                                        />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="tw-flex tw-justify-center">
+                            <button id="draw-l" class="tw-mx-auto" aria-label="draw-l-button" title="Draw L Shape">
+                                <svg
+                                    width="50"
+                                    height="50"
+                                    viewBox="0 0 37 36"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="tw-rotate-90"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        clip-rule="evenodd"
+                                        d="M15.7138 0.272705H0.11377V35.7272H15.7138V35.727L36.9864 35.727V20.127L15.7138 20.127V0.272705Z"
+                                        fill="#797979"
+                                    />
+                                </svg>
+                            </button>
+                            <button id="draw-u" class="tw-mx-auto" aria-label="draw-u-button" title="Draw U Shape">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="50"
+                                    height="50"
+                                    viewBox="0 0 42 36"
+                                    fill="none"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        clip-rule="evenodd"
+                                        d="M0.632568 0.272705H16.2326V20.1273H26.1597V0.272705H41.7597V35.7272H37.5052V35.7273H2.0507V35.7272H0.632568V0.272705Z"
+                                        fill="#797979"
+                                    />
+                                </svg>
+                            </button>
+                            <button id="draw-circle" class="tw-mx-auto" aria-label="draw-circle-button" title="Draw Circle Shape">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="50"
+                                    height="50"
+                                    viewBox="0 0 35 36"
+                                    fill="none"
+                                >
+                                    <ellipse
+                                        cx="17.5"
+                                        cy="18"
+                                        rx="17.5"
+                                        ry="18"
+                                        fill="#797979"
+                                    />
+                                </svg>
+                            </button>
+                            <div class="tw-flex tw-justify-center tw-ml-12">
                                 <div class="tw-mr-3">
                                     <input
                                         type="checkbox"
@@ -619,7 +789,8 @@
                     // For testing purpose only 
                     $('#enable-shape-drag').click();
                     // $('#draw-circle').click();
-                }, 500)
+                    // $('#draw-u').click(); // TODO: For Development purpose only.
+                }, 100)
             });
         </script>
     </body>

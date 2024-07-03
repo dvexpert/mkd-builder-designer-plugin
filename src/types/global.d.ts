@@ -1,6 +1,7 @@
 import { KonvaManager } from "@/KonvaManager";
 import type { SquareSide } from "@/helpers/SquareHelper";
 import type { LShapeSide } from "@/helpers/LShapeHelper";
+import { UShapeSide } from "@/helpers/UShapeHelper";
 
 interface CallBackPropsType {
     message?: string;
@@ -11,6 +12,7 @@ interface CallBackPropsType {
 
 type SquareSideT = SquareSide;
 type LSideT = LShapeSide;
+type USideT = UShapeSide;
 
 export type WallPresence = {
     [key in SquareSideT]: boolean;
@@ -27,8 +29,11 @@ interface CircleShapeSizeType {
     radius: string | number;
 }
 type LSideLengthsType = {
-    [key in LSideT]: number
-}
+    [key in LSideT]: number;
+};
+type USideLengthsType = {
+    [key in USideT]: number;
+};
 
 type ShapeTypes = "SquareShape" | "LShape";
 
@@ -63,9 +68,13 @@ interface RequestObjectType {
     againstTheWall?: WallPresence;
     backsplashes?: BacksplashesPresence;
     haveRoundedCorners?: HaveRoundedCornersPresence;
-    shapeSize?: ShapeSizeType | LSideLengthsType | CircleShapeSizeType;
+    shapeSize?:
+        | ShapeSizeType
+        | LSideLengthsType
+        | USideLengthsType
+        | CircleShapeSizeType;
     shapeType?: ShapeTypes;
-    position?: PositionType
+    position?: PositionType;
 }
 
 declare global {

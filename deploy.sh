@@ -35,4 +35,4 @@ echo -e "\n${Green}Build zip created succesfully. \"$build_file_name\"\n"
 # rm -rf /home/teq001/projects/mkd/mkd-builder/wp-content/plugins/mkd-builder/public/js/mkd-plugin.es.js-*
 
 # cp -Rf build/*.js /home/teq001/projects/mkd/mkd-builder/wp-content/plugins/mkd-builder/public/js/
-# cp -Rf build/assets/css/style.css /home/teq001/projects/mkd/mkd-builder/wp-content/plugins/mkd-builder/public/css/designer.css
+# cp -Rf build/designer.css /home/teq001/projects/mkd/mkd-builder/wp-content/plugins/mkd-builder/public/css/designer.css
