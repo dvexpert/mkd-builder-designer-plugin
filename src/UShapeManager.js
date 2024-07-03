@@ -936,7 +936,6 @@ export default class UShapeManager {
                     y: 0,
                 };
                 const textNodeI1 = shapeGroup.findOne(`#text_node_${USH.SideI1}`);
-                console.log(textNodeI1);
                 if (textNodeI1) {
                     positionI1 = { x: textNodeI1.x(), y: textNodeI1.y() };
                     positionI1.x = positionI1.x - i1Input?.width() / 1.75;
