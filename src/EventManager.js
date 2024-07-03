@@ -10,6 +10,7 @@ import {
 } from "./enum/ShapeManagerEnum";
 import { LShapeHelper as LSH } from "./helpers/LShapeHelper";
 import { SquareHelper } from "./helpers/SquareHelper";
+import { UShapeHelper as USH } from "./helpers/UShapeHelper";
 
 export default class EventManager {
     /**
@@ -245,18 +246,18 @@ export default class EventManager {
                  */
 
                 /** @type {Konva.Group} */
-                const edgeGroup = shapeGroup.findOne(`.${wall}`);
+                const edgeGroup = shapeGroup.findOne(`.${USH.isInteriorAngle(wall) ? USH.SideD : wall}`);
                 /** @type {Konva.Text} */
                 const labelNode = shapeGroup.findOne(
                     `#${UShapeIds.UShapeTextLayers[wall]}`
                 );
 
-                // if (LSH.SideI === wall) {
-                //     const interiorAngle = LSH.getInteriorAngleText(request.value);
-                //     labelNode.text(interiorAngle);
+                if (USH.isInteriorAngle(wall)) {
+                    const interiorAngle = USH.getInteriorAngleText(request.value);
+                    labelNode.text(interiorAngle);
 
-                //     return;
-                // }
+                    return;
+                }
 
                 this.manager.uShapeManager.handleInputValueChange(
                     edgeGroup,
@@ -447,30 +448,6 @@ export default class EventManager {
                 }
             }
         });
-    }
-
-    /**
-     *
-     * @typedef {"height" | "width"} AttrType
-     *
-     * @typedef {Object} Payload
-     * @property {string} width
-     * @property {string} height
-     * @property {AttrType} attr
-     *
-     * @param {number} shapeId
-     * @param {Payload} payload
-     */
-    setShapeSize(shapeId, payload) {
-        const shapeGroup = this.getShapeById(shapeId);
-        if (shapeGroup) {
-            this.manager.shapeManager.handleInputValueChange(
-                payload.attr,
-                shapeGroup,
-                null,
-                payload[payload.attr]
-            );
-        }
     }
 
     /**

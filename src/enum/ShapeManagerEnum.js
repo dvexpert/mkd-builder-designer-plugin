@@ -60,7 +60,8 @@ const UShapeIdsObject = {
     UShapeDTextLayer: "UShapeDTextLayer",
     UShapeETextLayer: "UShapeETextLayer",
     UShapeFTextLayer: "UShapeFTextLayer",
-    UShapeITextLayer: "UShapeITextLayer",
+    UShapeI1TextLayer: "UShapeI1TextLayer",
+    UShapeI2TextLayer: "UShapeI2TextLayer",
 
     UShapeTextLayers: {},
 
@@ -74,13 +75,14 @@ UShapeIdsObject.UShapeTextLayers = {
     [USH.SideD]: UShapeIdsObject.UShapeDTextLayer,
     [USH.SideE]: UShapeIdsObject.UShapeETextLayer,
     [USH.SideF]: UShapeIdsObject.UShapeFTextLayer,
-    // [USH.SideI]: UShapeIdsObject.UShapeITextLayer,
+    [USH.SideI1]: UShapeIdsObject.UShapeI1TextLayer,
+    [USH.SideI2]: UShapeIdsObject.UShapeI2TextLayer
 };
 
 export const UShapeIds = Object.freeze(UShapeIdsObject);
 
 export const CircleShapeIds = Object.freeze({
-    CircleShapeGroup: "circleShapeGroup",
+    CircleShapeGroup: "CircleShapeGroup",
     CircleShapeObject: "CircleShapeObject",
     CircleShapePlaceholderObject: "CircleShapePlaceholderObject",
     CircleSizeTextLayer: "CircleSizeTextLayer",

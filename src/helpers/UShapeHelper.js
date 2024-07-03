@@ -7,11 +7,10 @@ import Konva from "konva";
  * @typedef { "d" } UShapeSideD
  * @typedef { "e" } UShapeSideE
  * @typedef { "f" } UShapeSideF
-//  * @typedef { "i" } UShapeSideI
-//  * @typedef { "ic" } UShapeSideIC
-//  * @typedef { "ib" } UShapeSideIB
- * @typedef { UShapeSideA | UShapeSideB | UShapeSideC | UShapeSideD | UShapeSideE |UShapeSideF | UShapeSideI | UShapeSideIC | UShapeSideIB } UShapeSide
- * @typedef { "a" | "b" | "c" | "d" | "e" | "f" | "i" } UShapeSideO
+ * @typedef { "i1" } UShapeSideI1
+ * @typedef { "i2" } UShapeSideI2
+ * @typedef { UShapeSideA | UShapeSideB | UShapeSideC | UShapeSideD | UShapeSideE |UShapeSideF | UShapeSideI1 | UShapeSideI2 } UShapeSide
+ * @typedef { "a" | "b" | "c" | "d" | "e" | "f" | "i1" | "i2" } UShapeSideO
  */
 export class UShapeHelper {
     /**
@@ -51,29 +50,21 @@ export class UShapeHelper {
      */
     static SideF = "f";
 
-    // /**
-    //  *
-    //  * Interior angle group.
-    //  * @static
-    //  * @type {UShapeSideI}
-    //  */
-    // static SideI = "i";
+    /**
+     *
+     * Interior angle group.
+     * @static
+     * @type {UShapeSideI1}
+     */
+    static SideI1 = "i1";
 
-    // /**
-    //  *
-    //  * Interior side.
-    //  * @static
-    //  * @type {UShapeSideIC}
-    //  */
-    // static SideIC = "ic";
-
-    // /**
-    //  *
-    //  * Interior side.
-    //  * @static
-    //  * @type {UShapeSideIB}
-    //  */
-    // static SideIB = "ib";
+    /**
+     *
+     * Interior angle group.
+     * @static
+     * @type {UShapeSideI2}
+     */
+    static SideI2 = "i2";
 
     /**
      * @type {UShapeSideO[]}
@@ -85,6 +76,8 @@ export class UShapeHelper {
         UShapeHelper.SideD,
         UShapeHelper.SideE,
         UShapeHelper.SideF,
+        UShapeHelper.SideI1,
+        UShapeHelper.SideI2,
     ];
 
     static corners = [
@@ -93,7 +86,7 @@ export class UShapeHelper {
         UShapeHelper.SideC,
         UShapeHelper.SideD,
         UShapeHelper.SideE,
-        UShapeHelper.SideF
+        UShapeHelper.SideF,
     ];
 
     static wallBacksplashGap = 8;
@@ -279,15 +272,12 @@ export class UShapeHelper {
             case this.SideF:
                 length = this.calculateDistance(pointGroups[7], pointGroups[8]);
                 break;
-            // case this.SideI:
-            //     length = this.calculateDistance(pointGroups[2], pointGroups[3]);
-            //     break;
-            // case this.SideIB:
-            //     length = this.calculateDistance(pointGroups[2], pointGroups[3]);
-            //     break;
-            // case this.SideIC:
-            //     length = this.calculateDistance(pointGroups[3], pointGroups[4]);
-            //     break;
+            case this.SideI1:
+                length = this.calculateDistance(pointGroups[4], pointGroups[5]);
+                break;
+            case this.SideI2:
+                length = this.calculateDistance(pointGroups[3], pointGroups[4]);
+                break;
         }
 
         return length;
@@ -323,5 +313,15 @@ export class UShapeHelper {
      */
     static getInteriorAngleText(angle = 90) {
         return `${this.AnglePrefix} ${angle} ${this.AnglePostfix}`;
+    }
+
+    /**
+     *
+     * @param {UShapeSide} side
+     * 
+     * @returns boolean
+     */
+    static isInteriorAngle(side) {
+        return side === this.SideI1 || side === this.SideI2;
     }
 }

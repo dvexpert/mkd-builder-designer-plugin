@@ -104,7 +104,8 @@ export default class UShapeManager {
             sidesLength.d = (shapeSize && shapeSize[USH.SideD]) ?? sidesLength.d / USH.SizeDiff;
             sidesLength.e = (shapeSize && shapeSize[USH.SideE]) ?? sidesLength.e / USH.SizeDiff;
             sidesLength.f = (shapeSize && shapeSize[USH.SideF]) ?? sidesLength.f / USH.SizeDiff;
-            // sidesLength.i = (shapeSize && shapeSize[USH.SideI]) ??  90;
+            sidesLength.i1 = (shapeSize && shapeSize[USH.SideI1]) ?? 90;
+            sidesLength.i2 = (shapeSize && shapeSize[USH.SideI2]) ?? 90;
 
             shapeGroup = new Konva.Group({
                 x: posX,
@@ -373,7 +374,7 @@ export default class UShapeManager {
         y = 100,
         sidesLength = { a: 150, b: 100, c: 50, d: 40, e: 50, f: 90 }
     ) {
-        const shapeSidesLength = JSON.parse(JSON.stringify(sidesLength))
+        const shapeSidesLength = JSON.parse(JSON.stringify(sidesLength));
         shapeSidesLength.a *= USH.SizeDiff;
         shapeSidesLength.b *= USH.SizeDiff;
         shapeSidesLength.c *= USH.SizeDiff;
@@ -617,12 +618,20 @@ export default class UShapeManager {
                 //     });
                 // }
             } else {
-                const subGroup = new Konva.Group({
-                    name: subgroupName,
-                    height: attributes.height,
-                    width: attributes.width,
-                });
-                shapeGroup.add(subGroup);
+                /** @type {Konva.Group} */
+                let subGroup;
+                /** @type {Konva.Group} */
+                const innerSubGroup = shapeGroup.findOne(`.${USH.SideD}`);
+                if (!USH.isInteriorAngle(subgroupName) || (USH.isInteriorAngle(subgroupName) && !innerSubGroup)) {
+                    subGroup = new Konva.Group({
+                        name: USH.isInteriorAngle(subgroupName) || subgroupName === USH.SideD ? USH.SideD : subgroupName,
+                        height: attributes.height,
+                        width: attributes.width,
+                    });
+                    shapeGroup.add(subGroup);
+                } else {
+                    subGroup = innerSubGroup;
+                }
 
                 const sideLabel = new Konva.Text({
                     id: `text_node_${subgroupName}`,
@@ -630,12 +639,13 @@ export default class UShapeManager {
                     fill: "#000",
                     fontSize: 16,
                     stroke: "#000",
-                    strokeWidth: 1.2,
+                    strokeWidth: USH.isInteriorAngle(subgroupName)  ? 0.7 : 1.2,
                     fontVariant: "",
+                    fontFamily: "monospace"
                 });
                 subGroup.add(sideLabel);
 
-                // if (this.demoOnly) {
+                // if (this.demoOnly && !USH.isInteriorAngle(subgroupName)) {
                 //     // TODO: For development purposes only
                 //     const tempRect = new Konva.Rect({
                 //         name: "tempBG",
@@ -648,21 +658,6 @@ export default class UShapeManager {
                 //     subGroup.add(tempRect);
                 // }
             }
-
-            // if (subgroupName === USH.SideI) {
-            //     [USH.SideIB, USH.SideIC].forEach((iSubgroupName) => {
-            //         const sideLabel = new Konva.Text({
-            //             id: `text_node_${iSubgroupName}`,
-            //             text: iSubgroupName.toUpperCase(),
-            //             fill: "#000",
-            //             fontSize: 16,
-            //             stroke: "#000",
-            //             strokeWidth: 1.2,
-            //             fontVariant: "",
-            //         });
-            //         subGroup.add(sideLabel);
-            //     });
-            // }
         });
 
         this.updateEdgeGroupsPosition(shapeGroup, !updatePositionOnly);
@@ -681,7 +676,12 @@ export default class UShapeManager {
         const spacingOffset = 0;
         subgroupNames.forEach((subgroupName, index) => {
             /** @type {Konva.Group} */
-            const subGroup = shapeGroup.findOne(`.${subgroupName}`);
+            let subGroup = shapeGroup.findOne(`.${subgroupName}`);
+            if (USH.isInteriorAngle(subgroupName)) {
+                /** @type {Konva.Group} */
+                subGroup = shapeGroup.findOne(`.${USH.SideD}`);
+
+            }
             const sideLabel = shapeGroup.findOne(`#text_node_${subgroupName}`);
             const isHorizontal = USH.isHorizontal(subgroupName);
             const sidePosition = USH.getSidePoints(subgroupName, points);
@@ -695,7 +695,8 @@ export default class UShapeManager {
             };
 
             if (backsplash) {
-                backsplashOffset = backsplash.getAttr(isHorizontal ? 'height' :'width') + USH.wallBacksplashGap;
+                backsplashOffset =
+                    backsplash.getAttr(isHorizontal ? "height" : "width") + USH.wallBacksplashGap;
             }
             if (subgroupName === USH.SideA) {
                 const sidePositionS = sidePosition[0];
@@ -732,7 +733,17 @@ export default class UShapeManager {
 
                 const x = subGroup.width() - subGroup.width() * 0.9;
                 sideLabel.x(x);
-                sideLabel.y(30);
+                sideLabel.y(50);
+
+                const sideLabelI1 = shapeGroup.findOne(`#text_node_${USH.SideI1}`);
+                const i1x = subGroup.width() - sideLabelI1.width() - 10;
+                sideLabelI1.x(i1x);
+                sideLabelI1.y(20);
+
+                const sideLabelI2 = shapeGroup.findOne(`#text_node_${USH.SideI2}`);
+                const i2x = 10;
+                sideLabelI2.x(i2x);
+                sideLabelI2.y(10);
             }
             if (subgroupName === USH.SideF) {
                 const sidePositionS = sidePosition[1];
@@ -744,7 +755,7 @@ export default class UShapeManager {
                 sideLabel.y(30);
             }
 
-            createInputs && this.createLengthInput(subGroup);
+            createInputs && this.createLengthInput(subGroup, subgroupName);
 
             if (updateLabelPositionOnly === false) {
                 subGroup.position({
@@ -785,7 +796,7 @@ export default class UShapeManager {
                 position.x = subGroup.width() - checkboxRect.width();
                 position.y = 10;
             } else if (USH.SideD === subgroupName) {
-                position.x = - (checkboxRect.width() + 10);
+                position.x = -(checkboxRect.width() + 10);
                 position.y = -checkboxRect.height();
             } else if (USH.SideE === subgroupName) {
                 /** @type {Konva.Group} */
@@ -807,8 +818,9 @@ export default class UShapeManager {
     /**
      * Create Text and Input box for the border length adjustments
      * @param {Konva.Group} subGroup - edge sub group
+     * @param {import("./helpers/UShapeHelper.js").UShapeSide} side
      */
-    createLengthInput(subGroup) {
+    createLengthInput(subGroup, side) {
         /** @type {Konva.Group} */
         const shapeGroup = subGroup.findAncestor(`#${UShapeIds.UShapeGroup}`);
         const shapeObject = this.getShapeObject(shapeGroup);
@@ -816,12 +828,13 @@ export default class UShapeManager {
 
         /** @type {string | number} */
         let value = sideLength / USH.SizeDiff;
-        // if (subGroup.name() === USH.SideI) {
-        //     value = USH.getInteriorAngleText();
-        // }
+        if (USH.isInteriorAngle(side)) {
+            value = USH.getInteriorAngleText();
+        }
 
+        const subgroupName = USH.isInteriorAngle(side) ? side : subGroup.name();
         const lengthInput = new Konva.Text({
-            id: UShapeIds.UShapeTextLayers[subGroup.name()],
+            id: UShapeIds.UShapeTextLayers[subgroupName],
             text: String(value),
             fontSize: 20,
             fill: "black",
@@ -832,11 +845,11 @@ export default class UShapeManager {
 
         this.updateInputsPosition(subGroup, false, true);
 
-        // if (subGroup.name() === USH.SideI) {
-        //     // We don't need click event listeners
-        //     // for interior angle.
-        //     return;
-        // }
+        if (USH.isInteriorAngle(side)) {
+            // We don't need click event listeners
+            // for interior angle.
+            return;
+        }
         // create event listener to show text box to change width
         lengthInput.on("click", (e) => {
             let wInput = e.target;
@@ -901,46 +914,63 @@ export default class UShapeManager {
             shapeGroup = subGroup.findAncestor(`#${UShapeIds.UShapeGroup}`);
         }
 
-        const points = this.getShapeObject(shapeGroup).points();
+        // const points = this.getShapeObject(shapeGroup).points();
 
         if (heightOnly && [USH.SideB, USH.SideD, USH.SideF].includes(subGroup.name())) {
             const heightInput = shapeGroup.findOne(
                 `#${UShapeIds.UShapeTextLayers[subGroup.name()]}`
             );
 
-            if (!heightInput) {
-                return;
-            }
-
             let position = {
                 x: 0,
                 y: 0,
             };
-            const textNode = shapeGroup.findOne(`#text_node_${heightInput.getAttr("wall")}`);
+            const textNode = shapeGroup.findOne(`#text_node_${heightInput?.getAttr("wall")}`);
             if (textNode) {
                 position = { x: textNode.x(), y: textNode.y() };
                 position.x = position.x - 3;
-                position.y = position.y + 50;
+                position.y = position.y + 35;
             }
-            // if (heightInput.getAttr("wall") === USH.SideB) {
-            //     const textNode = shapeGroup.findOne(`#text_node_${heightInput.getAttr("wall")}`);
-            //     if (textNode) {
-            //         position = { x: textNode.x(), y: textNode.y() };
-            //         position.x = position.x - 3;
-            //         position.y = position.y + 50;
-            //     }
-            // } else {
-            //     const textNode = shapeGroup.findOne(`#text_node_${heightInput.getAttr("wall")}`);
-            //     if (textNode) {
-            //         position = { x: textNode.x(), y: textNode.y() };
-            //         position.y = position.y + 50;
-            //     }
-            // }
+            heightInput?.position(position);
 
-            heightInput.position(position);
+            if (subGroup.name() === USH.SideD) {
+                // This is interior subgroup so also update position of interior angles also.
+                const i1Input = shapeGroup.findOne(
+                    `#${UShapeIds.UShapeTextLayers[USH.SideI1]}`
+                );
+                let positionI1 = {
+                    x: 0,
+                    y: 0,
+                };
+                const textNodeI1 = shapeGroup.findOne(`#text_node_${USH.SideI1}`);
+                console.log(textNodeI1)
+                if (textNodeI1) {
+                    positionI1 = { x: textNodeI1.x(), y: textNodeI1.y() };
+                    positionI1.x = positionI1.x - (i1Input?.width() / 1.75);
+                    positionI1.y = positionI1.y + 30;
+                }
+                i1Input?.position(positionI1);
+
+                // For Side I2
+                const i2Input = shapeGroup.findOne(
+                    `#${UShapeIds.UShapeTextLayers[USH.SideI2]}`
+                );
+    
+                let positionI2 = {
+                    x: 0,
+                    y: 0,
+                };
+                const textNodeI2 = shapeGroup.findOne(`#text_node_${USH.SideI2}`);
+                if (textNodeI2) {
+                    positionI2 = { x: textNodeI2.x(), y: textNodeI2.y() };
+                    positionI2.x = positionI2.x + textNodeI2?.width() + 5;
+                    positionI2.y = positionI2.y;
+                }
+                i2Input?.position(positionI2);
+            }
         }
 
-        if (widthOnly && [USH.SideA, USH.SideC, USH.SideE, USH.SideI].includes(subGroup.name())) {
+        if (widthOnly && [USH.SideA, USH.SideC, USH.SideE].includes(subGroup.name())) {
             const widthInput = shapeGroup.findOne(
                 `#${UShapeIds.UShapeTextLayers[subGroup.name()]}`
             );
@@ -959,29 +989,6 @@ export default class UShapeManager {
                 position.x = position.x + 50;
                 position.y = position.y - 3;
             }
-            // else if (widthInput.getAttr("wall") === USH.SideI) {
-            //     // Interior angle.
-            //     const textNode = shapeGroup.findOne(`#text_node_${widthInput.getAttr("wall")}`);
-            //     if (textNode) {
-            //         position = { x: textNode.x(), y: textNode.y() };
-            //         position.x = position.x + 30;
-            //         position.y = position.y - 3;
-            //     }
-
-            //     const textNodeIB = shapeGroup.findOne(`#text_node_${USH.SideIB}`);
-            //     if (textNodeIB) {
-            //         const sideLength = Number(USH.getSideLength(USH.SideIB, points));
-            //         textNodeIB.x(sideLength / 2);
-            //         textNodeIB.y(position.y);
-            //     }
-
-            //     const textNodeIC = shapeGroup.findOne(`#text_node_${USH.SideIC}`);
-            //     if (textNodeIC) {
-            //         const sideLength = Number(USH.getSideLength(USH.SideIC, points));
-            //         textNodeIC.x(8);
-            //         textNodeIC.y(sideLength / 2);
-            //     }
-            // }
 
             widthInput.position(position);
         }
