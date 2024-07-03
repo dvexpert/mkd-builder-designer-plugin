@@ -308,7 +308,7 @@ export class UShapeHelper {
      * @returns
      */
     static getInteriorAngleText(angle = 90) {
-        return `${this.AnglePrefix} ${angle} ${this.AnglePostfix}`;
+        return `${this.AnglePrefix}${angle}${this.AnglePostfix}`;
     }
 
     /**

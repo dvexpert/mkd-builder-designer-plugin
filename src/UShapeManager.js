@@ -633,9 +633,8 @@ export default class UShapeManager {
                 const sideLabel = new Konva.Text({
                     id: `text_node_${subgroupName}`,
                     text: subgroupName.toUpperCase(),
-                    fill: "#000",
                     fontSize: 16,
-                    stroke: "#000",
+                    stroke: USH.isInteriorAngle(subgroupName) ? "#f00" : "#000",
                     strokeWidth: USH.isInteriorAngle(subgroupName) ? 0.7 : 1.2,
                     fontVariant: "",
                     fontFamily: "monospace",
@@ -833,7 +832,7 @@ export default class UShapeManager {
             id: UShapeIds.UShapeTextLayers[subgroupName],
             text: String(value),
             fontSize: 20,
-            fill: "black",
+            fill: USH.isInteriorAngle(side) ? '#970606' : "#000",
             // width: 80,
             wall: subGroup.name(),
         });
