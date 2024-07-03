@@ -40,7 +40,7 @@ export default class EventManager {
         document.addEventListener("mkd-plugin:draw:square", (e) => {
             const request = e?.detail;
             try {
-                const shapeGroup = this.manager.shapeManager.drawSquare(
+                const shapeGroup = this.manager.getSquareShapeManager().drawSquare(
                     request?.image,
                     true,
                     request.materialId,
@@ -54,13 +54,13 @@ export default class EventManager {
                 );
 
                 if (shapeGroup && request.placed && request.placed === true) {
-                    this.manager.shapeManager.drawSquare(
+                    this.manager.getSquareShapeManager().drawSquare(
                         request?.image,
                         false,
                         request.materialId,
                         shapeGroup
                     );
-                    this.manager.shapeManager.updateHoverActionOverlayPosition(
+                    this.manager.getSquareShapeManager().updateHoverActionOverlayPosition(
                         shapeGroup
                     );
                 }
@@ -185,7 +185,7 @@ export default class EventManager {
                 const payload = {};
                 payload.attr = SH.isHorizontal(request.wall) ? "width" : "height";
 
-                this.manager.shapeManager.handleInputValueChange(
+                this.manager.getSquareShapeManager().handleInputValueChange(
                     payload.attr,
                     shapeGroup,
                     null,
@@ -222,7 +222,7 @@ export default class EventManager {
                     return;
                 }
 
-                this.manager.lShapeManager.handleInputValueChange(
+                this.manager.getLShapeManager().handleInputValueChange(
                     LSH.isHorizontal(wall) ? "width" : "height",
                     edgeGroup,
                     labelNode,
@@ -259,7 +259,7 @@ export default class EventManager {
                     return;
                 }
 
-                this.manager.uShapeManager.handleInputValueChange(
+                this.manager.getUShapeManager().handleInputValueChange(
                     edgeGroup,
                     labelNode,
                     request.value
@@ -268,7 +268,7 @@ export default class EventManager {
                 shapeGroup &&
                 shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape
             ) {
-                this.manager.circleShapeManager.handleInputValueChange(
+                this.manager.getCircleShapeManager().handleInputValueChange(
                     shapeGroup,
                     null,
                     request.value
@@ -322,7 +322,7 @@ export default class EventManager {
         document.addEventListener("mkd-plugin:draw:l", (e) => {
             const request = e?.detail;
             try {
-                const shapeGroup = this.manager.lShapeManager.draw(
+                const shapeGroup = this.manager.getLShapeManager().draw(
                     request?.image,
                     true,
                     request.materialId,
@@ -336,13 +336,13 @@ export default class EventManager {
                 );
 
                 if (shapeGroup && request.placed && request.placed === true) {
-                    this.manager.lShapeManager.draw(
+                    this.manager.getLShapeManager().draw(
                         request?.image,
                         false,
                         request.materialId,
                         shapeGroup
                     );
-                    this.manager.lShapeManager.updateHoverActionOverlayPosition(
+                    this.manager.getLShapeManager().updateHoverActionOverlayPosition(
                         shapeGroup
                     );
                 }
@@ -366,7 +366,7 @@ export default class EventManager {
         document.addEventListener("mkd-plugin:draw:u", (e) => {
             const request = e?.detail;
             try {
-                const shapeGroup = this.manager.uShapeManager.draw(
+                const shapeGroup = this.manager.getUShapeManager().draw(
                     request?.image,
                     true,
                     request.materialId,
@@ -380,13 +380,13 @@ export default class EventManager {
                 );
 
                 if (shapeGroup && request.placed && request.placed === true) {
-                    this.manager.uShapeManager.draw(
+                    this.manager.getUShapeManager().draw(
                         request?.image,
                         false,
                         request.materialId,
                         shapeGroup
                     );
-                    this.manager.uShapeManager.updateHoverActionOverlayPosition(
+                    this.manager.getUShapeManager().updateHoverActionOverlayPosition(
                         shapeGroup
                     );
                 }
@@ -410,7 +410,7 @@ export default class EventManager {
         document.addEventListener("mkd-plugin:draw:circle", (e) => {
             const request = e?.detail;
             try {
-                const shapeGroup = this.manager.circleShapeManager.draw(
+                const shapeGroup = this.manager.getCircleShapeManager().draw(
                     request?.image,
                     true,
                     request.materialId,
@@ -424,13 +424,13 @@ export default class EventManager {
                 );
 
                 if (shapeGroup && request.placed && request.placed === true) {
-                    this.manager.circleShapeManager.draw(
+                    this.manager.getCircleShapeManager().draw(
                         request?.image,
                         false,
                         request.materialId,
                         shapeGroup
                     );
-                    this.manager.circleShapeManager.updateHoverActionOverlayPosition(
+                    this.manager.getCircleShapeManager().updateHoverActionOverlayPosition(
                         shapeGroup
                     );
                 }
@@ -470,7 +470,7 @@ export default class EventManager {
     deleteShape(shapeId) {
         const shapeGroup = this.getShapeById(shapeId);
         if (shapeGroup) {
-            this.manager.shapeManager.deleteShape(shapeGroup);
+            this.manager.getSquareShapeManager().deleteShape(shapeGroup);
         }
     }
 
@@ -635,11 +635,11 @@ export default class EventManager {
         /** @type {Konva.Group} */
         const edgeGroup = shape.findOne(`.${wall}`);
         if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
-            this.manager.shapeManager.addWall(edgeGroup, shape);
+            this.manager.getSquareShapeManager().addWall(edgeGroup, shape);
         } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
-            this.manager.lShapeManager.addWall(edgeGroup, shape);
+            this.manager.getLShapeManager().addWall(edgeGroup, shape);
         } else if (shape.getAttr("shapeType") === ShapeTypes.UShape) {
-            this.manager.uShapeManager.addWall(edgeGroup, shape);
+            this.manager.getUShapeManager().addWall(edgeGroup, shape);
         }
     }
 
@@ -653,11 +653,11 @@ export default class EventManager {
         /** @type {Konva.Group} */
         const edgeGroup = shape.findOne(`.${wall}`);
         if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
-            this.manager.shapeManager.removeWall(shape, wall);
+            this.manager.getSquareShapeManager().removeWall(shape, wall);
         } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
-            this.manager.lShapeManager.removeWall(edgeGroup, shape, wall);
+            this.manager.getLShapeManager().removeWall(edgeGroup, shape, wall);
         } else if (shape.getAttr("shapeType") === ShapeTypes.UShape) {
-            this.manager.uShapeManager.removeWall(edgeGroup, shape, wall);
+            this.manager.getUShapeManager().removeWall(edgeGroup, shape, wall);
         }
     }
 
@@ -671,11 +671,11 @@ export default class EventManager {
         /** @type {Konva.Group} */
         const backsplashGroup = shape.findOne(`.${wall}`);
         if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
-            this.manager.shapeManager.addBacksplash(backsplashGroup, shape);
+            this.manager.getSquareShapeManager().addBacksplash(backsplashGroup, shape);
         } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
-            this.manager.lShapeManager.addBacksplash(backsplashGroup, shape);
+            this.manager.getLShapeManager().addBacksplash(backsplashGroup, shape);
         } else if (shape.getAttr("shapeType") === ShapeTypes.UShape) {
-            this.manager.uShapeManager.addBacksplash(backsplashGroup, shape);
+            this.manager.getUShapeManager().addBacksplash(backsplashGroup, shape);
         }
     }
 
@@ -689,19 +689,19 @@ export default class EventManager {
         /** @type {Konva.Group} */
         const backsplashGroup = shape.findOne(`.${wall}`);
         if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
-            this.manager.shapeManager.removeBacksplash(
+            this.manager.getSquareShapeManager().removeBacksplash(
                 backsplashGroup,
                 shape,
                 wall
             );
         } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
-            this.manager.lShapeManager.removeBacksplash(
+            this.manager.getLShapeManager().removeBacksplash(
                 backsplashGroup,
                 shape,
                 wall
             );
         } else if (shape.getAttr("shapeType") === ShapeTypes.UShape) {
-            this.manager.uShapeManager.removeBacksplash(
+            this.manager.getUShapeManager().removeBacksplash(
                 backsplashGroup,
                 shape,
                 wall
@@ -884,11 +884,11 @@ export default class EventManager {
             return;
         }
         if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
-            this.manager.shapeManager.rotateShapeGroup(shape, rotation);
+            this.manager.getSquareShapeManager().rotateShapeGroup(shape, rotation);
         } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
-            this.manager.lShapeManager.rotateShapeGroup(shape, rotation);
+            this.manager.getLShapeManager().rotateShapeGroup(shape, rotation);
         } else if (shape.getAttr("shapeType") === ShapeTypes.UShape) {
-            this.manager.uShapeManager.rotateShapeGroup(shape, rotation);
+            this.manager.getUShapeManager().rotateShapeGroup(shape, rotation);
         }
     }
 
@@ -909,20 +909,20 @@ export default class EventManager {
                 throw new Error("Checkbox group already exists!");
             }
             if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
-                this.manager.shapeManager.addCheckboxGroup(
+                this.manager.getSquareShapeManager().addCheckboxGroup(
                     edgeSubGroup,
                     wall,
                     shape,
                     defaultVal
                 );
             } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
-                this.manager.lShapeManager.addCheckboxGroup(
+                this.manager.getLShapeManager().addCheckboxGroup(
                     wall,
                     shape,
                     defaultVal
                 );
             } else if (shape.getAttr("shapeType") === ShapeTypes.UShape) {
-                this.manager.uShapeManager.addCheckboxGroup(
+                this.manager.getUShapeManager().addCheckboxGroup(
                     wall,
                     shape,
                     defaultVal
@@ -933,11 +933,11 @@ export default class EventManager {
                 throw new Error("Checkbox group does not exists!");
             }
             if (shape.getAttr("shapeType") === ShapeTypes.SquareShape) {
-                this.manager.shapeManager.removeCheckboxGroup(wall, shape);
+                this.manager.getSquareShapeManager().removeCheckboxGroup(wall, shape);
             } else if (shape.getAttr("shapeType") === ShapeTypes.LShape) {
-                this.manager.lShapeManager.removeCheckboxGroup(wall, shape);
+                this.manager.getLShapeManager().removeCheckboxGroup(wall, shape);
             } else if (shape.getAttr("shapeType") === ShapeTypes.UShape) {
-                this.manager.uShapeManager.removeCheckboxGroup(wall, shape);
+                this.manager.getUShapeManager().removeCheckboxGroup(wall, shape);
             }
         }
     }
@@ -1001,25 +1001,25 @@ export default class EventManager {
         if (shapeGroup.getAttr("shapeType") === ShapeTypes.SquareShape) {
             position?.x && shapeGroup.x(Number(position.x));
             position.y && shapeGroup.y(Number(position.y));
-            this.manager.shapeManager.updateAttributesOverlayPosition(
+            this.manager.getSquareShapeManager().updateAttributesOverlayPosition(
                 shapeGroup
             );
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.LShape) {
             position?.x && shapeGroup.x(Number(position.x));
             position.y && shapeGroup.y(Number(position.y));
-            this.manager.lShapeManager.updateAttributesOverlayPosition(
+            this.manager.getLShapeManager().updateAttributesOverlayPosition(
                 shapeGroup
             );
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.UShape) {
             position?.x && shapeGroup.x(Number(position.x));
             position.y && shapeGroup.y(Number(position.y));
-            this.manager.uShapeManager.updateAttributesOverlayPosition(
+            this.manager.getUShapeManager().updateAttributesOverlayPosition(
                 shapeGroup
             );
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape) {
             position?.x && shapeGroup.x(Number(position.x));
             position.y && shapeGroup.y(Number(position.y));
-            this.manager.circleShapeManager.updateAttributesOverlayPosition(
+            this.manager.getCircleShapeManager().updateAttributesOverlayPosition(
                 shapeGroup
             );
         }
@@ -1042,7 +1042,7 @@ export default class EventManager {
         }
 
         if (shapeGroup.getAttr("shapeType") === ShapeTypes.SquareShape) {
-            this.manager.shapeManager.appendShapeCutOut(
+            this.manager.getSquareShapeManager().appendShapeCutOut(
                 shapeGroup,
                 payload.image,
                 payload.name,
@@ -1050,7 +1050,7 @@ export default class EventManager {
                 payload.propertyId
             );
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.LShape) {
-            this.manager.lShapeManager.appendShapeCutOut(
+            this.manager.getLShapeManager().appendShapeCutOut(
                 shapeGroup,
                 payload.image,
                 payload.name,
@@ -1058,7 +1058,7 @@ export default class EventManager {
                 payload.propertyId
             );
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.UShape) {
-            this.manager.uShapeManager.appendShapeCutOut(
+            this.manager.getUShapeManager().appendShapeCutOut(
                 shapeGroup,
                 payload.image,
                 payload.name,
@@ -1066,7 +1066,7 @@ export default class EventManager {
                 payload.propertyId
             );
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape) {
-            this.manager.circleShapeManager.appendShapeCutOut(
+            this.manager.getCircleShapeManager().appendShapeCutOut(
                 shapeGroup,
                 payload.image,
                 payload.name,
@@ -1088,13 +1088,13 @@ export default class EventManager {
         }
 
         if (shapeGroup.getAttr("shapeType") === ShapeTypes.SquareShape) {
-            this.manager.shapeManager.removeShapeCutOut(shapeGroup, propertyId);
+            this.manager.getSquareShapeManager().removeShapeCutOut(shapeGroup, propertyId);
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.LShape) {
-            this.manager.lShapeManager.removeShapeCutOut(shapeGroup, propertyId);
+            this.manager.getLShapeManager().removeShapeCutOut(shapeGroup, propertyId);
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.UShape) {
-            this.manager.uShapeManager.removeShapeCutOut(shapeGroup, propertyId);
+            this.manager.getUShapeManager().removeShapeCutOut(shapeGroup, propertyId);
         } else if (shapeGroup.getAttr("shapeType") === ShapeTypes.CircleShape) {
-            this.manager.circleShapeManager.removeShapeCutOut(shapeGroup, propertyId);
+            this.manager.getCircleShapeManager().removeShapeCutOut(shapeGroup, propertyId);
         }
     }
 }
